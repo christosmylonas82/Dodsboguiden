@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SystemRole {
+  USER
+  ADMIN
+}
+
+enum ProjectRole {
+  ADMIN
+  MEMBER
+}
+
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  passwordHash String   @map("password_hash")
+  role         SystemRole @default(USER)
+  gdprConsent  Boolean  @default(false) @map("gdpr_consent")
+  consentDate  DateTime? @map("consent_date")
+  createdAt    DateTime @default(now()) @map("created_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  ownedProjects  Project[]       @relation("ProjectOwner")
+  memberships    ProjectMember[]
+  completedTasks Task[]          @relation("TaskCompletedBy")
+  activityLogs   ActivityLog[]
+  auditLogs      AuditLog[]
+
+  @@map("users")
+}
+
+model Project {
+  id            String        @id @default(uuid())
+  ownerId       String        @map("owner_id")
+  deceasedName  String        @map("deceased_name")
+  status        ProjectStatus @default(ACTIVE)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  deletedAt     DateTime?     @map("deleted_at")
+
+  owner   User            @relation("ProjectOwner", fields: [ownerId], references: [id])
+  members ProjectMember[]
+  tasks   Task[]
+  activity ActivityLog[]
+
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String      @id @default(uuid())
+  projectId String      @map("project_id")
+  userId    String?     @map("user_id")
+  email     String
+  role      ProjectRole @default(MEMBER)
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id])
+
+  @@unique([projectId, email])
+  @@map("project_members")
+}
+
+model Task {
+  id          String    @id @default(uuid())
+  projectId   String    @map("project_id")
+  title       String
+  phase       String
+  completed   Boolean   @default(false)
+  completedBy String?   @map("completed_by")
+  completedAt DateTime? @map("completed_at")
+  orderIndex  Int       @map("order_index")
+
+  project         Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  completedByUser User?   @relation("TaskCompletedBy", fields: [completedBy], references: [id])
+  activity        ActivityLog[]
+
+  @@map("tasks")
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  userId    String   @map("user_id")
+  taskId    String?  @map("task_id")
+  action    String
+  timestamp DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+  task    Task?   @relation(fields: [taskId], references: [id])
+
+  @@map("activity_log")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  adminId    String   @map("admin_id")
+  action     String
+  targetType String   @map("target_type")
+  targetId   String   @map("target_id")
+  timestamp  DateTime @default(now())
+
+  admin User @relation(fields: [adminId], references: [id])
+
+  @@map("audit_log")
+}

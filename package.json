@@ -1,10 +1,19 @@
 {
   "name": "dodsboguiden",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "description": "Dödsbo Guide - family coordination MVP for simple estate settlement tasks",
+  "private": true,
+  "license": "ISC",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.1.0"
   },
-  "license": "ISC"
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,magenta \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
+    "build": "npm run build --workspace=server && npm run build --workspace=client",
+    "lint": "npm run lint --workspace=server && npm run lint --workspace=client"
+  }
 }

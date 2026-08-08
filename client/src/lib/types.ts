@@ -1,0 +1,52 @@
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role?: 'USER' | 'ADMIN';
+}
+
+export interface ProjectSummary {
+  id: string;
+  deceasedName: string;
+  status: 'ACTIVE' | 'COMPLETED';
+  createdAt: string;
+  memberCount: number;
+  progress: number;
+}
+
+export interface Task {
+  id: string;
+  projectId: string;
+  title: string;
+  phase: 'Förberedelser' | 'Förrättningen' | 'Efter förrättningen';
+  completed: boolean;
+  completedBy: string | null;
+  completedAt: string | null;
+  orderIndex: number;
+}
+
+export interface ProjectMember {
+  id: string;
+  projectId: string;
+  userId: string | null;
+  email: string;
+  role: 'ADMIN' | 'MEMBER';
+  user: { id: string; name: string; email: string } | null;
+}
+
+export interface ProjectDetail {
+  id: string;
+  deceasedName: string;
+  status: 'ACTIVE' | 'COMPLETED';
+  createdAt: string;
+  tasks: Task[];
+  members: ProjectMember[];
+}
+
+export interface ActivityEntry {
+  id: string;
+  action: string;
+  timestamp: string;
+  user: { id: string; name: string };
+  taskId: string | null;
+}
