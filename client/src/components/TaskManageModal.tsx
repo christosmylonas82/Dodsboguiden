@@ -57,7 +57,7 @@ export function TaskManageModal({
                             ? 'bg-warning text-white'
                             : 'bg-primary text-white'
                       }`
-                    : 'border-border text-text hover:bg-primary-light'
+                    : 'border-border bg-surface text-text hover:bg-primary-light'
                 }`}
               >
                 {TASK_STATUS_LABELS[s]}
