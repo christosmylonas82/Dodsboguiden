@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { TbProgress, TbUsers, TbBell, TbUserPlus, TbPencil } from 'react-icons/tb';
+import { TbProgress, TbUsers, TbBell, TbUserPlus, TbPencil, TbExternalLink } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { ActivityEntry, ProjectDetail, Task, TaskStatus } from '../lib/types';
 import { Badge, type BadgeTone } from '../components/Badge';
@@ -203,18 +203,33 @@ export function ProjectDetailPage() {
                         )}
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setManagingTaskId(task.id);
-                      }}
-                      aria-label="Redigera uppgift"
-                      title="Redigera"
-                      className="shrink-0 rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
-                    >
-                      <TbPencil size={18} />
-                    </button>
+                    <div className="flex shrink-0 items-center gap-1">
+                      {task.url && (
+                        <a
+                          href={task.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label="Läs mer hos Skatteverket"
+                          title="Läs mer hos Skatteverket"
+                          className="rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
+                        >
+                          <TbExternalLink size={18} />
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setManagingTaskId(task.id);
+                        }}
+                        aria-label="Redigera uppgift"
+                        title="Redigera"
+                        className="rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
+                      >
+                        <TbPencil size={18} />
+                      </button>
+                    </div>
                   </div>
                 );
               })}

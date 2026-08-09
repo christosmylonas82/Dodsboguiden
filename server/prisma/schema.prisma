@@ -85,6 +85,7 @@ model Task {
   projectId   String     @map("project_id")
   title       String
   description String?
+  url         String?
   phase       String
   completed   Boolean    @default(false)
   completedBy String?    @map("completed_by")
