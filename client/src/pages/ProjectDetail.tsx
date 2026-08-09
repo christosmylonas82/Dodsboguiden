@@ -157,57 +157,57 @@ export function ProjectDetailPage() {
                   return (
                     <div
                       key={task.id}
-                      className={`flex items-start gap-3 border-l-4 py-3 pl-3 first:pt-0 ${STATUS_BORDER_CLASS[task.status]} ${isDone ? 'opacity-60' : ''}`}
+                      className={`flex items-start gap-3 border-l-4 py-3 pl-3 first:pt-0 ${STATUS_BORDER_CLASS[task.status]}`}
                     >
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => toggleTask(task)}
-                        className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-primary)]"
-                      />
-                      <div
-                        role={isDone ? undefined : 'button'}
-                        tabIndex={isDone ? undefined : 0}
-                        onClick={isDone ? undefined : () => setManagingTaskId(task.id)}
-                        onKeyDown={
-                          isDone
-                            ? undefined
-                            : (e) => {
-                                if (e.key === 'Enter' || e.key === ' ') setManagingTaskId(task.id);
-                              }
-                        }
-                        className={isDone ? 'flex-1 pointer-events-none' : 'flex-1 cursor-pointer'}
-                      >
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className={isDone ? 'text-muted line-through' : 'text-text'}>{task.title}</span>
-                          <Badge tone={TASK_STATUS_TONES[task.status]}>{TASK_STATUS_LABELS[task.status]}</Badge>
-                        </div>
-                        {task.assignedUser && (
-                          <div className="mt-1.5 flex items-center gap-1.5">
-                            <Avatar name={task.assignedUser.name} size="sm" />
-                            <span className="text-xs text-muted">Tilldelad {task.assignedUser.name}</span>
-                          </div>
-                        )}
-                        {isDone && completedByName && task.completedAt && (
-                          <p className="mt-0.5 text-xs text-muted">
-                            Slutförd av {completedByName} den {formatTimestamp(task.completedAt)}
-                          </p>
-                        )}
-                      </div>
-                      {!isDone && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setManagingTaskId(task.id);
-                          }}
-                          aria-label="Redigera uppgift"
-                          title="Redigera"
-                          className="shrink-0 rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
+                      <div className={`flex flex-1 items-start gap-3 ${isDone ? 'opacity-60' : ''}`}>
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={() => toggleTask(task)}
+                          className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-primary)]"
+                        />
+                        <div
+                          role={isDone ? undefined : 'button'}
+                          tabIndex={isDone ? undefined : 0}
+                          onClick={isDone ? undefined : () => setManagingTaskId(task.id)}
+                          onKeyDown={
+                            isDone
+                              ? undefined
+                              : (e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') setManagingTaskId(task.id);
+                                }
+                          }
+                          className={isDone ? 'flex-1 pointer-events-none' : 'flex-1 cursor-pointer'}
                         >
-                          <TbPencil size={18} />
-                        </button>
-                      )}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={isDone ? 'text-muted line-through' : 'text-text'}>{task.title}</span>
+                            <Badge tone={TASK_STATUS_TONES[task.status]}>{TASK_STATUS_LABELS[task.status]}</Badge>
+                          </div>
+                          {task.assignedUser && (
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                              <Avatar name={task.assignedUser.name} size="sm" />
+                              <span className="text-xs text-muted">Tilldelad {task.assignedUser.name}</span>
+                            </div>
+                          )}
+                          {isDone && completedByName && task.completedAt && (
+                            <p className="mt-0.5 text-xs text-muted">
+                              Slutförd av {completedByName} den {formatTimestamp(task.completedAt)}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setManagingTaskId(task.id);
+                        }}
+                        aria-label="Redigera uppgift"
+                        title="Redigera"
+                        className="shrink-0 rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
+                      >
+                        <TbPencil size={18} />
+                      </button>
                     </div>
                   );
                 })}
