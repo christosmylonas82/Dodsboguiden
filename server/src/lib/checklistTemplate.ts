@@ -17,25 +17,25 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Skaffa fullmakter från dödsbodelägare',
     description: 'Alla delägare behöver godkänna vem som företräder dödsboet.',
-    url: 'https://www.skatteverket.se/privat/skatter/ombudforenprivatperson/varaombudforenprivatpersonellerettdodsbo.4.5a85666214dbad743ff11444.html',
+    url: 'https://www.efterlevandeguiden.se/manaderna-efter-ett-dodsfall/bouppteckning-steg-for-steg.html',
     phase: 'Förberedelser',
   },
   {
     title: 'Kontakta bank och spärra kort',
     description: 'Frys autogiron som inte längre behövs.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/begravning.4.3528414214b3f875805c66.html',
+    url: 'https://www.efterlevandeguiden.se/att-borja-med-nar-en-narstaende-dor/skota-ett-dodsbo.html',
     phase: 'Förberedelser',
   },
   {
     title: 'Sammanställ tillgångar per dödsdagen',
     description: 'Kontoutdrag, fonder, fastighet, bil, lösöre.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/fastighetenellerbostadsratten.4.3528414214b3f875805ce2.html',
+    url: 'https://www.efterlevandeguiden.se/manaderna-efter-ett-dodsfall/bouppteckning-steg-for-steg.html',
     phase: 'Förberedelser',
   },
   {
     title: 'Sammanställ skulder och räkningar',
     description: 'Lån, obetalda fakturor, begravningskostnader.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/aktierochuppskovmedvinst.4.3528414214b3f8758051c18.html',
+    url: 'https://www.efterlevandeguiden.se/manaderna-efter-ett-dodsfall/bouppteckning-steg-for-steg.html',
     phase: 'Förberedelser',
   },
   {
@@ -53,19 +53,19 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Utse bouppgivare',
     description: 'Den som känner boet bäst lämnar uppgifterna.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/bouppteckning.4.18e1b10334ebe8bc80001217.html',
+    url: 'https://www.efterlevandeguiden.se/manaderna-efter-ett-dodsfall/bouppteckning-steg-for-steg.html',
     phase: 'Förberedelser',
   },
   {
     title: 'Utse två förrättningsmän',
     description: 'Får inte vara dödsbodelägare.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/bouppteckning.4.18e1b10334ebe8bc80001217.html',
+    url: 'https://www.efterlevandeguiden.se/manaderna-efter-ett-dodsfall/bouppteckning-steg-for-steg.html',
     phase: 'Förberedelser',
   },
   {
     title: 'Kalla samtliga dödsbodelägare',
     description: 'Kallelsen ska skickas i god tid före förrättningen.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/bouppteckning.4.18e1b10334ebe8bc80001217.html',
+    url: 'https://www.efterlevandeguiden.se/manaderna-efter-ett-dodsfall/bouppteckning-steg-for-steg.html',
     phase: 'Förberedelser',
   },
 
@@ -73,13 +73,13 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Boka datum och plats för förrättningen',
     description: 'Inom tre månader från dödsfallet.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/bouppteckning.4.18e1b10334ebe8bc80001217.html',
+    url: 'https://www.efterlevandeguiden.se/manaderna-efter-ett-dodsfall/bouppteckning-steg-for-steg.html',
     phase: 'Förrättningen',
   },
   {
     title: 'Gå igenom tillgångar och skulder',
     description: 'Värdering sker per dödsdagen.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/bouppteckning.4.18e1b10334ebe8bc80001217.html',
+    url: 'https://www.efterlevandeguiden.se/manaderna-efter-ett-dodsfall/bouppteckning-steg-for-steg.html',
     phase: 'Förrättningen',
   },
   {
@@ -97,7 +97,7 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Notera närvarande och frånvarande',
     description: 'Kallelsebevis behövs för de som inte deltar.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/bouppteckning.4.18e1b10334ebe8bc80001217.html',
+    url: 'https://www.efterlevandeguiden.se/manaderna-efter-ett-dodsfall/bouppteckning-steg-for-steg.html',
     phase: 'Förrättningen',
   },
   {
@@ -109,7 +109,7 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Underskrifter av bouppgivare och förrättningsmän',
     description: 'Kontrollera att alla fält är ifyllda.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/bouppteckning.4.18e1b10334ebe8bc80001217.html',
+    url: 'https://www.efterlevandeguiden.se/manaderna-efter-ett-dodsfall/bouppteckning-steg-for-steg.html',
     phase: 'Förrättningen',
   },
 
@@ -129,7 +129,7 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Avsluta konton och abonnemang',
     description: 'El, telefoni, försäkringar, streaming.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/avslutadodsboet.4.5a85666214dbad743ffecae.html',
+    url: 'https://www.efterlevandeguiden.se/att-borja-med-nar-en-narstaende-dor/avsluta-abonnemang.html',
     phase: 'Efter förrättningen',
   },
   {
@@ -141,7 +141,7 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Genomför arvskifte',
     description: 'Fördela tillgångarna mellan delägarna.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/arv.4.3528414214b3f875805caf.html',
+    url: 'https://www.efterlevandeguiden.se/manaderna-efter-ett-dodsfall/arvskifte---dela-upp-arv.html',
     phase: 'Efter förrättningen',
   },
   {
@@ -153,7 +153,7 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Avregistrera dödsboet',
     description: 'När allt är fördelat och skiftat.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/avslutadodsboet.4.5a85666214dbad743ffecae.html',
+    url: 'https://www.efterlevandeguiden.se/foljande-ar-avsluta-dodsboet.html',
     phase: 'Efter förrättningen',
   },
 ];
