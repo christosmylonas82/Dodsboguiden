@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   const adminEmail = 'admin@dodsboguiden.se';
+  const adminPassword = process.env.ADMIN_PASSWORD ?? 'changeme123';
   const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
 
   if (!existingAdmin) {
@@ -12,13 +13,17 @@ async function main() {
       data: {
         email: adminEmail,
         name: 'Admin',
-        passwordHash: await bcrypt.hash('changeme123', 12),
+        passwordHash: await bcrypt.hash(adminPassword, 12),
         role: 'ADMIN',
         gdprConsent: true,
         consentDate: new Date(),
       },
     });
-    console.log(`Seeded admin user: ${adminEmail} / changeme123 (change this password)`);
+    console.log(
+      process.env.ADMIN_PASSWORD
+        ? `Seeded admin user: ${adminEmail} (password from ADMIN_PASSWORD)`
+        : `Seeded admin user: ${adminEmail} / changeme123 (change this password)`,
+    );
   }
 }
 
