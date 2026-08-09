@@ -41,13 +41,13 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Ta reda på om testamente finns',
     description: 'Kolla bankfack, hemmet och hos begravningsbyrån.',
-    url: 'https://www4.skatteverket.se/rattsligvagledning/edition/2025.2/329132.html',
+    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/arv.4.3528414214b3f875805caf.html',
     phase: 'Förberedelser',
   },
   {
     title: 'Kontrollera äktenskapsförord',
     description: 'Påverkar hur giftorättsgodset fördelas.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/bouppteckning.4.18e1b10334ebe8bc80001217.html',
+    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/arv.4.3528414214b3f875805caf.html',
     phase: 'Förberedelser',
   },
   {
@@ -59,13 +59,13 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Utse två förrättningsmän',
     description: 'Får inte vara dödsbodelägare.',
-    url: 'https://www4.skatteverket.se/rattsligvagledning/edition/2025.3/378355.html',
+    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/bouppteckning.4.18e1b10334ebe8bc80001217.html',
     phase: 'Förberedelser',
   },
   {
     title: 'Kalla samtliga dödsbodelägare',
     description: 'Kallelsen ska skickas i god tid före förrättningen.',
-    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/anmalnyadressfordodsbo.4.3528414214b3f8758056b6.html',
+    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/bouppteckning.4.18e1b10334ebe8bc80001217.html',
     phase: 'Förberedelser',
   },
 
@@ -91,7 +91,7 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Anteckna eventuellt testamente och förord',
     description: 'Bifogas som bilaga till bouppteckningen.',
-    url: 'https://www4.skatteverket.se/rattsligvagledning/edition/2025.2/329132.html',
+    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/arv.4.3528414214b3f875805caf.html',
     phase: 'Förrättningen',
   },
   {
@@ -141,7 +141,7 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
   {
     title: 'Genomför arvskifte',
     description: 'Fördela tillgångarna mellan delägarna.',
-    url: 'https://www4.skatteverket.se/rattsligvagledning/edition/2014.4/322288.html',
+    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/arv.4.3528414214b3f875805caf.html',
     phase: 'Efter förrättningen',
   },
   {
