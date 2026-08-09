@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { ProjectMember, Task, TaskStatus } from '../lib/types';
 import { TASK_STATUS_LABELS, TASK_STATUS_ORDER, TASK_STATUS_TONES } from '../lib/taskStatus';
+import { ModalOverlay } from './ModalOverlay';
 
 export function TaskManageModal({
   task,
@@ -30,14 +31,8 @@ export function TaskManageModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-lg"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <ModalOverlay onClose={onClose}>
+      <div className="rounded-2xl border border-border bg-surface p-6 shadow-lg">
         <h3 className="text-lg font-semibold text-text">{task.title}</h3>
 
         <div className="mt-5">
@@ -103,6 +98,6 @@ export function TaskManageModal({
           </button>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 }

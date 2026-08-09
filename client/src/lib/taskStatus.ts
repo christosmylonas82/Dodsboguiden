@@ -2,9 +2,9 @@ import type { TaskStatus } from './types';
 import type { BadgeTone } from '../components/Badge';
 
 export const TASK_STATUS_LABELS: Record<TaskStatus, string> = {
-  PENDING: 'Väntar',
+  PENDING: 'Väntande',
   IN_PROGRESS: 'Pågår',
-  DONE: 'Klar',
+  DONE: 'Klart',
 };
 
 export const TASK_STATUS_TONES: Record<TaskStatus, BadgeTone> = {

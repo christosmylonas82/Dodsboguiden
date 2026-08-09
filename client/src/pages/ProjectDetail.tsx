@@ -8,8 +8,8 @@ import { MetricCard } from '../components/MetricCard';
 import { Avatar } from '../components/Avatar';
 import { TaskManageModal } from '../components/TaskManageModal';
 import { InviteModal } from '../components/InviteModal';
+import { TaskStatusBadge } from '../components/TaskStatusBadge';
 import { formatActivityAction, formatRelativeTime, formatTimestamp } from '../lib/activity';
-import { TASK_STATUS_LABELS, TASK_STATUS_TONES } from '../lib/taskStatus';
 import { PHASE_DESCRIPTIONS, TASK_DESCRIPTIONS } from '../lib/taskDescriptions';
 
 const PHASES: Task['phase'][] = ['Förberedelser', 'Förrättningen', 'Efter förrättningen'];
@@ -186,8 +186,8 @@ export function ProjectDetailPage() {
                         className={isDone ? 'flex-1 pointer-events-none' : 'flex-1 cursor-pointer'}
                       >
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={isDone ? 'text-muted line-through' : 'text-text'}>{task.title}</span>
-                          <Badge tone={TASK_STATUS_TONES[task.status]}>{TASK_STATUS_LABELS[task.status]}</Badge>
+                          <span className={isDone ? 'text-muted' : 'text-text'}>{task.title}</span>
+                          <TaskStatusBadge status={task.status} />
                         </div>
                         {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
                         {task.assignedUser && (

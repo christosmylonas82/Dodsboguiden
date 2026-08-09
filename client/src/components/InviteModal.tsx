@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { ModalOverlay } from './ModalOverlay';
 
 export function InviteModal({
   onClose,
@@ -26,14 +27,8 @@ export function InviteModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-lg"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <ModalOverlay onClose={onClose}>
+      <div className="rounded-2xl border border-border bg-surface p-6 shadow-lg">
         <h3 className="text-lg font-semibold text-text">Bjud in familjemedlem</h3>
         <form onSubmit={handleSubmit} className="mt-5">
           <div className="flex flex-col gap-1.5">
@@ -69,6 +64,6 @@ export function InviteModal({
           </div>
         </form>
       </div>
-    </div>
+    </ModalOverlay>
   );
 }
