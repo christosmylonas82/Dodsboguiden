@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { TbProgress, TbUsers, TbBell, TbUserPlus } from 'react-icons/tb';
+import { TbProgress, TbUsers, TbBell, TbUserPlus, TbPencil } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { ActivityEntry, ProjectDetail, Task, TaskStatus } from '../lib/types';
 import { Badge, type BadgeTone } from '../components/Badge';
@@ -153,10 +153,11 @@ export function ProjectDetailPage() {
               <div className="mt-2 divide-y divide-border">
                 {tasks.map((task) => {
                   const completedByName = task.completedBy ? memberNameByUserId.get(task.completedBy) : null;
+                  const isDone = task.status === 'DONE';
                   return (
                     <div
                       key={task.id}
-                      className={`flex items-start gap-3 border-l-4 py-3 pl-3 first:pt-0 ${STATUS_BORDER_CLASS[task.status]}`}
+                      className={`flex items-start gap-3 border-l-4 py-3 pl-3 first:pt-0 ${STATUS_BORDER_CLASS[task.status]} ${isDone ? 'opacity-60' : ''}`}
                     >
                       <input
                         type="checkbox"
@@ -165,18 +166,20 @@ export function ProjectDetailPage() {
                         className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-primary)]"
                       />
                       <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => setManagingTaskId(task.id)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') setManagingTaskId(task.id);
-                        }}
-                        className="flex-1 cursor-pointer"
+                        role={isDone ? undefined : 'button'}
+                        tabIndex={isDone ? undefined : 0}
+                        onClick={isDone ? undefined : () => setManagingTaskId(task.id)}
+                        onKeyDown={
+                          isDone
+                            ? undefined
+                            : (e) => {
+                                if (e.key === 'Enter' || e.key === ' ') setManagingTaskId(task.id);
+                              }
+                        }
+                        className={isDone ? 'flex-1 pointer-events-none' : 'flex-1 cursor-pointer'}
                       >
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={task.completed ? 'text-muted line-through' : 'text-text'}>
-                            {task.title}
-                          </span>
+                          <span className={isDone ? 'text-muted line-through' : 'text-text'}>{task.title}</span>
                           <Badge tone={TASK_STATUS_TONES[task.status]}>{TASK_STATUS_LABELS[task.status]}</Badge>
                         </div>
                         {task.assignedUser && (
@@ -185,12 +188,26 @@ export function ProjectDetailPage() {
                             <span className="text-xs text-muted">Tilldelad {task.assignedUser.name}</span>
                           </div>
                         )}
-                        {task.completed && completedByName && task.completedAt && (
+                        {isDone && completedByName && task.completedAt && (
                           <p className="mt-0.5 text-xs text-muted">
                             Slutförd av {completedByName} den {formatTimestamp(task.completedAt)}
                           </p>
                         )}
                       </div>
+                      {!isDone && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setManagingTaskId(task.id);
+                          }}
+                          aria-label="Redigera uppgift"
+                          title="Redigera"
+                          className="shrink-0 rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
+                        >
+                          <TbPencil size={18} />
+                        </button>
+                      )}
                     </div>
                   );
                 })}
