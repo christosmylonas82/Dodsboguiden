@@ -1,4 +1,4 @@
-import { TbClock, TbLoader2, TbCheck } from 'react-icons/tb';
+import { TbClock, TbCircleFilled, TbCheck } from 'react-icons/tb';
 import type { TaskStatus } from '../lib/types';
 import { TASK_STATUS_LABELS } from '../lib/taskStatus';
 
@@ -10,7 +10,7 @@ const STATUS_CLASSES: Record<TaskStatus, string> = {
 
 const STATUS_ICONS: Record<TaskStatus, React.ReactNode> = {
   PENDING: <TbClock size={15} />,
-  IN_PROGRESS: <TbLoader2 size={15} className="animate-spin" />,
+  IN_PROGRESS: <TbCircleFilled size={11} />,
   DONE: <TbCheck size={16} strokeWidth={3} />,
 };
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { TbProgress, TbUsers, TbBell, TbUserPlus, TbPencil, TbExternalLink } from 'react-icons/tb';
+import { TbProgress, TbUsers, TbBell, TbUserPlus, TbPencil } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { ActivityEntry, ProjectDetail, Task, TaskStatus } from '../lib/types';
 import { Badge, type BadgeTone } from '../components/Badge';
@@ -190,6 +190,17 @@ export function ProjectDetailPage() {
                           <TaskStatusBadge status={task.status} />
                         </div>
                         {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
+                        {task.url && (
+                          <a
+                            href={task.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="mt-1 inline-block text-sm text-blue-600 hover:underline"
+                          >
+                            Läs mer
+                          </a>
+                        )}
                         {task.assignedUser && (
                           <div className="mt-1.5 flex items-center gap-1.5">
                             <Avatar name={task.assignedUser.name} size="sm" />
@@ -204,19 +215,6 @@ export function ProjectDetailPage() {
                       </div>
                     </div>
                     <div className="flex shrink-0 items-center gap-1">
-                      {task.url && (
-                        <a
-                          href={task.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          aria-label="Läs mer hos Skatteverket"
-                          title="Läs mer hos Skatteverket"
-                          className="rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
-                        >
-                          <TbExternalLink size={18} />
-                        </a>
-                      )}
                       <button
                         type="button"
                         onClick={(e) => {
