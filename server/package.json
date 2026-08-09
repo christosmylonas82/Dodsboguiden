@@ -13,7 +13,8 @@
     "prisma:generate": "prisma generate",
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:studio": "prisma studio",
-    "prisma:backfill-urls": "tsx prisma/backfill-task-urls.ts"
+    "prisma:backfill-urls": "tsx prisma/backfill-task-urls.ts",
+    "prisma:sync-urls": "tsx prisma/sync-task-urls.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",
