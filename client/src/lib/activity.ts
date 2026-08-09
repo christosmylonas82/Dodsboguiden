@@ -1,9 +1,9 @@
 export function formatActivityAction(action: string): string {
   if (action === 'project_created') return 'skapade dödsboet';
   if (action.startsWith('invited ')) return `bjöd in ${action.slice('invited '.length)}`;
-  if (action.startsWith('completed task ')) return `avklarade ${action.slice('completed '.length)}`;
-  if (action.startsWith('reopened task ')) return `återöppnade ${action.slice('reopened '.length)}`;
-  if (action.startsWith('added task ')) return `lade till ${action.slice('added '.length)}`;
+  if (action.startsWith('completed task ')) return `avklarade ${action.slice('completed task '.length)}`;
+  if (action.startsWith('reopened task ')) return `återöppnade ${action.slice('reopened task '.length)}`;
+  if (action.startsWith('added task ')) return `lade till ${action.slice('added task '.length)}`;
   return action;
 }
 
