@@ -37,9 +37,13 @@ export async function createTask(req: Request, res: Response) {
   res.status(201).json(task);
 }
 
+const TASK_STATUSES = ['PENDING', 'IN_PROGRESS', 'DONE'] as const;
+
 const updateTaskSchema = z.object({
   title: z.string().min(1).optional(),
   completed: z.boolean().optional(),
+  status: z.enum(TASK_STATUSES).optional(),
+  assignedTo: z.string().uuid().nullable().optional(),
 });
 
 export async function updateTask(req: Request, res: Response) {
@@ -52,26 +56,55 @@ export async function updateTask(req: Request, res: Response) {
     throw new HttpError(404, 'Task not found');
   }
 
+  if (body.assignedTo) {
+    const member = await prisma.projectMember.findFirst({
+      where: { projectId, userId: body.assignedTo },
+    });
+    if (!member) {
+      throw new HttpError(400, 'Assignee must be a member of this project');
+    }
+  }
+
+  const nextStatus = body.status ?? (body.completed !== undefined ? (body.completed ? 'DONE' : 'PENDING') : undefined);
+  const statusChanged = nextStatus !== undefined && nextStatus !== existingTask.status;
+  const assignedToChanged = body.assignedTo !== undefined && body.assignedTo !== existingTask.assignedTo;
+
   const task = await prisma.task.update({
     where: { id: taskId },
     data: {
       ...(body.title !== undefined ? { title: body.title } : {}),
-      ...(body.completed !== undefined
+      ...(nextStatus !== undefined
         ? {
-            completed: body.completed,
-            completedBy: body.completed ? userId : null,
-            completedAt: body.completed ? new Date() : null,
+            status: nextStatus,
+            completed: nextStatus === 'DONE',
+            completedBy: nextStatus === 'DONE' ? userId : null,
+            completedAt: nextStatus === 'DONE' ? new Date() : null,
           }
         : {}),
+      ...(body.assignedTo !== undefined ? { assignedTo: body.assignedTo } : {}),
+    },
+    include: {
+      assignedUser: { select: { id: true, name: true, email: true } },
     },
   });
 
-  if (body.completed !== undefined && body.completed !== existingTask.completed) {
+  if (statusChanged) {
     await logActivity({
       projectId,
       userId,
       taskId: task.id,
-      action: body.completed ? `completed task "${task.title}"` : `reopened task "${task.title}"`,
+      action: `changed status of "${task.title}" to ${nextStatus}`,
+    });
+  }
+
+  if (assignedToChanged) {
+    await logActivity({
+      projectId,
+      userId,
+      taskId: task.id,
+      action: task.assignedUser
+        ? `assigned "${task.title}" to ${task.assignedUser.name}`
+        : `unassigned "${task.title}"`,
     });
   }
 

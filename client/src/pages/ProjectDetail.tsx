@@ -1,12 +1,21 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import { apiFetch, ApiError } from '../lib/api';
-import type { ActivityEntry, ProjectDetail, Task } from '../lib/types';
+import type { ActivityEntry, ProjectDetail, Task, TaskStatus } from '../lib/types';
 import { Badge, type BadgeTone } from '../components/Badge';
 import { MetricCard } from '../components/MetricCard';
+import { Avatar } from '../components/Avatar';
+import { TaskManageModal } from '../components/TaskManageModal';
 import { formatActivityAction, formatRelativeTime, formatTimestamp } from '../lib/activity';
+import { TASK_STATUS_LABELS, TASK_STATUS_TONES } from '../lib/taskStatus';
 
 const PHASES: Task['phase'][] = ['Förberedelser', 'Förrättningen', 'Efter förrättningen'];
+
+const STATUS_BORDER_CLASS: Record<TaskStatus, string> = {
+  PENDING: 'border-l-border',
+  IN_PROGRESS: 'border-l-warning',
+  DONE: 'border-l-success',
+};
 
 function phaseStatus(tasks: Task[]): { label: string; tone: BadgeTone } {
   const done = tasks.filter((t) => t.completed).length;
@@ -22,6 +31,7 @@ export function ProjectDetailPage() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [inviteSubmitting, setInviteSubmitting] = useState(false);
+  const [managingTaskId, setManagingTaskId] = useState<string | null>(null);
 
   async function reload() {
     if (!id) return;
@@ -55,6 +65,15 @@ export function ProjectDetailPage() {
     reload();
   }
 
+  async function saveTask(task: Task, updates: { status: TaskStatus; assignedTo: string | null }) {
+    if (!id) return;
+    await apiFetch(`/projects/${id}/tasks/${task.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    });
+    reload();
+  }
+
   async function handleInvite(e: FormEvent) {
     e.preventDefault();
     if (!id) return;
@@ -80,6 +99,7 @@ export function ProjectDetailPage() {
     ? Math.round((project.tasks.filter((t) => t.completed).length / project.tasks.length) * 100)
     : 0;
   const lastActivity = activity[0];
+  const managingTask = project.tasks.find((t) => t.id === managingTaskId) ?? null;
 
   return (
     <div>
@@ -123,9 +143,9 @@ export function ProjectDetailPage() {
                 {tasks.map((task) => {
                   const completedByName = task.completedBy ? memberNameByUserId.get(task.completedBy) : null;
                   return (
-                    <label
+                    <div
                       key={task.id}
-                      className="flex cursor-pointer items-start gap-3 py-3 first:pt-0"
+                      className={`flex items-start gap-3 border-l-4 py-3 pl-3 first:pt-0 ${STATUS_BORDER_CLASS[task.status]}`}
                     >
                       <input
                         type="checkbox"
@@ -133,17 +153,34 @@ export function ProjectDetailPage() {
                         onChange={() => toggleTask(task)}
                         className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-primary)]"
                       />
-                      <div>
-                        <span className={task.completed ? 'text-muted line-through' : 'text-text'}>
-                          {task.title}
-                        </span>
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setManagingTaskId(task.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') setManagingTaskId(task.id);
+                        }}
+                        className="flex-1 cursor-pointer"
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={task.completed ? 'text-muted line-through' : 'text-text'}>
+                            {task.title}
+                          </span>
+                          <Badge tone={TASK_STATUS_TONES[task.status]}>{TASK_STATUS_LABELS[task.status]}</Badge>
+                        </div>
+                        {task.assignedUser && (
+                          <div className="mt-1.5 flex items-center gap-1.5">
+                            <Avatar name={task.assignedUser.name} size="sm" />
+                            <span className="text-xs text-muted">Tilldelad {task.assignedUser.name}</span>
+                          </div>
+                        )}
                         {task.completed && completedByName && task.completedAt && (
                           <p className="mt-0.5 text-xs text-muted">
                             Slutförd av {completedByName} den {formatTimestamp(task.completedAt)}
                           </p>
                         )}
                       </div>
-                    </label>
+                    </div>
                   );
                 })}
               </div>
@@ -159,9 +196,7 @@ export function ProjectDetailPage() {
         <ul className="mt-4 flex flex-col gap-3">
           {project.members.map((m) => (
             <li key={m.id} className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-light text-sm font-semibold text-primary-dark">
-                {(m.user?.name ?? m.email).charAt(0).toUpperCase()}
-              </div>
+              <Avatar name={m.user?.name ?? m.email} />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm text-text">{m.user?.name ?? m.email}</p>
                 {!m.userId && <p className="text-xs text-muted">Inbjuden, väntar på registrering</p>}
@@ -218,6 +253,15 @@ export function ProjectDetailPage() {
           </ul>
         )}
       </div>
+
+      {managingTask && (
+        <TaskManageModal
+          task={managingTask}
+          members={project.members}
+          onClose={() => setManagingTaskId(null)}
+          onSave={(updates) => saveTask(managingTask, updates)}
+        />
+      )}
     </div>
   );
 }

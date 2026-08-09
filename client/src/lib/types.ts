@@ -14,6 +14,8 @@ export interface ProjectSummary {
   progress: number;
 }
 
+export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'DONE';
+
 export interface Task {
   id: string;
   projectId: string;
@@ -22,6 +24,9 @@ export interface Task {
   completed: boolean;
   completedBy: string | null;
   completedAt: string | null;
+  status: TaskStatus;
+  assignedTo: string | null;
+  assignedUser: { id: string; name: string; email: string } | null;
   orderIndex: number;
 }
 

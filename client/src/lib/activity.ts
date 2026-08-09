@@ -1,9 +1,29 @@
+import { TASK_STATUS_LABELS } from './taskStatus';
+import type { TaskStatus } from './types';
+
 export function formatActivityAction(action: string): string {
   if (action === 'project_created') return 'skapade dödsboet';
   if (action.startsWith('invited ')) return `bjöd in ${action.slice('invited '.length)}`;
   if (action.startsWith('completed task ')) return `avklarade ${action.slice('completed task '.length)}`;
   if (action.startsWith('reopened task ')) return `återöppnade ${action.slice('reopened task '.length)}`;
   if (action.startsWith('added task ')) return `lade till ${action.slice('added task '.length)}`;
+
+  const statusMatch = action.match(/^changed status of (.+) to (PENDING|IN_PROGRESS|DONE)$/);
+  if (statusMatch) {
+    const [, quotedTitle, status] = statusMatch;
+    return `ändrade status för ${quotedTitle} till "${TASK_STATUS_LABELS[status as TaskStatus]}"`;
+  }
+
+  const assignedMatch = action.match(/^assigned (.+) to (.+)$/);
+  if (assignedMatch) {
+    const [, quotedTitle, name] = assignedMatch;
+    return `tilldelade ${quotedTitle} till ${name}`;
+  }
+
+  if (action.startsWith('unassigned ')) {
+    return `tog bort tilldelningen för ${action.slice('unassigned '.length)}`;
+  }
+
   return action;
 }
 
