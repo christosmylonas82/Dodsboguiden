@@ -20,6 +20,7 @@ export interface Task {
   id: string;
   projectId: string;
   title: string;
+  description: string | null;
   phase: 'Förberedelser' | 'Förrättningen' | 'Efter förrättningen';
   completed: boolean;
   completedBy: string | null;

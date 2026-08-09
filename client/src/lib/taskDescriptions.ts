@@ -2,10 +2,12 @@ import type { Task } from './types';
 
 export const PHASE_DESCRIPTIONS: Record<Task['phase'], string> = {
   Förberedelser: 'Samla underlag och kalla till förrättningen. Ta det i den takt ni orkar.',
-  Förrättningen: 'Gå igenom dödsboets tillgångar och skulder tillsammans, och underteckna bouppteckningen.',
-  'Efter förrättningen': 'Skicka in bouppteckningen och vänta på Skatteverkets godkännande.',
+  Förrättningen: 'Mötet där ni går igenom tillgångar och skulder tillsammans.',
+  'Efter förrättningen': 'Skicka in till Skatteverket och avsluta det praktiska.',
 };
 
+// Fallback descriptions for tasks created before the `description` column existed
+// (older projects whose tasks predate this field, keyed by their fixed title).
 export const TASK_DESCRIPTIONS: Record<string, string> = {
   'Samla dokument (bouppteckning, testamente, försäkringar)':
     'Leta fram testamente, försäkringsbrev och andra papper som visar vad som ingår i dödsboet.',

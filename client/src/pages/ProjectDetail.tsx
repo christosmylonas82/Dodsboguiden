@@ -159,7 +159,7 @@ export function ProjectDetailPage() {
               {tasks.map((task) => {
                 const completedByName = task.completedBy ? memberNameByUserId.get(task.completedBy) : null;
                 const isDone = task.status === 'DONE';
-                const description = TASK_DESCRIPTIONS[task.title];
+                const description = task.description ?? TASK_DESCRIPTIONS[task.title];
                 return (
                   <div
                     key={task.id}

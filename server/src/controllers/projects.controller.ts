@@ -28,6 +28,7 @@ export async function createProject(req: Request, res: Response) {
       tasks: {
         create: DEFAULT_CHECKLIST.map((item, index) => ({
           title: item.title,
+          description: item.description,
           phase: item.phase,
           orderIndex: index,
         })),
