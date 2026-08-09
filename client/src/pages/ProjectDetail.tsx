@@ -10,6 +10,7 @@ import { TaskManageModal } from '../components/TaskManageModal';
 import { InviteModal } from '../components/InviteModal';
 import { formatActivityAction, formatRelativeTime, formatTimestamp } from '../lib/activity';
 import { TASK_STATUS_LABELS, TASK_STATUS_TONES } from '../lib/taskStatus';
+import { PHASE_DESCRIPTIONS, TASK_DESCRIPTIONS } from '../lib/taskDescriptions';
 
 const PHASES: Task['phase'][] = ['Förberedelser', 'Förrättningen', 'Efter förrättningen'];
 
@@ -138,93 +139,99 @@ export function ProjectDetailPage() {
         />
       </div>
 
-      <div className="mt-8 rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-text">Checklista</h2>
-        {PHASES.map((phase) => {
-          const tasks = project.tasks.filter((t) => t.phase === phase);
-          if (tasks.length === 0) return null;
-          const status = phaseStatus(tasks);
-          return (
-            <div className="mt-6 first:mt-4" key={phase}>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted">{phase}</h3>
-                <Badge tone={status.tone}>{status.label}</Badge>
-              </div>
-              <div className="mt-2 divide-y divide-border">
-                {tasks.map((task) => {
-                  const completedByName = task.completedBy ? memberNameByUserId.get(task.completedBy) : null;
-                  const isDone = task.status === 'DONE';
-                  return (
-                    <div
-                      key={task.id}
-                      className={`flex items-start gap-3 border-l-4 py-3 pl-3 first:pt-0 ${STATUS_BORDER_CLASS[task.status]}`}
-                    >
-                      <div className={`flex flex-1 items-start gap-3 ${isDone ? 'opacity-60' : ''}`}>
-                        <input
-                          type="checkbox"
-                          checked={task.completed}
-                          onChange={() => toggleTask(task)}
-                          className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-primary)]"
-                        />
-                        <div
-                          role={isDone ? undefined : 'button'}
-                          tabIndex={isDone ? undefined : 0}
-                          onClick={isDone ? undefined : () => setManagingTaskId(task.id)}
-                          onKeyDown={
-                            isDone
-                              ? undefined
-                              : (e) => {
-                                  if (e.key === 'Enter' || e.key === ' ') setManagingTaskId(task.id);
-                                }
-                          }
-                          className={isDone ? 'flex-1 pointer-events-none' : 'flex-1 cursor-pointer'}
-                        >
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className={isDone ? 'text-muted line-through' : 'text-text'}>{task.title}</span>
-                            <Badge tone={TASK_STATUS_TONES[task.status]}>{TASK_STATUS_LABELS[task.status]}</Badge>
-                          </div>
-                          {task.assignedUser && (
-                            <div className="mt-1.5 flex items-center gap-1.5">
-                              <Avatar name={task.assignedUser.name} size="sm" />
-                              <span className="text-xs text-muted">Tilldelad {task.assignedUser.name}</span>
-                            </div>
-                          )}
-                          {isDone && completedByName && task.completedAt && (
-                            <p className="mt-0.5 text-xs text-muted">
-                              Slutförd av {completedByName} den {formatTimestamp(task.completedAt)}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setManagingTaskId(task.id);
-                        }}
-                        aria-label="Redigera uppgift"
-                        title="Redigera"
-                        className="shrink-0 rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
-                      >
-                        <TbPencil size={18} />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+      {PHASES.map((phase) => {
+        const tasks = project.tasks.filter((t) => t.phase === phase);
+        if (tasks.length === 0) return null;
+        const status = phaseStatus(tasks);
+        const doneCount = tasks.filter((t) => t.completed).length;
+        return (
+          <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm" key={phase}>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-semibold text-text">{phase}</h2>
+              <Badge tone={status.tone}>{status.label}</Badge>
+              <span className="text-sm text-muted">
+                {doneCount} av {tasks.length} klara
+              </span>
             </div>
-          );
-        })}
-      </div>
+            <p className="mt-1 text-sm text-muted">{PHASE_DESCRIPTIONS[phase]}</p>
+
+            <div className="mt-4 divide-y divide-border">
+              {tasks.map((task) => {
+                const completedByName = task.completedBy ? memberNameByUserId.get(task.completedBy) : null;
+                const isDone = task.status === 'DONE';
+                const description = TASK_DESCRIPTIONS[task.title];
+                return (
+                  <div
+                    key={task.id}
+                    className={`flex items-start gap-3 border-l-4 py-3 pl-3 first:pt-0 ${STATUS_BORDER_CLASS[task.status]}`}
+                  >
+                    <div className={`flex flex-1 items-start gap-3 ${isDone ? 'opacity-60' : ''}`}>
+                      <input
+                        type="checkbox"
+                        checked={task.completed}
+                        onChange={() => toggleTask(task)}
+                        className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-primary)]"
+                      />
+                      <div
+                        role={isDone ? undefined : 'button'}
+                        tabIndex={isDone ? undefined : 0}
+                        onClick={isDone ? undefined : () => setManagingTaskId(task.id)}
+                        onKeyDown={
+                          isDone
+                            ? undefined
+                            : (e) => {
+                                if (e.key === 'Enter' || e.key === ' ') setManagingTaskId(task.id);
+                              }
+                        }
+                        className={isDone ? 'flex-1 pointer-events-none' : 'flex-1 cursor-pointer'}
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={isDone ? 'text-muted line-through' : 'text-text'}>{task.title}</span>
+                          <Badge tone={TASK_STATUS_TONES[task.status]}>{TASK_STATUS_LABELS[task.status]}</Badge>
+                        </div>
+                        {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
+                        {task.assignedUser && (
+                          <div className="mt-1.5 flex items-center gap-1.5">
+                            <Avatar name={task.assignedUser.name} size="sm" />
+                            <span className="text-xs text-muted">Tilldelad {task.assignedUser.name}</span>
+                          </div>
+                        )}
+                        {isDone && completedByName && task.completedAt && (
+                          <p className="mt-0.5 text-xs text-muted">
+                            Slutförd av {completedByName} den {formatTimestamp(task.completedAt)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setManagingTaskId(task.id);
+                      }}
+                      aria-label="Redigera uppgift"
+                      title="Redigera"
+                      className="shrink-0 rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
+                    >
+                      <TbPencil size={18} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
 
       <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-text">Medlemmar</h2>
+        <h2 className="text-lg font-semibold text-text">Familjemedlemmar</h2>
         <ul className="mt-4 flex flex-col gap-3">
           {project.members.map((m) => (
             <li key={m.id} className="flex items-center gap-3">
               <Avatar name={m.user?.name ?? m.email} />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm text-text">{m.user?.name ?? m.email}</p>
+                {m.user && <p className="truncate text-xs text-muted">{m.email}</p>}
                 {!m.userId && <p className="text-xs text-muted">Inbjuden, väntar på registrering</p>}
               </div>
               <Badge tone={m.role === 'ADMIN' ? 'success' : 'neutral'}>
