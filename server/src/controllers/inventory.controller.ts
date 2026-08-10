@@ -4,13 +4,13 @@ import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
 
 const createInventoryItemSchema = z.object({
-  type: z.string().min(1),
+  type: z.string(),
   value: z.number().int(),
   comments: z.string().optional(),
 });
 
 const updateInventoryItemSchema = z.object({
-  type: z.string().min(1).optional(),
+  type: z.string().optional(),
   value: z.number().int().optional(),
   comments: z.string().nullable().optional(),
 });
