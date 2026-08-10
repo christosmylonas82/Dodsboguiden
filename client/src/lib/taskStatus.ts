@@ -1,7 +1,7 @@
 import type { TaskStatus } from './types';
 
 export const TASK_STATUS_LABELS: Record<TaskStatus, string> = {
-  PENDING: 'Väntande',
+  PENDING: 'Ej påbörjad',
   IN_PROGRESS: 'Pågår',
   DONE: 'Klart',
 };

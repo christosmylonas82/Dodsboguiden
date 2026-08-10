@@ -21,6 +21,13 @@ export function TaskManageModal({
 
   const assignableMembers = members.filter((m) => m.userId && m.user);
 
+  function handleAssigneeChange(newValue: string) {
+    if (newValue && !assignedTo && status === 'PENDING') {
+      setStatus('IN_PROGRESS');
+    }
+    setAssignedTo(newValue);
+  }
+
   async function handleSave() {
     setSaving(true);
     try {
@@ -63,7 +70,7 @@ export function TaskManageModal({
           <select
             id="assignee"
             value={assignedTo}
-            onChange={(e) => setAssignedTo(e.target.value)}
+            onChange={(e) => handleAssigneeChange(e.target.value)}
             className="mt-2 w-full rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
           >
             <option value="">Ingen</option>

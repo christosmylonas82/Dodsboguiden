@@ -33,16 +33,6 @@ export function ProjectDetailPage() {
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [managingTaskId, setManagingTaskId] = useState<string | null>(null);
-  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
-
-  function toggleExpanded(taskId: string) {
-    setExpandedTaskIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(taskId)) next.delete(taskId);
-      else next.add(taskId);
-      return next;
-    });
-  }
 
   async function reload() {
     if (!id) return;
@@ -173,95 +163,73 @@ export function ProjectDetailPage() {
                 return (
                   <div
                     key={task.id}
-                    className={`flex items-start gap-3 border-l-4 py-3 pl-3 first:pt-0 ${STATUS_BORDER_CLASS[task.status]}`}
+                    role={isDone ? undefined : 'button'}
+                    tabIndex={isDone ? undefined : 0}
+                    onClick={isDone ? undefined : () => setManagingTaskId(task.id)}
+                    onKeyDown={
+                      isDone
+                        ? undefined
+                        : (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') setManagingTaskId(task.id);
+                          }
+                    }
+                    className={`border-l-4 py-3 pr-2 pl-3 transition-colors duration-200 first:pt-0 ${STATUS_BORDER_CLASS[task.status]} ${
+                      isDone ? '' : 'cursor-pointer hover:bg-gray-50'
+                    }`}
                   >
-                    <div className={`flex flex-1 items-start gap-3 ${isDone ? 'opacity-60' : ''}`}>
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => toggleTask(task)}
-                        className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-primary)]"
-                      />
-                      <div
-                        role={isDone ? undefined : 'button'}
-                        tabIndex={isDone ? undefined : 0}
-                        onClick={isDone ? undefined : () => setManagingTaskId(task.id)}
-                        onKeyDown={
-                          isDone
-                            ? undefined
-                            : (e) => {
-                                if (e.key === 'Enter' || e.key === ' ') setManagingTaskId(task.id);
-                              }
-                        }
-                        className={isDone ? 'flex-1 pointer-events-none' : 'flex-1 cursor-pointer'}
-                      >
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className={isDone ? 'text-muted' : 'text-text'}>{task.title}</span>
-                          <TaskStatusBadge status={task.status} />
-                        </div>
-                        {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
-                        {task.url && (
-                          <a
-                            href={task.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="mt-1 inline-block text-sm text-blue-600 hover:underline"
-                          >
-                            Läs mer hos Skatteverket
-                          </a>
-                        )}
-                        {task.moreInfo && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleExpanded(task.id);
-                              }}
-                              className="mt-1 block bg-transparent p-0 text-sm text-blue-600 hover:underline"
-                            >
-                              {expandedTaskIds.has(task.id) ? 'Dölj' : 'Läs mer'}
-                            </button>
-                            <div
-                              className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
-                                expandedTaskIds.has(task.id) ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-                              }`}
-                            >
-                              <div className="overflow-hidden">
-                                <div className="mt-2 rounded-lg border border-border bg-bg p-3 text-xs text-muted">
-                                  {task.moreInfo}
-                                </div>
-                              </div>
-                            </div>
-                          </>
-                        )}
-                        {task.assignedUser && (
-                          <div className="mt-1.5 flex items-center gap-1.5">
-                            <Avatar name={task.assignedUser.name} size="sm" />
-                            <span className="text-xs text-muted">Tilldelad {task.assignedUser.name}</span>
-                          </div>
-                        )}
-                        {isDone && completedByName && task.completedAt && (
-                          <p className="mt-0.5 text-xs text-muted">
-                            Slutförd av {completedByName} den {formatTimestamp(task.completedAt)}
-                          </p>
-                        )}
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                      <div className={`flex min-w-0 items-center gap-3 ${isDone ? 'opacity-60' : ''}`}>
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={() => toggleTask(task)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-5 w-5 shrink-0 accent-[var(--color-primary)]"
+                        />
+                        <span className={isDone ? 'text-muted' : 'text-text'}>{task.title}</span>
+                      </div>
+                      <div className={isDone ? 'opacity-60' : ''}>
+                        <TaskStatusBadge status={task.status} />
+                      </div>
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setManagingTaskId(task.id);
+                          }}
+                          aria-label="Redigera uppgift"
+                          title="Redigera"
+                          className="rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
+                        >
+                          <TbPencil size={18} />
+                        </button>
                       </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setManagingTaskId(task.id);
-                        }}
-                        aria-label="Redigera uppgift"
-                        title="Redigera"
-                        className="rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
-                      >
-                        <TbPencil size={18} />
-                      </button>
+                    <div className={`pl-8 ${isDone ? 'opacity-60' : ''}`}>
+                      {description && <p className="mt-1 text-sm text-muted">{description}</p>}
+                      {task.url && (
+                        <a
+                          href={task.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="mt-1 inline-block text-sm text-blue-600 hover:underline"
+                        >
+                          Läs mer hos Skatteverket
+                        </a>
+                      )}
+                      {task.assignedUser && (
+                        <div className="mt-1.5 flex items-center gap-1.5">
+                          <Avatar name={task.assignedUser.name} size="sm" />
+                          <span className="text-xs text-muted">Tilldelad {task.assignedUser.name}</span>
+                        </div>
+                      )}
+                      {isDone && completedByName && task.completedAt && (
+                        <p className="mt-0.5 text-xs text-muted">
+                          Slutförd av {completedByName} den {formatTimestamp(task.completedAt)}
+                        </p>
+                      )}
                     </div>
                   </div>
                 );
