@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { ProjectMember, Task, TaskStatus } from '../lib/types';
-import { TASK_STATUS_LABELS, TASK_STATUS_ORDER, TASK_STATUS_TONES } from '../lib/taskStatus';
+import { TASK_STATUS_LABELS, TASK_STATUS_ORDER } from '../lib/taskStatus';
+import { TASK_STATUS_BADGE_CLASSES } from './TaskStatusBadge';
 import { ModalOverlay } from './ModalOverlay';
 
 export function TaskManageModal({
@@ -43,15 +44,9 @@ export function TaskManageModal({
                 key={s}
                 type="button"
                 onClick={() => setStatus(s)}
-                className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                className={`rounded-full border-2 px-3 py-1.5 text-sm font-medium transition ${
                   status === s
-                    ? `border-transparent font-medium ${
-                        TASK_STATUS_TONES[s] === 'success'
-                          ? 'bg-success text-white'
-                          : TASK_STATUS_TONES[s] === 'warning'
-                            ? 'bg-warning text-white'
-                            : 'bg-primary text-white'
-                      }`
+                    ? TASK_STATUS_BADGE_CLASSES[s]
                     : 'border-border bg-surface text-text hover:bg-primary-light'
                 }`}
               >
