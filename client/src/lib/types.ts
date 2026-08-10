@@ -51,6 +51,26 @@ export interface ProjectDetail {
   members: ProjectMember[];
 }
 
+export interface Contact {
+  id: string;
+  projectId: string;
+  name: string;
+  relation: string;
+  phone: string | null;
+  email: string | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  projectId: string;
+  type: string;
+  value: number;
+  comments: string | null;
+  createdAt: string;
+}
+
 export interface ActivityEntry {
   id: string;
   action: string;

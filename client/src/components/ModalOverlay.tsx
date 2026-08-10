@@ -1,6 +1,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
 
-export function ModalOverlay({ children, onClose }: { children: ReactNode; onClose: () => void }) {
+export function ModalOverlay({
+  children,
+  onClose,
+  maxWidthClassName = 'max-w-md',
+}: {
+  children: ReactNode;
+  onClose: () => void;
+  maxWidthClassName?: string;
+}) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -23,7 +31,7 @@ export function ModalOverlay({ children, onClose }: { children: ReactNode; onClo
       }`}
       onClick={onClose}
     >
-      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md">
+      <div onClick={(e) => e.stopPropagation()} className={`w-full ${maxWidthClassName}`}>
         {children}
       </div>
     </div>

@@ -61,6 +61,8 @@ model Project {
   members ProjectMember[]
   tasks   Task[]
   activity ActivityLog[]
+  contacts       Contact[]
+  inventoryItems InventoryItem[]
 
   @@map("projects")
 }
@@ -116,6 +118,34 @@ model ActivityLog {
   task    Task?   @relation(fields: [taskId], references: [id])
 
   @@map("activity_log")
+}
+
+model Contact {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  name      String
+  relation  String
+  phone     String?
+  email     String?
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("contacts")
+}
+
+model InventoryItem {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  type      String
+  value     Int
+  comments  String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("inventory_items")
 }
 
 model AuditLog {
