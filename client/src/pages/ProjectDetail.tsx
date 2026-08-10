@@ -173,12 +173,12 @@ export function ProjectDetailPage() {
                             if (e.key === 'Enter' || e.key === ' ') setManagingTaskId(task.id);
                           }
                     }
-                    className={`border-l-4 py-3 pr-2 pl-3 transition-colors duration-200 first:pt-0 ${STATUS_BORDER_CLASS[task.status]} ${
-                      isDone ? '' : 'cursor-pointer hover:bg-gray-50'
+                    className={`border-l-4 py-3 pr-2 pl-3 transition-colors duration-150 first:pt-0 ${STATUS_BORDER_CLASS[task.status]} ${
+                      isDone ? '' : 'cursor-pointer hover:bg-black/[0.02]'
                     }`}
                   >
-                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                      <div className={`flex min-w-0 items-center gap-3 ${isDone ? 'opacity-60' : ''}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`flex min-w-0 flex-1 items-center gap-3 ${isDone ? 'opacity-60' : ''}`}>
                         <input
                           type="checkbox"
                           checked={task.completed}
@@ -188,10 +188,10 @@ export function ProjectDetailPage() {
                         />
                         <span className={isDone ? 'text-muted' : 'text-text'}>{task.title}</span>
                       </div>
-                      <div className={isDone ? 'opacity-60' : ''}>
-                        <TaskStatusBadge status={task.status} />
-                      </div>
-                      <div className="flex justify-end">
+                      <div className="flex shrink-0 items-center gap-2">
+                        <div className={isDone ? 'opacity-60' : ''}>
+                          <TaskStatusBadge status={task.status} />
+                        </div>
                         <button
                           type="button"
                           onClick={(e) => {
