@@ -1,8 +1,10 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useParams } from 'react-router-dom';
+import { TbHistory } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 
 export function Layout() {
   const { user, logout } = useAuth();
+  const { id: projectId } = useParams<{ id?: string }>();
 
   return (
     <div className="flex min-h-screen flex-col bg-bg">
@@ -17,6 +19,15 @@ export function Layout() {
                 <Link to="/dashboard" className="text-text hover:text-primary-dark">
                   Mina dödsbon
                 </Link>
+                {projectId && (
+                  <Link
+                    to={`/projects/${projectId}/activity`}
+                    className="flex items-center gap-1 text-text hover:text-primary-dark"
+                  >
+                    <TbHistory size={16} />
+                    Aktivitetslogg
+                  </Link>
+                )}
                 <Link to="/settings" className="text-text hover:text-primary-dark">
                   Inställningar
                 </Link>

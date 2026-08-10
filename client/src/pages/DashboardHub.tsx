@@ -7,7 +7,7 @@ import { Badge } from '../components/Badge';
 import { MetricCard } from '../components/MetricCard';
 import { Avatar } from '../components/Avatar';
 import { InviteModal } from '../components/InviteModal';
-import { formatActivityAction, formatRelativeTime, formatTimestamp } from '../lib/activity';
+import { formatActivityAction, formatRelativeTime } from '../lib/activity';
 import { PHASE_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { PHASES, phaseStatus } from '../lib/phases';
 import { PHASE_ROUTE_SLUG } from '../lib/phaseRoutes';
@@ -141,28 +141,6 @@ export function DashboardHubPage() {
             </li>
           ))}
         </ul>
-      </div>
-
-      <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-text">Aktivitetslogg</h2>
-        {activity.length === 0 ? (
-          <p className="mt-3 text-sm text-muted">Ingen aktivitet än.</p>
-        ) : (
-          <ul className="mt-4 flex flex-col gap-4">
-            {activity.map((entry) => (
-              <li key={entry.id} className="flex gap-3">
-                <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
-                <div>
-                  <p className="text-sm text-text">
-                    <span className="font-medium">{entry.user.name}</span>{' '}
-                    {formatActivityAction(entry.action)}
-                  </p>
-                  <p className="text-xs text-muted">{formatTimestamp(entry.timestamp)}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
 
       {inviteModalOpen && (

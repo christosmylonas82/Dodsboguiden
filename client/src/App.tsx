@@ -8,6 +8,7 @@ import { RegisterPage } from './pages/Register';
 import { DashboardPage } from './pages/Dashboard';
 import { DashboardHubPage } from './pages/DashboardHub';
 import { PhaseDashboardPage } from './pages/PhaseDashboard';
+import { ProjectActivityPage } from './pages/ProjectActivity';
 import { SettingsPage } from './pages/Settings';
 import { AdminDashboardPage } from './pages/admin/AdminDashboard';
 import { AdminUsersPage } from './pages/admin/AdminUsers';
@@ -34,6 +35,7 @@ function App() {
                 path="/projects/:id/efter-forrattningen"
                 element={<PhaseDashboardPage phase="Efter förrättningen" />}
               />
+              <Route path="/projects/:id/activity" element={<ProjectActivityPage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
 
