@@ -219,7 +219,7 @@ export function ProjectDetailPage() {
                                 e.stopPropagation();
                                 toggleExpanded(task.id);
                               }}
-                              className="mt-1 block text-sm text-blue-600 hover:underline"
+                              className="mt-1 block bg-transparent p-0 text-sm text-blue-600 hover:underline"
                             >
                               {expandedTaskIds.has(task.id) ? 'Dölj' : 'Läs mer'}
                             </button>
