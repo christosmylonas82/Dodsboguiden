@@ -33,6 +33,16 @@ export function ProjectDetailPage() {
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [managingTaskId, setManagingTaskId] = useState<string | null>(null);
+  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
+
+  function toggleExpanded(taskId: string) {
+    setExpandedTaskIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(taskId)) next.delete(taskId);
+      else next.add(taskId);
+      return next;
+    });
+  }
 
   async function reload() {
     if (!id) return;
@@ -218,6 +228,30 @@ export function ProjectDetailPage() {
                         >
                           Läs mer hos Skatteverket
                         </a>
+                      )}
+                      {task.moreInfo && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleExpanded(task.id);
+                            }}
+                            className="mt-1 block bg-transparent p-0 text-sm text-blue-600 hover:underline"
+                          >
+                            {expandedTaskIds.has(task.id) ? 'Dölj' : 'Läs mer'}
+                          </button>
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            className={`grid transition-[grid-template-rows] duration-[250ms] ease-in-out ${
+                              expandedTaskIds.has(task.id) ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                            }`}
+                          >
+                            <div className="overflow-hidden">
+                              <div className="mt-2 rounded-lg bg-bg p-3 text-sm text-muted">{task.moreInfo}</div>
+                            </div>
+                          </div>
+                        </>
                       )}
                       {task.assignedUser && (
                         <div className="mt-1.5 flex items-center gap-1.5">

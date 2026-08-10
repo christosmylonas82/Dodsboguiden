@@ -21,6 +21,7 @@ export interface Task {
   projectId: string;
   title: string;
   description: string | null;
+  moreInfo: string | null;
   url: string | null;
   phase: 'Förberedelser' | 'Förrättningen' | 'Efter förrättningen';
   completed: boolean;
