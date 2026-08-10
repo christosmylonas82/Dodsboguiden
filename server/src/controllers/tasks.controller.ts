@@ -112,10 +112,14 @@ export async function updateTask(req: Request, res: Response) {
 }
 
 export async function listActivity(req: Request, res: Response) {
+  const limitParam = Number(req.query.limit);
+  const take = Number.isInteger(limitParam) && limitParam > 0 ? limitParam : undefined;
+
   const activity = await prisma.activityLog.findMany({
     where: { projectId: req.params.id },
     include: { user: { select: { id: true, name: true } } },
     orderBy: { timestamp: 'desc' },
+    take,
   });
 
   res.json(activity);

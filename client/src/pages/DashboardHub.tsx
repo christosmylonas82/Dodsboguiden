@@ -5,8 +5,10 @@ import { apiFetch, ApiError } from '../lib/api';
 import type { ActivityEntry, ProjectDetail } from '../lib/types';
 import { Badge } from '../components/Badge';
 import { MetricCard } from '../components/MetricCard';
-import { Avatar } from '../components/Avatar';
 import { InviteModal } from '../components/InviteModal';
+import { ProgressOverviewModal } from '../components/ProgressOverviewModal';
+import { RecentActivityModal } from '../components/RecentActivityModal';
+import { MembersModal } from '../components/MembersModal';
 import { formatActivityAction, formatRelativeTime } from '../lib/activity';
 import { PHASE_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { PHASES, phaseStatus } from '../lib/phases';
@@ -17,6 +19,7 @@ export function DashboardHubPage() {
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [openModal, setOpenModal] = useState<'progress' | 'activity' | 'members' | null>(null);
 
   async function reload() {
     if (!id) return;
@@ -81,18 +84,21 @@ export function DashboardHubPage() {
           label="Framsteg"
           value={`${progress}%`}
           hint={`${project.tasks.filter((t) => t.completed).length} av ${project.tasks.length} klara`}
+          onClick={() => setOpenModal('progress')}
         />
         <MetricCard
           icon={<TbUsers size={20} />}
           label="Familjemedlemmar"
           value={project.members.length}
           hint={project.members.length === 1 ? '1 medlem' : `${project.members.length} medlemmar`}
+          onClick={() => setOpenModal('members')}
         />
         <MetricCard
           icon={<TbBell size={20} />}
           label="Senaste aktivitet"
           value={lastActivity ? formatRelativeTime(lastActivity.timestamp) : '—'}
           hint={lastActivity ? `${lastActivity.user.name} ${formatActivityAction(lastActivity.action)}` : 'Ingen aktivitet än'}
+          onClick={() => setOpenModal('activity')}
         />
       </div>
 
@@ -124,27 +130,18 @@ export function DashboardHubPage() {
         })}
       </div>
 
-      <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-text">Familjemedlemmar</h2>
-        <ul className="mt-4 flex flex-col gap-3">
-          {project.members.map((m) => (
-            <li key={m.id} className="flex items-center gap-3">
-              <Avatar name={m.user?.name ?? m.email} />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm text-text">{m.user?.name ?? m.email}</p>
-                {m.user && <p className="truncate text-xs text-muted">{m.email}</p>}
-                {!m.userId && <p className="text-xs text-muted">Inbjuden, väntar på registrering</p>}
-              </div>
-              <Badge tone={m.role === 'ADMIN' ? 'success' : 'neutral'}>
-                {m.role === 'ADMIN' ? 'Admin' : 'Medlem'}
-              </Badge>
-            </li>
-          ))}
-        </ul>
-      </div>
-
       {inviteModalOpen && (
         <InviteModal onClose={() => setInviteModalOpen(false)} onInvite={inviteMember} />
+      )}
+
+      {openModal === 'progress' && (
+        <ProgressOverviewModal tasks={project.tasks} onClose={() => setOpenModal(null)} />
+      )}
+      {openModal === 'activity' && (
+        <RecentActivityModal projectId={id!} activity={activity} onClose={() => setOpenModal(null)} />
+      )}
+      {openModal === 'members' && (
+        <MembersModal members={project.members} onClose={() => setOpenModal(null)} />
       )}
     </div>
   );
