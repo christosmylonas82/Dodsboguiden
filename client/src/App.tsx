@@ -2,10 +2,12 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { Layout } from './components/Layout';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
+import { ProjectRedirect } from './components/ProjectRedirect';
 import { LoginPage } from './pages/Login';
 import { RegisterPage } from './pages/Register';
 import { DashboardPage } from './pages/Dashboard';
-import { ProjectDetailPage } from './pages/ProjectDetail';
+import { DashboardHubPage } from './pages/DashboardHub';
+import { PhaseDashboardPage } from './pages/PhaseDashboard';
 import { SettingsPage } from './pages/Settings';
 import { AdminDashboardPage } from './pages/admin/AdminDashboard';
 import { AdminUsersPage } from './pages/admin/AdminUsers';
@@ -24,7 +26,14 @@ function App() {
 
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/projects/:id" element={<ProjectDetailPage />} />
+              <Route path="/projects/:id" element={<ProjectRedirect />} />
+              <Route path="/projects/:id/dashboard" element={<DashboardHubPage />} />
+              <Route path="/projects/:id/foreberedelser" element={<PhaseDashboardPage phase="Förberedelser" />} />
+              <Route path="/projects/:id/forrattningen" element={<PhaseDashboardPage phase="Förrättningen" />} />
+              <Route
+                path="/projects/:id/efter-forrattningen"
+                element={<PhaseDashboardPage phase="Efter förrättningen" />}
+              />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
 

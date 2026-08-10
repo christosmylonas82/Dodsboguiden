@@ -24,7 +24,7 @@ export function DashboardPage() {
         method: 'POST',
         body: JSON.stringify({ deceasedName }),
       });
-      navigate(`/projects/${project.id}`);
+      navigate(`/projects/${project.id}/dashboard`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Kunde inte skapa dödsbo');
     } finally {
@@ -75,7 +75,7 @@ export function DashboardPage() {
           {projects?.map((p) => (
             <Link
               key={p.id}
-              to={`/projects/${p.id}`}
+              to={`/projects/${p.id}/dashboard`}
               className="block rounded-2xl border border-border bg-surface p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-2">
