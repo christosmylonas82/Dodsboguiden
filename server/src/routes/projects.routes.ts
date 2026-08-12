@@ -3,10 +3,13 @@ import { requireAuth } from '../middleware/auth.js';
 import { requireProjectAdmin, requireProjectMember } from '../middleware/projectAccess.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import {
+  archiveProject,
   createProject,
   getProject,
   inviteMember,
   listProjects,
+  permanentlyDeleteProject,
+  restoreProject,
 } from '../controllers/projects.controller.js';
 import { createTask, listActivity, updateTask } from '../controllers/tasks.controller.js';
 import {
@@ -30,6 +33,9 @@ router.post('/', asyncHandler(createProject));
 router.get('/', asyncHandler(listProjects));
 router.get('/:id', requireProjectMember, asyncHandler(getProject));
 router.post('/:id/invite', requireProjectAdmin, asyncHandler(inviteMember));
+router.patch('/:id/archive', requireProjectAdmin, asyncHandler(archiveProject));
+router.patch('/:id/restore', requireProjectAdmin, asyncHandler(restoreProject));
+router.delete('/:id/permanent', requireProjectAdmin, asyncHandler(permanentlyDeleteProject));
 
 router.post('/:id/tasks', requireProjectMember, asyncHandler(createTask));
 router.put('/:id/tasks/:taskId', requireProjectMember, asyncHandler(updateTask));

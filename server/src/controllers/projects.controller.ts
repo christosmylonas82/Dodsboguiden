@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
@@ -46,9 +47,12 @@ export async function createProject(req: Request, res: Response) {
 
 export async function listProjects(req: Request, res: Response) {
   const userId = req.user!.userId;
+  const includeArchived = req.query.includeArchived === 'true';
 
   const projects = await prisma.project.findMany({
-    where: { deletedAt: null, members: { some: { userId } } },
+    where: includeArchived
+      ? { members: { some: { userId, role: 'ADMIN' } } }
+      : { deletedAt: null, members: { some: { userId } } },
     include: {
       tasks: { select: { completed: true } },
       _count: { select: { members: true } },
@@ -62,6 +66,7 @@ export async function listProjects(req: Request, res: Response) {
       deceasedName: p.deceasedName,
       status: p.status,
       createdAt: p.createdAt,
+      deletedAt: p.deletedAt,
       memberCount: p._count.members,
       progress: p.tasks.length
         ? Math.round((p.tasks.filter((t) => t.completed).length / p.tasks.length) * 100)
@@ -97,21 +102,31 @@ export async function inviteMember(req: Request, res: Response) {
   const body = inviteSchema.parse(req.body);
   const projectId = req.params.id;
 
-  const existing = await prisma.projectMember.findFirst({
+  const existingMember = await prisma.projectMember.findFirst({
     where: { projectId, email: body.email },
   });
-  if (existing) {
+  if (existingMember) {
+    throw new HttpError(409, 'This person is already a member or has a pending invite');
+  }
+
+  const existingInvitation = await prisma.invitation.findFirst({
+    where: { projectId, invitedEmail: body.email, status: 'PENDING' },
+  });
+  if (existingInvitation) {
     throw new HttpError(409, 'This person is already a member or has a pending invite');
   }
 
   const invitedUser = await prisma.user.findUnique({ where: { email: body.email } });
+  const tokenExpiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
 
-  const member = await prisma.projectMember.create({
+  const invitation = await prisma.invitation.create({
     data: {
       projectId,
-      email: body.email,
-      userId: invitedUser?.id,
-      role: 'MEMBER',
+      senderUserId: req.user!.userId,
+      invitedEmail: body.email,
+      invitedUserId: invitedUser?.id,
+      invitationToken: randomUUID(),
+      tokenExpiresAt,
     },
   });
 
@@ -121,5 +136,44 @@ export async function inviteMember(req: Request, res: Response) {
     action: `invited ${body.email}`,
   });
 
-  res.status(201).json(member);
+  res.status(201).json(invitation);
+}
+
+const permanentDeleteSchema = z.object({
+  confirmationText: z.string().min(1),
+});
+
+export async function archiveProject(req: Request, res: Response) {
+  const project = await prisma.project.update({
+    where: { id: req.params.id },
+    data: { deletedAt: new Date() },
+  });
+  res.json(project);
+}
+
+export async function restoreProject(req: Request, res: Response) {
+  const project = await prisma.project.update({
+    where: { id: req.params.id },
+    data: { deletedAt: null },
+  });
+  res.json(project);
+}
+
+export async function permanentlyDeleteProject(req: Request, res: Response) {
+  const body = permanentDeleteSchema.parse(req.body);
+  const project = await prisma.project.findUnique({ where: { id: req.params.id } });
+
+  if (!project) {
+    throw new HttpError(404, 'Project not found');
+  }
+  if (!project.deletedAt) {
+    throw new HttpError(400, 'Project must be archived before it can be permanently deleted');
+  }
+  if (body.confirmationText !== project.deceasedName) {
+    throw new HttpError(400, 'Confirmation text does not match the project name');
+  }
+
+  await prisma.project.delete({ where: { id: project.id } });
+
+  res.status(204).end();
 }

@@ -28,6 +28,12 @@ enum TaskStatus {
   DONE
 }
 
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
@@ -46,6 +52,8 @@ model User {
   assignedTasks  Task[]          @relation("TaskAssignee")
   activityLogs   ActivityLog[]
   auditLogs      AuditLog[]
+  sentInvitations     Invitation[] @relation("InvitationSender")
+  receivedInvitations Invitation[] @relation("InvitationRecipient")
 
   @@map("users")
 }
@@ -64,6 +72,7 @@ model Project {
   activity ActivityLog[]
   contacts       Contact[]
   inventoryItems InventoryItem[]
+  invitations    Invitation[]
 
   @@map("projects")
 }
@@ -147,6 +156,26 @@ model InventoryItem {
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("inventory_items")
+}
+
+model Invitation {
+  id               String           @id @default(uuid())
+  projectId        String           @map("project_id")
+  senderUserId     String           @map("sender_user_id")
+  invitedEmail     String           @map("invited_email")
+  invitedUserId    String?          @map("invited_user_id")
+  status           InvitationStatus @default(PENDING)
+  invitationToken  String           @unique @map("invitation_token")
+  tokenExpiresAt   DateTime         @map("token_expires_at")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  acceptedAt       DateTime?        @map("accepted_at")
+  declinedAt       DateTime?        @map("declined_at")
+
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  senderUser  User    @relation("InvitationSender", fields: [senderUserId], references: [id])
+  invitedUser User?   @relation("InvitationRecipient", fields: [invitedUserId], references: [id])
+
+  @@map("invitations")
 }
 
 model AuditLog {

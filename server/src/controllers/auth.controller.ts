@@ -37,6 +37,10 @@ export async function register(req: Request, res: Response) {
     where: { email: body.email, userId: null },
     data: { userId: user.id },
   });
+  await prisma.invitation.updateMany({
+    where: { invitedEmail: body.email, invitedUserId: null },
+    data: { invitedUserId: user.id },
+  });
 
   const token = signToken({ userId: user.id, role: user.role });
   res.status(201).json({
@@ -106,4 +110,74 @@ export async function markTipsSeen(req: Request, res: Response) {
     role: user.role,
     hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
   });
+}
+
+const updateEmailSchema = z.object({
+  newEmail: z.string().email(),
+  password: z.string().min(1),
+});
+
+export async function updateEmail(req: Request, res: Response) {
+  const body = updateEmailSchema.parse(req.body);
+  const userId = req.user!.userId;
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || user.deletedAt) {
+    throw new HttpError(404, 'User not found');
+  }
+
+  const valid = await verifyPassword(body.password, user.passwordHash);
+  if (!valid) {
+    throw new HttpError(401, 'Incorrect password');
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email: body.newEmail } });
+  if (existing && existing.id !== userId) {
+    throw new HttpError(409, 'This email is already in use');
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { email: body.newEmail },
+  });
+
+  res.json({
+    id: updated.id,
+    email: updated.email,
+    name: updated.name,
+    role: updated.role,
+    hasSeenTipsOnboarding: updated.hasSeenTipsOnboarding,
+  });
+}
+
+const updatePasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[a-z]/, 'Password must contain a lowercase letter')
+    .regex(/[A-Z]/, 'Password must contain an uppercase letter')
+    .regex(/[0-9]/, 'Password must contain a number'),
+});
+
+export async function updatePassword(req: Request, res: Response) {
+  const body = updatePasswordSchema.parse(req.body);
+  const userId = req.user!.userId;
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || user.deletedAt) {
+    throw new HttpError(404, 'User not found');
+  }
+
+  const valid = await verifyPassword(body.currentPassword, user.passwordHash);
+  if (!valid) {
+    throw new HttpError(401, 'Incorrect current password');
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash: await hashPassword(body.newPassword) },
+  });
+
+  res.json({ success: true });
 }

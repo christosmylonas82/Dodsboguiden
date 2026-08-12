@@ -11,6 +11,7 @@ export interface ProjectSummary {
   deceasedName: string;
   status: 'ACTIVE' | 'COMPLETED';
   createdAt: string;
+  deletedAt?: string | null;
   memberCount: number;
   progress: number;
 }
@@ -70,6 +71,18 @@ export interface InventoryItem {
   value: number;
   comments: string | null;
   createdAt: string;
+}
+
+export type InvitationStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED';
+
+export interface Invitation {
+  id: string;
+  projectId: string;
+  invitedEmail: string;
+  status: InvitationStatus;
+  createdAt: string;
+  project: { id: string; deceasedName: string };
+  senderUser: { id: string; name: string };
 }
 
 export interface ActivityEntry {

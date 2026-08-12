@@ -9,6 +9,7 @@ interface AuthContextValue {
   register: (email: string, name: string, password: string, gdprConsent: boolean) => Promise<void>;
   logout: () => void;
   markTipsSeen: () => Promise<void>;
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -57,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, markTipsSeen }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, markTipsSeen, updateUser: setUser }}>
       {children}
     </AuthContext.Provider>
   );

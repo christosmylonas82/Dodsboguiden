@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { TbProgress, TbUsers, TbBell, TbUserPlus, TbArrowRight } from 'react-icons/tb';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { TbProgress, TbUsers, TbBell, TbUserPlus, TbArrowRight, TbArchive } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { ActivityEntry, ProjectDetail } from '../lib/types';
 import { Badge } from '../components/Badge';
@@ -9,6 +9,7 @@ import { InviteModal } from '../components/InviteModal';
 import { ProgressOverviewModal } from '../components/ProgressOverviewModal';
 import { RecentActivityModal } from '../components/RecentActivityModal';
 import { MembersModal } from '../components/MembersModal';
+import { useAuth } from '../context/AuthContext';
 import { formatActivityAction, formatRelativeTime } from '../lib/activity';
 import { PHASE_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { PHASES, phaseStatus } from '../lib/phases';
@@ -16,10 +17,14 @@ import { PHASE_ROUTE_SLUG } from '../lib/phaseRoutes';
 
 export function DashboardHubPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [openModal, setOpenModal] = useState<'progress' | 'activity' | 'members' | null>(null);
+  const [archiving, setArchiving] = useState(false);
+  const [confirmingArchive, setConfirmingArchive] = useState(false);
 
   async function reload() {
     if (!id) return;
@@ -49,12 +54,24 @@ export function DashboardHubPage() {
     }
   }
 
+  async function handleArchive() {
+    if (!id) return;
+    setArchiving(true);
+    try {
+      await apiFetch(`/projects/${id}/archive`, { method: 'PATCH' });
+      navigate('/dashboard');
+    } finally {
+      setArchiving(false);
+    }
+  }
+
   if (!project) return <p className="text-muted">Laddar…</p>;
 
   const progress = project.tasks.length
     ? Math.round((project.tasks.filter((t) => t.completed).length / project.tasks.length) * 100)
     : 0;
   const lastActivity = activity[0];
+  const isAdmin = project.members.find((m) => m.userId === user?.id)?.role === 'ADMIN';
 
   return (
     <div>
@@ -129,6 +146,40 @@ export function DashboardHubPage() {
           );
         })}
       </div>
+
+      {isAdmin && (
+        <div className="mt-8 flex justify-end">
+          {!confirmingArchive ? (
+            <button
+              type="button"
+              onClick={() => setConfirmingArchive(true)}
+              className="flex items-center gap-1.5 bg-transparent text-sm text-muted hover:text-danger"
+            >
+              <TbArchive size={16} />
+              Arkivera dödsbo
+            </button>
+          ) : (
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-muted">Arkivera detta dödsbo? Det kan återställas i 30 dagar.</span>
+              <button
+                type="button"
+                onClick={() => setConfirmingArchive(false)}
+                className="rounded-lg border border-border bg-transparent px-3 py-1.5 text-text hover:bg-primary-light"
+              >
+                Avbryt
+              </button>
+              <button
+                type="button"
+                onClick={handleArchive}
+                disabled={archiving}
+                className="rounded-lg bg-danger px-3 py-1.5 font-medium text-white hover:opacity-90 disabled:opacity-60"
+              >
+                {archiving ? 'Arkiverar…' : 'Ja, arkivera'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {inviteModalOpen && (
         <InviteModal onClose={() => setInviteModalOpen(false)} onInvite={inviteMember} />
