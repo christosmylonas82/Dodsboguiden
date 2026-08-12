@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch, ApiError, BASE_URL, getToken } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
-import type { ProjectSummary } from '../lib/types';
+import type { ProjectSummary, User } from '../lib/types';
 import { ChangeEmailModal } from '../components/ChangeEmailModal';
 import { ChangePasswordModal } from '../components/ChangePasswordModal';
 import { DeleteProjectPermanentlyModal } from '../components/DeleteProjectPermanentlyModal';
+import { ImageUploadModal } from '../components/ImageUploadModal';
+import { Avatar } from '../components/Avatar';
 
 const RETENTION_DAYS = 30;
 
@@ -31,10 +33,13 @@ export function SettingsPage() {
 
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<ProjectSummary | null>(null);
 
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
+  const [confirmingImageRemove, setConfirmingImageRemove] = useState(false);
+  const [removingImage, setRemovingImage] = useState(false);
 
   async function reload() {
     const projects = await apiFetch<ProjectSummary[]>('/projects?includeArchived=true');
@@ -74,6 +79,18 @@ export function SettingsPage() {
     URL.revokeObjectURL(url);
   }
 
+  async function handleRemoveImage() {
+    setRemovingImage(true);
+    try {
+      const updated = await apiFetch<User>('/auth/profile-image', { method: 'DELETE' });
+      updateUser(updated);
+      flashMessage('Profilbild borttagen');
+    } finally {
+      setRemovingImage(false);
+      setConfirmingImageRemove(false);
+    }
+  }
+
   async function handleDeleteAccount() {
     setDeletingAccount(true);
     try {
@@ -96,6 +113,51 @@ export function SettingsPage() {
           {message}
         </div>
       )}
+
+      <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-text">Min profil</h2>
+        <div className="mt-4 flex flex-col items-center gap-3">
+          <Avatar name={user.name} imageUrl={user.profileImageUrl} userId={user.id} size="lg" />
+          <p className="font-medium text-text">{user.name}</p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setImageModalOpen(true)}
+              className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
+            >
+              Ladda upp bild
+            </button>
+            {!confirmingImageRemove ? (
+              <button
+                type="button"
+                onClick={() => setConfirmingImageRemove(true)}
+                disabled={!user.profileImageUrl}
+                className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light disabled:opacity-40"
+              >
+                Ta bort bild
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  disabled={removingImage}
+                  className="rounded-lg bg-danger px-3 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+                >
+                  {removingImage ? 'Tar bort…' : 'Bekräfta'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmingImageRemove(false)}
+                  className="rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-text hover:bg-primary-light"
+                >
+                  Avbryt
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-text">Konto</h2>
@@ -238,6 +300,15 @@ export function SettingsPage() {
           onClose={() => {
             setPasswordModalOpen(false);
             flashMessage('Lösenord uppdaterat');
+          }}
+        />
+      )}
+      {imageModalOpen && (
+        <ImageUploadModal
+          onClose={() => setImageModalOpen(false)}
+          onUploaded={(updated) => {
+            updateUser(updated);
+            flashMessage('Profilbild uppdaterad');
           }}
         />
       )}

@@ -45,7 +45,7 @@ export function MembersModal({
             const isSelf = m.userId === currentUserId;
             return (
               <li key={m.id} className="flex items-center gap-3">
-                <Avatar name={m.user?.name ?? m.email} />
+                <Avatar name={m.user?.name ?? m.email} imageUrl={m.user?.profileImageUrl} userId={m.userId ?? m.id} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm text-text">{m.user?.name ?? m.email}</p>
                   {m.user && <p className="truncate text-xs text-muted">{m.email}</p>}

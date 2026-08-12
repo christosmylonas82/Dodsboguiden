@@ -1,9 +1,21 @@
 import type { Request, Response } from 'express';
+import type { User } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { hashPassword, verifyPassword } from '../lib/password.js';
 import { signToken } from '../lib/jwt.js';
 import { HttpError } from '../middleware/errorHandler.js';
+
+function toUserResponse(user: User) {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
+    profileImageUrl: user.profileImageUrl,
+  };
+}
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -43,15 +55,7 @@ export async function register(req: Request, res: Response) {
   });
 
   const token = signToken({ userId: user.id, role: user.role });
-  res.status(201).json({
-    token,
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
-    },
-  });
+  res.status(201).json({ token, user: toUserResponse(user) });
 }
 
 const loginSchema = z.object({
@@ -73,15 +77,7 @@ export async function login(req: Request, res: Response) {
   }
 
   const token = signToken({ userId: user.id, role: user.role });
-  res.json({
-    token,
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
-    },
-  });
+  res.json({ token, user: toUserResponse(user) });
 }
 
 export async function me(req: Request, res: Response) {
@@ -89,13 +85,7 @@ export async function me(req: Request, res: Response) {
   if (!user || user.deletedAt) {
     throw new HttpError(404, 'User not found');
   }
-  res.json({
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-    hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
-  });
+  res.json(toUserResponse(user));
 }
 
 export async function markTipsSeen(req: Request, res: Response) {
@@ -103,13 +93,7 @@ export async function markTipsSeen(req: Request, res: Response) {
     where: { id: req.user!.userId },
     data: { hasSeenTipsOnboarding: true },
   });
-  res.json({
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-    hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
-  });
+  res.json(toUserResponse(user));
 }
 
 const updateEmailSchema = z.object({
@@ -141,13 +125,7 @@ export async function updateEmail(req: Request, res: Response) {
     data: { email: body.newEmail },
   });
 
-  res.json({
-    id: updated.id,
-    email: updated.email,
-    name: updated.name,
-    role: updated.role,
-    hasSeenTipsOnboarding: updated.hasSeenTipsOnboarding,
-  });
+  res.json(toUserResponse(updated));
 }
 
 const updatePasswordSchema = z.object({
@@ -180,4 +158,41 @@ export async function updatePassword(req: Request, res: Response) {
   });
 
   res.json({ success: true });
+}
+
+const IMAGE_DATA_URL_PATTERN = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]+=*)$/;
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+
+const updateProfileImageSchema = z.object({
+  imageDataUrl: z.string().min(1),
+});
+
+export async function updateProfileImage(req: Request, res: Response) {
+  const body = updateProfileImageSchema.parse(req.body);
+
+  const match = body.imageDataUrl.match(IMAGE_DATA_URL_PATTERN);
+  if (!match) {
+    throw new HttpError(400, 'Image must be a JPEG, PNG, or WebP data URL');
+  }
+
+  const byteLength = Math.ceil((match[2].length * 3) / 4);
+  if (byteLength > MAX_IMAGE_BYTES) {
+    throw new HttpError(400, 'Image is too large');
+  }
+
+  const user = await prisma.user.update({
+    where: { id: req.user!.userId },
+    data: { profileImageUrl: body.imageDataUrl },
+  });
+
+  res.json(toUserResponse(user));
+}
+
+export async function removeProfileImage(req: Request, res: Response) {
+  const user = await prisma.user.update({
+    where: { id: req.user!.userId },
+    data: { profileImageUrl: null },
+  });
+
+  res.json(toUserResponse(user));
 }

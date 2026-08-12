@@ -193,7 +193,12 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
                   )}
                   {task.assignedUser && (
                     <div className="mt-1.5 flex items-center gap-1.5">
-                      <Avatar name={task.assignedUser.name} size="sm" />
+                      <Avatar
+                        name={task.assignedUser.name}
+                        imageUrl={task.assignedUser.profileImageUrl}
+                        userId={task.assignedUser.id}
+                        size="sm"
+                      />
                       <span className="text-xs text-muted">Tilldelad {task.assignedUser.name}</span>
                     </div>
                   )}

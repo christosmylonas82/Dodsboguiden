@@ -84,7 +84,7 @@ export async function updateTask(req: Request, res: Response) {
       ...(body.assignedTo !== undefined ? { assignedTo: body.assignedTo } : {}),
     },
     include: {
-      assignedUser: { select: { id: true, name: true, email: true } },
+      assignedUser: { select: { id: true, name: true, email: true, profileImageUrl: true } },
     },
   });
 
@@ -117,7 +117,7 @@ export async function listActivity(req: Request, res: Response) {
 
   const activity = await prisma.activityLog.findMany({
     where: { projectId: req.params.id },
-    include: { user: { select: { id: true, name: true } } },
+    include: { user: { select: { id: true, name: true, profileImageUrl: true } } },
     orderBy: { timestamp: 'desc' },
     take,
   });

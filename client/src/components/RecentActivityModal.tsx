@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { ActivityEntry } from '../lib/types';
 import { formatActivityAction, formatTimestamp } from '../lib/activity';
+import { Avatar } from './Avatar';
 import { ModalOverlay } from './ModalOverlay';
 
 export function RecentActivityModal({
@@ -34,9 +35,12 @@ export function RecentActivityModal({
         ) : (
           <ul className="mt-5 flex flex-col gap-3">
             {recent.map((entry) => (
-              <li key={entry.id} className="text-sm text-text">
-                <span className="font-medium">{entry.user.name}</span> {formatActivityAction(entry.action)}
-                <p className="text-xs text-muted">{formatTimestamp(entry.timestamp)}</p>
+              <li key={entry.id} className="flex items-start gap-3 text-sm text-text">
+                <Avatar name={entry.user.name} imageUrl={entry.user.profileImageUrl} userId={entry.user.id} size="sm" />
+                <div>
+                  <span className="font-medium">{entry.user.name}</span> {formatActivityAction(entry.action)}
+                  <p className="text-xs text-muted">{formatTimestamp(entry.timestamp)}</p>
+                </div>
               </li>
             ))}
           </ul>

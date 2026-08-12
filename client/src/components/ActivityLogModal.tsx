@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { apiFetch } from '../lib/api';
 import type { ActivityEntry } from '../lib/types';
 import { formatActivityAction, formatTimestamp } from '../lib/activity';
+import { Avatar } from './Avatar';
 import { ModalOverlay } from './ModalOverlay';
 
 export function ActivityLogModal({ projectId, onClose }: { projectId: string; onClose: () => void }) {
@@ -37,9 +38,12 @@ export function ActivityLogModal({ projectId, onClose }: { projectId: string; on
         ) : (
           <ul className="mt-5 flex flex-col gap-3">
             {activity.map((entry) => (
-              <li key={entry.id} className="border-b border-border pb-3 text-sm text-text last:border-0 last:pb-0">
-                <span className="font-medium">{entry.user.name}</span> {formatActivityAction(entry.action)}
-                <p className="text-xs text-muted">{formatTimestamp(entry.timestamp)}</p>
+              <li key={entry.id} className="flex items-start gap-3 border-b border-border pb-3 last:border-0 last:pb-0">
+                <Avatar name={entry.user.name} imageUrl={entry.user.profileImageUrl} userId={entry.user.id} size="sm" />
+                <div className="text-sm text-text">
+                  <span className="font-medium">{entry.user.name}</span> {formatActivityAction(entry.action)}
+                  <p className="text-xs text-muted">{formatTimestamp(entry.timestamp)}</p>
+                </div>
               </li>
             ))}
           </ul>

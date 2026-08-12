@@ -81,9 +81,9 @@ export async function getProject(req: Request, res: Response) {
     include: {
       tasks: {
         orderBy: { orderIndex: 'asc' },
-        include: { assignedUser: { select: { id: true, name: true, email: true } } },
+        include: { assignedUser: { select: { id: true, name: true, email: true, profileImageUrl: true } } },
       },
-      members: { include: { user: { select: { id: true, name: true, email: true } } } },
+      members: { include: { user: { select: { id: true, name: true, email: true, profileImageUrl: true } } } },
     },
   });
 

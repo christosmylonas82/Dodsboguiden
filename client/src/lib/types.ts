@@ -4,6 +4,7 @@ export interface User {
   name: string;
   role?: 'USER' | 'ADMIN';
   hasSeenTipsOnboarding: boolean;
+  profileImageUrl: string | null;
 }
 
 export interface ProjectSummary {
@@ -31,7 +32,7 @@ export interface Task {
   completedAt: string | null;
   status: TaskStatus;
   assignedTo: string | null;
-  assignedUser: { id: string; name: string; email: string } | null;
+  assignedUser: { id: string; name: string; email: string; profileImageUrl: string | null } | null;
   orderIndex: number;
 }
 
@@ -41,7 +42,7 @@ export interface ProjectMember {
   userId: string | null;
   email: string;
   role: 'ADMIN' | 'MEMBER';
-  user: { id: string; name: string; email: string } | null;
+  user: { id: string; name: string; email: string; profileImageUrl: string | null } | null;
 }
 
 export interface ProjectDetail {
@@ -89,6 +90,6 @@ export interface ActivityEntry {
   id: string;
   action: string;
   timestamp: string;
-  user: { id: string; name: string };
+  user: { id: string; name: string; profileImageUrl: string | null };
   taskId: string | null;
 }
