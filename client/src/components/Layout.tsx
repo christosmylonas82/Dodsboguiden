@@ -7,10 +7,12 @@ import {
   TbBulb,
   TbSettings,
   TbBook2,
+  TbHome,
   TbMenu2,
   TbX,
   TbLogout2,
   TbMailbox,
+  TbLayoutDashboard,
 } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
@@ -29,6 +31,7 @@ type ModalKey = 'activity' | 'contacts' | 'inventory' | 'tips' | 'invitations';
 export function Layout() {
   const { user, logout, markTipsSeen } = useAuth();
   const { id: projectId } = useParams<{ id?: string }>();
+  const isInProject = Boolean(projectId);
   const [openModal, setOpenModal] = useState<ModalKey | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [invitationCount, setInvitationCount] = useState(0);
@@ -72,8 +75,12 @@ export function Layout() {
     }
   }
 
-  const navItems = projectId ? (
+  const navItems = isInProject ? (
     <>
+      <Link to={`/projects/${projectId}/dashboard`} className={itemClass} onClick={() => setMobileMenuOpen(false)}>
+        <TbLayoutDashboard size={20} />
+        Projekt
+      </Link>
       <button type="button" onClick={() => openModalAndCloseMenu('activity')} className={`${itemClass} bg-transparent`}>
         <TbHistory size={20} />
         Aktivitetslogg
@@ -91,9 +98,7 @@ export function Layout() {
         Tips
       </button>
     </>
-  ) : null;
-
-  const rightItems = (
+  ) : (
     <>
       <button
         type="button"
@@ -108,6 +113,15 @@ export function Layout() {
           </span>
         )}
       </button>
+      <button type="button" onClick={() => openModalAndCloseMenu('tips')} className={`${itemClass} bg-transparent`}>
+        <TbBulb size={20} />
+        Tips
+      </button>
+    </>
+  );
+
+  const rightItems = (
+    <>
       <Link to="/settings" className={itemClass} onClick={() => setMobileMenuOpen(false)}>
         <TbSettings size={20} />
         Inställningar
@@ -134,19 +148,29 @@ export function Layout() {
     <div className="flex min-h-screen flex-col bg-bg">
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
-          <Link
-            to="/"
-            className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
-          >
-            <TbBook2 size={24} className="text-primary-dark" />
-            Dödsbo Guide
-          </Link>
+          {isInProject ? (
+            <Link
+              to="/dashboard"
+              className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
+            >
+              <TbHome size={24} className="text-primary-dark" />
+              Översikt
+            </Link>
+          ) : (
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
+            >
+              <TbBook2 size={24} className="text-primary-dark" />
+              Dödsbo Guide
+            </Link>
+          )}
 
           {user ? (
             <>
               <nav className="hidden items-center gap-1 md:flex">
                 {navItems}
-                {navItems && <div className="mx-2 h-5 w-px bg-border" />}
+                <div className="mx-2 h-5 w-px bg-border" />
                 {rightItems}
               </nav>
 
@@ -174,7 +198,7 @@ export function Layout() {
         {user && mobileMenuOpen && (
           <nav className="flex flex-col gap-1 border-t border-border p-4 md:hidden">
             {navItems}
-            {navItems && <div className="my-1 h-px w-full bg-border" />}
+            <div className="my-1 h-px w-full bg-border" />
             {rightItems}
           </nav>
         )}
