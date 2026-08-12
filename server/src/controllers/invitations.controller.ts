@@ -96,3 +96,27 @@ export async function declineInvitation(req: Request, res: Response) {
 
   res.json({ success: true });
 }
+
+export async function revokeInvitation(req: Request, res: Response) {
+  const userId = req.user!.userId;
+  const invitation = await prisma.invitation.findUnique({ where: { id: req.params.invitationId } });
+
+  if (!invitation) {
+    throw new HttpError(404, 'Invitation not found');
+  }
+
+  const membership = await prisma.projectMember.findFirst({
+    where: { projectId: invitation.projectId, userId },
+  });
+  if (!membership || membership.role !== 'ADMIN') {
+    throw new HttpError(403, 'Project admin access required');
+  }
+
+  if (invitation.status !== 'PENDING') {
+    throw new HttpError(400, 'Only pending invitations can be revoked');
+  }
+
+  await prisma.invitation.delete({ where: { id: invitation.id } });
+
+  res.status(204).end();
+}

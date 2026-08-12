@@ -52,6 +52,16 @@ export interface ProjectDetail {
   createdAt: string;
   tasks: Task[];
   members: ProjectMember[];
+  invitations: PendingInvitation[];
+}
+
+export interface PendingInvitation {
+  id: string;
+  projectId: string;
+  invitedEmail: string;
+  status: InvitationStatus;
+  createdAt: string;
+  invitedUser: { id: string; name: string; email: string; profileImageUrl: string | null } | null;
 }
 
 export interface Contact {

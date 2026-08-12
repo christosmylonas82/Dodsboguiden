@@ -84,6 +84,11 @@ export async function getProject(req: Request, res: Response) {
         include: { assignedUser: { select: { id: true, name: true, email: true, profileImageUrl: true } } },
       },
       members: { include: { user: { select: { id: true, name: true, email: true, profileImageUrl: true } } } },
+      invitations: {
+        where: { status: 'PENDING' },
+        include: { invitedUser: { select: { id: true, name: true, email: true, profileImageUrl: true } } },
+        orderBy: { createdAt: 'desc' },
+      },
     },
   });
 

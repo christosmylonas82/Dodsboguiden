@@ -202,12 +202,19 @@ export function DashboardHubPage() {
           projectId={id!}
           projectName={project.deceasedName}
           members={project.members}
+          pendingInvitations={project.invitations}
           currentUserId={user?.id}
           isAdmin={isAdmin}
           onClose={() => setOpenModal(null)}
           onMemberRemoved={(memberId) => {
             setProject((prev) => (prev ? { ...prev, members: prev.members.filter((m) => m.id !== memberId) } : prev));
             showToast('Medlem borttagen');
+          }}
+          onInvitationRevoked={(invitationId) => {
+            setProject((prev) =>
+              prev ? { ...prev, invitations: prev.invitations.filter((i) => i.id !== invitationId) } : prev,
+            );
+            showToast('Inbjudan tillbakadragen');
           }}
         />
       )}
