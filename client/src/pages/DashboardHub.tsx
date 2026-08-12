@@ -25,6 +25,12 @@ export function DashboardHubPage() {
   const [openModal, setOpenModal] = useState<'progress' | 'activity' | 'members' | null>(null);
   const [archiving, setArchiving] = useState(false);
   const [confirmingArchive, setConfirmingArchive] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  function showToast(message: string) {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
+  }
 
   async function reload() {
     if (!id) return;
@@ -192,7 +198,24 @@ export function DashboardHubPage() {
         <RecentActivityModal projectId={id!} activity={activity} onClose={() => setOpenModal(null)} />
       )}
       {openModal === 'members' && (
-        <MembersModal members={project.members} onClose={() => setOpenModal(null)} />
+        <MembersModal
+          projectId={id!}
+          projectName={project.deceasedName}
+          members={project.members}
+          currentUserId={user?.id}
+          isAdmin={isAdmin}
+          onClose={() => setOpenModal(null)}
+          onMemberRemoved={(memberId) => {
+            setProject((prev) => (prev ? { ...prev, members: prev.members.filter((m) => m.id !== memberId) } : prev));
+            showToast('Medlem borttagen');
+          }}
+        />
+      )}
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-[60] rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-text shadow-lg">
+          {toast}
+        </div>
       )}
     </div>
   );

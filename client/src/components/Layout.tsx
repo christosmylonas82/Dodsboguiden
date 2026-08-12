@@ -10,29 +10,55 @@ import {
   TbMenu2,
   TbX,
   TbLogout2,
+  TbMailbox,
 } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
+import { apiFetch } from '../lib/api';
+import type { Invitation } from '../lib/types';
 import { ContactsModal } from './ContactsModal';
 import { InventoryModal } from './InventoryModal';
 import { TipsModal } from './TipsModal';
 import { ActivityLogModal } from './ActivityLogModal';
+import { InvitationsModal } from './InvitationsModal';
 
 const itemClass =
   'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
 
-type ModalKey = 'activity' | 'contacts' | 'inventory' | 'tips';
+type ModalKey = 'activity' | 'contacts' | 'inventory' | 'tips' | 'invitations';
 
 export function Layout() {
   const { user, logout, markTipsSeen } = useAuth();
   const { id: projectId } = useParams<{ id?: string }>();
   const [openModal, setOpenModal] = useState<ModalKey | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [invitationCount, setInvitationCount] = useState(0);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     if (user && !user.hasSeenTipsOnboarding) {
       setOpenModal('tips');
     }
   }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      setInvitationCount(0);
+      return;
+    }
+    refreshInvitationCount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  function refreshInvitationCount() {
+    apiFetch<Invitation[]>('/invitations')
+      .then((invitations) => setInvitationCount(invitations.length))
+      .catch(() => setInvitationCount(0));
+  }
+
+  function showToast(message: string) {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
+  }
 
   function openModalAndCloseMenu(modal: ModalKey) {
     setOpenModal(modal);
@@ -69,6 +95,19 @@ export function Layout() {
 
   const rightItems = (
     <>
+      {invitationCount > 0 && (
+        <button
+          type="button"
+          onClick={() => openModalAndCloseMenu('invitations')}
+          className={`${itemClass} bg-transparent`}
+        >
+          <TbMailbox size={20} />
+          Inbjudningar
+          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-warning px-1.5 text-xs font-semibold text-white">
+            {invitationCount}
+          </span>
+        </button>
+      )}
       <Link to="/settings" className={itemClass} onClick={() => setMobileMenuOpen(false)}>
         <TbSettings size={20} />
         Inställningar
@@ -144,6 +183,12 @@ export function Layout() {
         <Outlet />
       </main>
 
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-[60] rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-text shadow-lg">
+          {toast}
+        </div>
+      )}
+
       {openModal === 'activity' && projectId && (
         <ActivityLogModal projectId={projectId} onClose={() => setOpenModal(null)} />
       )}
@@ -154,6 +199,15 @@ export function Layout() {
         <InventoryModal projectId={projectId} onClose={() => setOpenModal(null)} />
       )}
       {openModal === 'tips' && <TipsModal onClose={closeTipsModal} />}
+      {openModal === 'invitations' && (
+        <InvitationsModal
+          onClose={() => setOpenModal(null)}
+          onHandled={(message) => {
+            showToast(message);
+            refreshInvitationCount();
+          }}
+        />
+      )}
     </div>
   );
 }

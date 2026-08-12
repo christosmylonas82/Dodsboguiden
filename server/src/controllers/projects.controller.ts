@@ -177,3 +177,26 @@ export async function permanentlyDeleteProject(req: Request, res: Response) {
 
   res.status(204).end();
 }
+
+export async function removeMember(req: Request, res: Response) {
+  const { id: projectId, memberId } = req.params;
+  const requestingUserId = req.user!.userId;
+
+  const member = await prisma.projectMember.findUnique({ where: { id: memberId } });
+  if (!member || member.projectId !== projectId) {
+    throw new HttpError(404, 'Member not found');
+  }
+  if (member.userId === requestingUserId) {
+    throw new HttpError(400, 'You cannot remove yourself from the project');
+  }
+
+  await prisma.projectMember.delete({ where: { id: memberId } });
+
+  await logActivity({
+    projectId,
+    userId: requestingUserId,
+    action: `removed member ${member.email}`,
+  });
+
+  res.status(204).end();
+}

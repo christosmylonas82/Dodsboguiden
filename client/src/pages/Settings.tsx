@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch, ApiError, BASE_URL, getToken } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
-import type { Invitation, ProjectSummary } from '../lib/types';
-import { formatTimestamp } from '../lib/activity';
+import type { ProjectSummary } from '../lib/types';
 import { ChangeEmailModal } from '../components/ChangeEmailModal';
 import { ChangePasswordModal } from '../components/ChangePasswordModal';
 import { DeleteProjectPermanentlyModal } from '../components/DeleteProjectPermanentlyModal';
@@ -26,7 +25,6 @@ export function SettingsPage() {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
 
-  const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [archivedProjects, setArchivedProjects] = useState<ProjectSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
@@ -39,11 +37,7 @@ export function SettingsPage() {
   const [deletingAccount, setDeletingAccount] = useState(false);
 
   async function reload() {
-    const [invites, projects] = await Promise.all([
-      apiFetch<Invitation[]>('/invitations'),
-      apiFetch<ProjectSummary[]>('/projects?includeArchived=true'),
-    ]);
-    setInvitations(invites);
+    const projects = await apiFetch<ProjectSummary[]>('/projects?includeArchived=true');
     setArchivedProjects(projects.filter((p) => p.deletedAt));
   }
 
@@ -54,26 +48,6 @@ export function SettingsPage() {
   function flashMessage(text: string) {
     setMessage(text);
     setTimeout(() => setMessage(null), 3000);
-  }
-
-  async function handleAcceptInvitation(invitation: Invitation) {
-    try {
-      await apiFetch(`/invitations/${invitation.id}/accept`, { method: 'POST' });
-      setInvitations((prev) => prev.filter((i) => i.id !== invitation.id));
-      flashMessage(`Du är nu medlem i ${invitation.project.deceasedName}`);
-    } catch (err) {
-      flashMessage(err instanceof ApiError ? err.message : 'Kunde inte acceptera inbjudan');
-    }
-  }
-
-  async function handleDeclineInvitation(invitation: Invitation) {
-    try {
-      await apiFetch(`/invitations/${invitation.id}/decline`, { method: 'POST' });
-      setInvitations((prev) => prev.filter((i) => i.id !== invitation.id));
-      flashMessage('Inbjudan nekad');
-    } catch (err) {
-      flashMessage(err instanceof ApiError ? err.message : 'Kunde inte neka inbjudan');
-    }
   }
 
   async function handleRestore(project: ProjectSummary) {
@@ -152,42 +126,6 @@ export function SettingsPage() {
             Ändra lösenord
           </button>
         </div>
-      </div>
-
-      <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-text">Mottagna inbjudningar {invitations.length > 0 && `(${invitations.length})`}</h2>
-        {loading ? (
-          <p className="mt-4 text-sm text-muted">Laddar…</p>
-        ) : invitations.length === 0 ? (
-          <p className="mt-4 text-sm text-muted">Du har inga väntande inbjudningar.</p>
-        ) : (
-          <ul className="mt-4 flex flex-col gap-3">
-            {invitations.map((invitation) => (
-              <li key={invitation.id} className="rounded-lg border border-border p-4">
-                <p className="font-medium text-text">{invitation.project.deceasedName}</p>
-                <p className="text-sm text-muted">
-                  Inbjuden av: {invitation.senderUser.name} ({formatTimestamp(invitation.createdAt)})
-                </p>
-                <div className="mt-3 flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => handleDeclineInvitation(invitation)}
-                    className="rounded-lg border border-border bg-transparent px-4 py-1.5 text-sm text-text hover:bg-primary-light"
-                  >
-                    Neka
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleAcceptInvitation(invitation)}
-                    className="rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-white hover:bg-primary-dark"
-                  >
-                    Acceptera
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
 
       <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">

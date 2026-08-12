@@ -9,6 +9,7 @@ import {
   inviteMember,
   listProjects,
   permanentlyDeleteProject,
+  removeMember,
   restoreProject,
 } from '../controllers/projects.controller.js';
 import { createTask, listActivity, updateTask } from '../controllers/tasks.controller.js';
@@ -36,6 +37,7 @@ router.post('/:id/invite', requireProjectAdmin, asyncHandler(inviteMember));
 router.patch('/:id/archive', requireProjectAdmin, asyncHandler(archiveProject));
 router.patch('/:id/restore', requireProjectAdmin, asyncHandler(restoreProject));
 router.delete('/:id/permanent', requireProjectAdmin, asyncHandler(permanentlyDeleteProject));
+router.delete('/:id/members/:memberId', requireProjectAdmin, asyncHandler(removeMember));
 
 router.post('/:id/tasks', requireProjectMember, asyncHandler(createTask));
 router.put('/:id/tasks/:taskId', requireProjectMember, asyncHandler(updateTask));
