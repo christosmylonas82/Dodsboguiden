@@ -12,7 +12,6 @@ import {
   TbX,
   TbLogout2,
   TbMailbox,
-  TbLayoutDashboard,
 } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
@@ -77,10 +76,6 @@ export function Layout() {
 
   const navItems = isInProject ? (
     <>
-      <Link to={`/projects/${projectId}/dashboard`} className={itemClass} onClick={() => setMobileMenuOpen(false)}>
-        <TbLayoutDashboard size={20} />
-        Projekt
-      </Link>
       <button type="button" onClick={() => openModalAndCloseMenu('activity')} className={`${itemClass} bg-transparent`}>
         <TbHistory size={20} />
         Aktivitetslogg
@@ -92,10 +87,6 @@ export function Layout() {
       <button type="button" onClick={() => openModalAndCloseMenu('inventory')} className={`${itemClass} bg-transparent`}>
         <TbClipboardList size={20} />
         Inventarielista
-      </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('tips')} className={`${itemClass} bg-transparent`}>
-        <TbBulb size={20} />
-        Tips
       </button>
     </>
   ) : (

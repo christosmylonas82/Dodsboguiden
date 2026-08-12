@@ -44,27 +44,31 @@ export function MembersModal({
           {members.map((m) => {
             const isSelf = m.userId === currentUserId;
             return (
-              <li key={m.id} className="flex items-center gap-3">
-                <Avatar name={m.user?.name ?? m.email} imageUrl={m.user?.profileImageUrl} userId={m.userId ?? m.id} />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm text-text">{m.user?.name ?? m.email}</p>
-                  {m.user && <p className="truncate text-xs text-muted">{m.email}</p>}
-                  {!m.userId && <p className="text-xs text-muted">Inbjuden, väntar på registrering</p>}
+              <li key={m.id} className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <Avatar name={m.user?.name ?? m.email} imageUrl={m.user?.profileImageUrl} userId={m.userId ?? m.id} />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm text-text">{m.user?.name ?? m.email}</p>
+                    {m.user && <p className="truncate text-xs text-muted">{m.email}</p>}
+                    {!m.userId && <p className="text-xs text-muted">Inbjuden, väntar på registrering</p>}
+                  </div>
                 </div>
-                <Badge tone={m.role === 'ADMIN' ? 'success' : 'neutral'}>
-                  {m.role === 'ADMIN' ? 'Admin' : 'Medlem'}
-                  {isSelf ? ' (Du)' : ''}
-                </Badge>
-                {isAdmin && !isSelf && (
-                  <button
-                    type="button"
-                    onClick={() => setMemberToDelete(m)}
-                    aria-label="Ta bort medlem"
-                    className="rounded-lg bg-transparent p-1.5 text-muted hover:bg-danger-light hover:text-danger"
-                  >
-                    <TbTrash size={16} />
-                  </button>
-                )}
+                <div className="flex shrink-0 items-center gap-2">
+                  <Badge tone={m.role === 'ADMIN' ? 'success' : 'neutral'}>
+                    {m.role === 'ADMIN' ? 'Admin' : 'Medlem'}
+                    {isSelf ? ' (Du)' : ''}
+                  </Badge>
+                  {isAdmin && !isSelf && (
+                    <button
+                      type="button"
+                      onClick={() => setMemberToDelete(m)}
+                      aria-label="Ta bort medlem"
+                      className="rounded-lg bg-transparent p-1.5 text-muted hover:bg-danger-light hover:text-danger"
+                    >
+                      <TbTrash size={16} />
+                    </button>
+                  )}
+                </div>
               </li>
             );
           })}
