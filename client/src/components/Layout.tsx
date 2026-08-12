@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Outlet, useParams } from 'react-router-dom';
 import {
   TbHistory,
@@ -15,27 +15,43 @@ import { useAuth } from '../context/AuthContext';
 import { ContactsModal } from './ContactsModal';
 import { InventoryModal } from './InventoryModal';
 import { TipsModal } from './TipsModal';
+import { ActivityLogModal } from './ActivityLogModal';
 
 const itemClass =
   'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
 
+type ModalKey = 'activity' | 'contacts' | 'inventory' | 'tips';
+
 export function Layout() {
-  const { user, logout } = useAuth();
+  const { user, logout, markTipsSeen } = useAuth();
   const { id: projectId } = useParams<{ id?: string }>();
-  const [openModal, setOpenModal] = useState<'contacts' | 'inventory' | 'tips' | null>(null);
+  const [openModal, setOpenModal] = useState<ModalKey | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  function openModalAndCloseMenu(modal: 'contacts' | 'inventory' | 'tips') {
+  useEffect(() => {
+    if (user && !user.hasSeenTipsOnboarding) {
+      setOpenModal('tips');
+    }
+  }, [user]);
+
+  function openModalAndCloseMenu(modal: ModalKey) {
     setOpenModal(modal);
     setMobileMenuOpen(false);
   }
 
+  function closeTipsModal() {
+    setOpenModal(null);
+    if (user && !user.hasSeenTipsOnboarding) {
+      markTipsSeen();
+    }
+  }
+
   const navItems = projectId ? (
     <>
-      <Link to={`/projects/${projectId}/activity`} className={itemClass} onClick={() => setMobileMenuOpen(false)}>
+      <button type="button" onClick={() => openModalAndCloseMenu('activity')} className={`${itemClass} bg-transparent`}>
         <TbHistory size={20} />
         Aktivitetslogg
-      </Link>
+      </button>
       <button type="button" onClick={() => openModalAndCloseMenu('contacts')} className={`${itemClass} bg-transparent`}>
         <TbAddressBook size={20} />
         Kontaktlista
@@ -46,7 +62,7 @@ export function Layout() {
       </button>
       <button type="button" onClick={() => openModalAndCloseMenu('tips')} className={`${itemClass} bg-transparent`}>
         <TbBulb size={20} />
-        Tips &amp; rekommendationer
+        Tips
       </button>
     </>
   ) : null;
@@ -128,13 +144,16 @@ export function Layout() {
         <Outlet />
       </main>
 
+      {openModal === 'activity' && projectId && (
+        <ActivityLogModal projectId={projectId} onClose={() => setOpenModal(null)} />
+      )}
       {openModal === 'contacts' && projectId && (
         <ContactsModal projectId={projectId} onClose={() => setOpenModal(null)} />
       )}
       {openModal === 'inventory' && projectId && (
         <InventoryModal projectId={projectId} onClose={() => setOpenModal(null)} />
       )}
-      {openModal === 'tips' && <TipsModal onClose={() => setOpenModal(null)} />}
+      {openModal === 'tips' && <TipsModal onClose={closeTipsModal} />}
     </div>
   );
 }

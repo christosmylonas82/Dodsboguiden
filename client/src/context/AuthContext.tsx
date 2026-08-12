@@ -8,6 +8,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, name: string, password: string, gdprConsent: boolean) => Promise<void>;
   logout: () => void;
+  markTipsSeen: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -50,8 +51,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
+  async function markTipsSeen() {
+    const updated = await apiFetch<User>('/auth/me/seen-tips', { method: 'PUT' });
+    setUser(updated);
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, markTipsSeen }}>
       {children}
     </AuthContext.Provider>
   );

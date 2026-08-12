@@ -39,7 +39,15 @@ export async function register(req: Request, res: Response) {
   });
 
   const token = signToken({ userId: user.id, role: user.role });
-  res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name } });
+  res.status(201).json({
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
+    },
+  });
 }
 
 const loginSchema = z.object({
@@ -61,7 +69,15 @@ export async function login(req: Request, res: Response) {
   }
 
   const token = signToken({ userId: user.id, role: user.role });
-  res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
+  res.json({
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
+    },
+  });
 }
 
 export async function me(req: Request, res: Response) {
@@ -69,5 +85,25 @@ export async function me(req: Request, res: Response) {
   if (!user || user.deletedAt) {
     throw new HttpError(404, 'User not found');
   }
-  res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
+  res.json({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
+  });
+}
+
+export async function markTipsSeen(req: Request, res: Response) {
+  const user = await prisma.user.update({
+    where: { id: req.user!.userId },
+    data: { hasSeenTipsOnboarding: true },
+  });
+  res.json({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
+  });
 }
