@@ -51,7 +51,7 @@ export function Layout() {
 
   function refreshInvitationCount() {
     apiFetch<Invitation[]>('/invitations')
-      .then((invitations) => setInvitationCount(invitations.length))
+      .then((invitations) => setInvitationCount(invitations.filter((i) => i.status === 'PENDING').length))
       .catch(() => setInvitationCount(0));
   }
 
@@ -95,19 +95,19 @@ export function Layout() {
 
   const rightItems = (
     <>
-      {invitationCount > 0 && (
-        <button
-          type="button"
-          onClick={() => openModalAndCloseMenu('invitations')}
-          className={`${itemClass} bg-transparent`}
-        >
-          <TbMailbox size={20} />
-          Inbjudningar
+      <button
+        type="button"
+        onClick={() => openModalAndCloseMenu('invitations')}
+        className={`${itemClass} bg-transparent`}
+      >
+        <TbMailbox size={20} />
+        Inbjudningar
+        {invitationCount > 0 && (
           <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-warning px-1.5 text-xs font-semibold text-white">
             {invitationCount}
           </span>
-        </button>
-      )}
+        )}
+      </button>
       <Link to="/settings" className={itemClass} onClick={() => setMobileMenuOpen(false)}>
         <TbSettings size={20} />
         Inställningar

@@ -17,6 +17,8 @@ async function findOwnedInvitation(invitationId: string, userId: string) {
   return { invitation, user };
 }
 
+const STATUS_ORDER: Record<string, number> = { PENDING: 0, ACCEPTED: 1, DECLINED: 2 };
+
 export async function listMyInvitations(req: Request, res: Response) {
   const userId = req.user!.userId;
   const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -26,7 +28,6 @@ export async function listMyInvitations(req: Request, res: Response) {
 
   const invitations = await prisma.invitation.findMany({
     where: {
-      status: 'PENDING',
       OR: [{ invitedUserId: userId }, { invitedEmail: user.email }],
     },
     include: {
@@ -35,6 +36,8 @@ export async function listMyInvitations(req: Request, res: Response) {
     },
     orderBy: { createdAt: 'desc' },
   });
+
+  invitations.sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
 
   res.json(invitations);
 }

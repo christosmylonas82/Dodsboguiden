@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react';
+import { TbCircleCheck, TbCircleX } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
-import type { Invitation } from '../lib/types';
+import type { Invitation, InvitationStatus } from '../lib/types';
 import { formatTimestamp } from '../lib/activity';
+import { Badge } from './Badge';
 import { ModalOverlay } from './ModalOverlay';
+
+const STATUS_BADGE: Record<InvitationStatus, { tone: 'warning' | 'success' | 'danger'; label: string }> = {
+  PENDING: { tone: 'warning', label: 'Väntande' },
+  ACCEPTED: { tone: 'success', label: 'Accepterad' },
+  DECLINED: { tone: 'danger', label: 'Nekad' },
+};
 
 export function InvitationsModal({
   onClose,
@@ -13,6 +21,7 @@ export function InvitationsModal({
 }) {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
     apiFetch<Invitation[]>('/invitations')
@@ -20,29 +29,39 @@ export function InvitationsModal({
       .finally(() => setLoading(false));
   }, []);
 
+  function updateStatus(id: string, status: InvitationStatus) {
+    setInvitations((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)));
+  }
+
   async function handleAccept(invitation: Invitation) {
+    setBusyId(invitation.id);
     try {
       await apiFetch(`/invitations/${invitation.id}/accept`, { method: 'POST' });
+      updateStatus(invitation.id, 'ACCEPTED');
       onHandled(`Du är nu medlem i ${invitation.project.deceasedName}`);
-      onClose();
     } catch (err) {
       onHandled(err instanceof ApiError ? err.message : 'Kunde inte acceptera inbjudan');
+    } finally {
+      setBusyId(null);
     }
   }
 
   async function handleDecline(invitation: Invitation) {
+    setBusyId(invitation.id);
     try {
       await apiFetch(`/invitations/${invitation.id}/decline`, { method: 'POST' });
+      updateStatus(invitation.id, 'DECLINED');
       onHandled('Inbjudan nekad');
-      onClose();
     } catch (err) {
       onHandled(err instanceof ApiError ? err.message : 'Kunde inte neka inbjudan');
+    } finally {
+      setBusyId(null);
     }
   }
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Inbjudningar</h3>
           <button
@@ -58,35 +77,59 @@ export function InvitationsModal({
         {loading ? (
           <p className="mt-5 text-sm text-muted">Laddar…</p>
         ) : invitations.length === 0 ? (
-          <p className="mt-5 text-sm text-muted">Du har inga väntande inbjudningar.</p>
+          <p className="mt-5 text-sm text-muted">Du har inga inbjudningar.</p>
         ) : (
           <>
             <p className="mt-5 text-sm text-muted">Du är inbjuden till följande dödsbon:</p>
             <ul className="mt-3 flex flex-col gap-3">
-              {invitations.map((invitation) => (
-                <li key={invitation.id} className="rounded-lg border border-border p-4">
-                  <p className="font-medium text-text">{invitation.project.deceasedName}</p>
-                  <p className="text-sm text-muted">
-                    Inbjuden av: {invitation.senderUser.name} ({formatTimestamp(invitation.createdAt)})
-                  </p>
-                  <div className="mt-3 flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => handleDecline(invitation)}
-                      className="rounded-lg border border-border bg-transparent px-4 py-1.5 text-sm text-text hover:bg-primary-light"
-                    >
-                      Neka
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleAccept(invitation)}
-                      className="rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-white hover:bg-primary-dark"
-                    >
-                      Acceptera
-                    </button>
-                  </div>
-                </li>
-              ))}
+              {invitations.map((invitation) => {
+                const badge = STATUS_BADGE[invitation.status];
+                const isBusy = busyId === invitation.id;
+                return (
+                  <li key={invitation.id} className="rounded-lg border border-border p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-medium text-text">{invitation.project.deceasedName}</p>
+                        <p className="text-sm text-muted">
+                          Inbjuden av: {invitation.senderUser.name} ({formatTimestamp(invitation.createdAt)})
+                        </p>
+                      </div>
+                      <Badge tone={badge.tone}>{badge.label}</Badge>
+                    </div>
+                    <div className="mt-3 flex gap-3">
+                      {invitation.status === 'PENDING' ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleDecline(invitation)}
+                            disabled={isBusy}
+                            className="rounded-lg border border-border bg-transparent px-4 py-1.5 text-sm text-text hover:bg-primary-light disabled:opacity-60"
+                          >
+                            Neka
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleAccept(invitation)}
+                            disabled={isBusy}
+                            className="rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-60"
+                          >
+                            Acceptera
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled
+                          className="flex items-center gap-1.5 rounded-lg border border-border bg-transparent px-4 py-1.5 text-sm text-muted opacity-70"
+                        >
+                          {invitation.status === 'ACCEPTED' ? <TbCircleCheck size={16} /> : <TbCircleX size={16} />}
+                          {invitation.status === 'ACCEPTED' ? 'Accepterad' : 'Nekad'}
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </>
         )}
