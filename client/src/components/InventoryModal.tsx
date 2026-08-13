@@ -47,14 +47,31 @@ export function InventoryModal({
     await apiFetch(`/projects/${projectId}/inventory/${itemId}`, { method: 'DELETE' });
   }
 
+  function isDebt(item: InventoryItem): boolean {
+    return item.type.toLowerCase().includes('skuld') || item.value < 0;
+  }
+
+  const totalAssets = items
+    .filter((i) => !isDebt(i) && i.value > 0)
+    .reduce((sum, i) => sum + i.value, 0);
+  const totalDebts = items.filter(isDebt).reduce((sum, i) => sum + Math.abs(i.value), 0);
+  const netValue = totalAssets - totalDebts;
+
+  function formatCurrency(value: number): string {
+    return `${value.toLocaleString('sv-SE')} kr`;
+  }
+
   function exportOptions() {
-    const total = items.reduce((sum, item) => sum + item.value, 0);
     return {
       title: 'Inventarielista',
       deceasedName: projectName,
       headers: ['Typ', 'Värde (kr)', 'Kommentarer'],
       rows: items.map((i) => [i.type || '—', String(i.value), i.comments ?? '—']),
-      footerNote: `Totalt: ${total.toLocaleString('sv-SE')} kr`,
+      footerLines: [
+        `Totalt tillgångar: ${formatCurrency(totalAssets)}`,
+        `Totalt skulder: ${formatCurrency(totalDebts)}`,
+        `Netto värde: ${formatCurrency(netValue)}`,
+      ],
       filenamePrefix: 'inventarielista',
     };
   }
@@ -142,6 +159,24 @@ export function InventoryModal({
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {items.length > 0 && (
+              <div className="mt-4 rounded-lg border-t border-border bg-bg p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted">Sammanfattning</p>
+                <div className="mt-2 flex items-center justify-between text-sm text-text">
+                  <span>Totalt tillgångar:</span>
+                  <strong>{formatCurrency(totalAssets)}</strong>
+                </div>
+                <div className="mt-1.5 flex items-center justify-between text-sm text-text">
+                  <span>Totalt skulder:</span>
+                  <strong>{formatCurrency(totalDebts)}</strong>
+                </div>
+                <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-base font-semibold text-text">
+                  <span>Netto värde:</span>
+                  <strong>{formatCurrency(netValue)}</strong>
+                </div>
               </div>
             )}
 

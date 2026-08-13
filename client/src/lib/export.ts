@@ -6,7 +6,7 @@ interface ExportTableOptions {
   deceasedName: string;
   headers: string[];
   rows: string[][];
-  footerNote?: string;
+  footerLines?: string[];
   filenamePrefix: string;
 }
 
@@ -51,7 +51,18 @@ export async function exportTableToPdf(opts: ExportTableOptions): Promise<void> 
       <thead><tr>${headerHtml}</tr></thead>
       <tbody>${rowsHtml}</tbody>
     </table>
-    ${opts.footerNote ? `<p style="margin-top:16px;font-size:13px;font-weight:bold;">${opts.footerNote}</p>` : ''}
+    ${
+      opts.footerLines?.length
+        ? `<div style="margin-top:20px;padding-top:12px;border-top:1px solid #333;">
+             ${opts.footerLines
+               .map(
+                 (line, i) =>
+                   `<p style="font-size:${i === opts.footerLines!.length - 1 ? 15 : 13}px;font-weight:bold;margin:4px 0;">${line}</p>`,
+               )
+               .join('')}
+           </div>`
+        : ''
+    }
   `;
 
   await html2pdf()
@@ -77,7 +88,13 @@ export async function exportTableToDocx(opts: ExportTableOptions): Promise<void>
           new Paragraph({ text: `${opts.title} - ${opts.deceasedName}`, heading: HeadingLevel.HEADING_1 }),
           new Paragraph({ text: `Exporterat: ${new Date().toLocaleDateString('sv-SE')}`, spacing: { after: 200 } }),
           new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [headerRow, ...dataRows] }),
-          ...(opts.footerNote ? [new Paragraph({ text: opts.footerNote, spacing: { before: 200 } })] : []),
+          ...(opts.footerLines ?? []).map(
+            (line, i, arr) =>
+              new Paragraph({
+                children: [new TextRun({ text: line, bold: true, size: i === arr.length - 1 ? 26 : 22 })],
+                spacing: { before: i === 0 ? 300 : 100 },
+              }),
+          ),
         ],
       },
     ],

@@ -71,8 +71,8 @@ export function ContactsModal({
     return {
       title: 'Kontaktlista',
       deceasedName: projectName,
-      headers: ['Namn', 'Relation', 'Telefon', 'E-post'],
-      rows: contacts.map((c) => [c.name, c.relation, c.phone ?? '—', c.email ?? '—']),
+      headers: ['Namn', 'Relation', 'Telefon', 'E-post', 'Anteckningar'],
+      rows: contacts.map((c) => [c.name, c.relation, c.phone ?? '—', c.email ?? '—', c.notes ?? '—']),
       filenamePrefix: 'kontaktlista',
     };
   }
