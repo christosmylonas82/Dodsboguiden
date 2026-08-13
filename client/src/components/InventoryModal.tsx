@@ -2,9 +2,18 @@ import { useEffect, useState } from 'react';
 import { TbTrash } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
 import type { InventoryItem } from '../lib/types';
+import { ExportMenu } from './ExportMenu';
 import { ModalOverlay } from './ModalOverlay';
 
-export function InventoryModal({ projectId, onClose }: { projectId: string; onClose: () => void }) {
+export function InventoryModal({
+  projectId,
+  projectName,
+  onClose,
+}: {
+  projectId: string;
+  projectName: string;
+  onClose: () => void;
+}) {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,19 +47,37 @@ export function InventoryModal({ projectId, onClose }: { projectId: string; onCl
     await apiFetch(`/projects/${projectId}/inventory/${itemId}`, { method: 'DELETE' });
   }
 
+  function exportOptions() {
+    const total = items.reduce((sum, item) => sum + item.value, 0);
+    return {
+      title: 'Inventarielista',
+      deceasedName: projectName,
+      headers: ['Typ', 'Värde (kr)', 'Kommentarer'],
+      rows: items.map((i) => [i.type || '—', String(i.value), i.comments ?? '—']),
+      footerNote: `Totalt: ${total.toLocaleString('sv-SE')} kr`,
+      filenamePrefix: 'inventarielista',
+    };
+  }
+
   return (
     <ModalOverlay onClose={onClose} maxWidthClassName="max-w-2xl">
       <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Inventarielista</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Stäng"
-            className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-1">
+            <ExportMenu
+              onExportPdf={async () => (await import('../lib/export')).exportTableToPdf(exportOptions())}
+              onExportDocx={async () => (await import('../lib/export')).exportTableToDocx(exportOptions())}
+            />
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Stäng"
+              className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {loading ? (

@@ -10,6 +10,7 @@ This project is tracked in Git and pushed to GitHub (`christosmylonas82/Dodsbogu
 - Push commits to GitHub immediately after committing — don't let commits sit locally — so there's always a saved, revertible version of the project and no work is ever at risk of being lost.
 - Treat "commit and push" as the default follow-up after every meaningful change, without needing to be asked each time — unless work is explicitly WIP/experimental and shouldn't be pushed yet.
 - Do this proactively throughout a work session, not just at the end — commit and push as soon as a change is in a working/reviewable state.
+- The point of this cadence is continuity: regular commits + pushes mean the current state of the project is never sitting only in an uncommitted working directory. If a session ends unexpectedly, the worst-case loss is the small increment since the last commit, not the whole session's work.
 
 ## 🏢 Dödsboguiden - Multi-Agent Team
 

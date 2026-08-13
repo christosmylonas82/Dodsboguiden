@@ -4,9 +4,18 @@ import { apiFetch } from '../lib/api';
 import type { ActivityEntry } from '../lib/types';
 import { formatActivityAction, formatTimestamp } from '../lib/activity';
 import { Avatar } from './Avatar';
+import { ExportMenu } from './ExportMenu';
 import { ModalOverlay } from './ModalOverlay';
 
-export function ActivityLogModal({ projectId, onClose }: { projectId: string; onClose: () => void }) {
+export function ActivityLogModal({
+  projectId,
+  projectName,
+  onClose,
+}: {
+  projectId: string;
+  projectName: string;
+  onClose: () => void;
+}) {
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,19 +25,35 @@ export function ActivityLogModal({ projectId, onClose }: { projectId: string; on
       .finally(() => setLoading(false));
   }, [projectId]);
 
+  function exportOptions() {
+    return {
+      title: 'Aktivitetslogg',
+      deceasedName: projectName,
+      headers: ['Användare', 'Vad som gjordes', 'Tidpunkt'],
+      rows: activity.map((entry) => [entry.user.name, formatActivityAction(entry.action), formatTimestamp(entry.timestamp)]),
+      filenamePrefix: 'aktivitetslogg',
+    };
+  }
+
   return (
     <ModalOverlay onClose={onClose} maxWidthClassName="max-w-lg">
       <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Aktivitetslogg</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Stäng"
-            className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-1">
+            <ExportMenu
+              onExportPdf={async () => (await import('../lib/export')).exportTableToPdf(exportOptions())}
+              onExportDocx={async () => (await import('../lib/export')).exportTableToDocx(exportOptions())}
+            />
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Stäng"
+              className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {loading ? (

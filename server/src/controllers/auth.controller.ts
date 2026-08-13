@@ -88,6 +88,19 @@ export async function me(req: Request, res: Response) {
   res.json(toUserResponse(user));
 }
 
+const updateNameSchema = z.object({
+  name: z.string().min(1).max(100),
+});
+
+export async function updateName(req: Request, res: Response) {
+  const body = updateNameSchema.parse(req.body);
+  const user = await prisma.user.update({
+    where: { id: req.user!.userId },
+    data: { name: body.name },
+  });
+  res.json(toUserResponse(user));
+}
+
 export async function markTipsSeen(req: Request, res: Response) {
   const user = await prisma.user.update({
     where: { id: req.user!.userId },

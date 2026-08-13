@@ -15,17 +15,18 @@ import {
 } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
-import type { Invitation } from '../lib/types';
+import type { Invitation, ProjectDetail } from '../lib/types';
 import { ContactsModal } from './ContactsModal';
 import { InventoryModal } from './InventoryModal';
 import { TipsModal } from './TipsModal';
 import { ActivityLogModal } from './ActivityLogModal';
 import { InvitationsModal } from './InvitationsModal';
+import { SettingsModal } from './SettingsModal';
 
 const itemClass =
   'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
 
-type ModalKey = 'activity' | 'contacts' | 'inventory' | 'tips' | 'invitations';
+type ModalKey = 'activity' | 'contacts' | 'inventory' | 'tips' | 'invitations' | 'settings';
 
 export function Layout() {
   const { user, logout, markTipsSeen } = useAuth();
@@ -35,12 +36,23 @@ export function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [invitationCount, setInvitationCount] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
+  const [projectName, setProjectName] = useState('');
 
   useEffect(() => {
     if (user && !user.hasSeenTipsOnboarding) {
       setOpenModal('tips');
     }
   }, [user]);
+
+  useEffect(() => {
+    if (!projectId) {
+      setProjectName('');
+      return;
+    }
+    apiFetch<ProjectDetail>(`/projects/${projectId}`)
+      .then((p) => setProjectName(p.deceasedName))
+      .catch(() => setProjectName(''));
+  }, [projectId]);
 
   useEffect(() => {
     if (!user) {
@@ -113,10 +125,10 @@ export function Layout() {
 
   const rightItems = (
     <>
-      <Link to="/settings" className={itemClass} onClick={() => setMobileMenuOpen(false)}>
+      <button type="button" onClick={() => openModalAndCloseMenu('settings')} className={`${itemClass} bg-transparent`}>
         <TbSettings size={20} />
         Inställningar
-      </Link>
+      </button>
       {user?.role === 'ADMIN' && (
         <Link to="/admin/dashboard" className={itemClass} onClick={() => setMobileMenuOpen(false)}>
           Admin
@@ -205,13 +217,13 @@ export function Layout() {
       )}
 
       {openModal === 'activity' && projectId && (
-        <ActivityLogModal projectId={projectId} onClose={() => setOpenModal(null)} />
+        <ActivityLogModal projectId={projectId} projectName={projectName} onClose={() => setOpenModal(null)} />
       )}
       {openModal === 'contacts' && projectId && (
-        <ContactsModal projectId={projectId} onClose={() => setOpenModal(null)} />
+        <ContactsModal projectId={projectId} projectName={projectName} onClose={() => setOpenModal(null)} />
       )}
       {openModal === 'inventory' && projectId && (
-        <InventoryModal projectId={projectId} onClose={() => setOpenModal(null)} />
+        <InventoryModal projectId={projectId} projectName={projectName} onClose={() => setOpenModal(null)} />
       )}
       {openModal === 'tips' && <TipsModal onClose={closeTipsModal} />}
       {openModal === 'invitations' && (
@@ -223,6 +235,7 @@ export function Layout() {
           }}
         />
       )}
+      {openModal === 'settings' && <SettingsModal onClose={() => setOpenModal(null)} />}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import {
   register,
   removeProfileImage,
   updateEmail,
+  updateName,
   updatePassword,
   updateProfileImage,
 } from '../controllers/auth.controller.js';
@@ -18,6 +19,7 @@ const router = Router();
 router.post('/register', asyncHandler(register));
 router.post('/login', asyncHandler(login));
 router.get('/me', requireAuth, asyncHandler(me));
+router.put('/me', requireAuth, asyncHandler(updateName));
 router.put('/me/seen-tips', requireAuth, asyncHandler(markTipsSeen));
 router.put('/email', requireAuth, asyncHandler(updateEmail));
 router.put('/password', requireAuth, asyncHandler(updatePassword));

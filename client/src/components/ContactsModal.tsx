@@ -2,9 +2,18 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { TbTrash } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { Contact } from '../lib/types';
+import { ExportMenu } from './ExportMenu';
 import { ModalOverlay } from './ModalOverlay';
 
-export function ContactsModal({ projectId, onClose }: { projectId: string; onClose: () => void }) {
+export function ContactsModal({
+  projectId,
+  projectName,
+  onClose,
+}: {
+  projectId: string;
+  projectName: string;
+  onClose: () => void;
+}) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,19 +67,35 @@ export function ContactsModal({ projectId, onClose }: { projectId: string; onClo
     }
   }
 
+  function exportOptions() {
+    return {
+      title: 'Kontaktlista',
+      deceasedName: projectName,
+      headers: ['Namn', 'Relation', 'Telefon', 'E-post'],
+      rows: contacts.map((c) => [c.name, c.relation, c.phone ?? '—', c.email ?? '—']),
+      filenamePrefix: 'kontaktlista',
+    };
+  }
+
   return (
     <ModalOverlay onClose={onClose} maxWidthClassName="max-w-2xl">
       <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Kontaktlista</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Stäng"
-            className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-1">
+            <ExportMenu
+              onExportPdf={async () => (await import('../lib/export')).exportTableToPdf(exportOptions())}
+              onExportDocx={async () => (await import('../lib/export')).exportTableToDocx(exportOptions())}
+            />
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Stäng"
+              className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {loading ? (
