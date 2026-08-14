@@ -16,6 +16,7 @@ export function InventoryModal({
 }) {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [valueDrafts, setValueDrafts] = useState<Record<string, string>>({});
 
   useEffect(() => {
     apiFetch<InventoryItem[]>(`/projects/${projectId}/inventory`)
@@ -130,11 +131,25 @@ export function InventoryModal({
                         </td>
                         <td className="py-2 pr-3">
                           <input
-                            type="number"
-                            value={item.value}
-                            onChange={(e) => updateLocal(item.id, { value: Number(e.target.value) })}
-                            onBlur={(e) => saveField(item.id, { value: Number(e.target.value) })}
-                            className="w-28 rounded-lg border border-border px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                            type="text"
+                            inputMode="decimal"
+                            value={valueDrafts[item.id] ?? String(item.value)}
+                            onChange={(e) => {
+                              const input = e.target.value;
+                              if (input === '' || input === '-' || /^-?\d*\.?\d*$/.test(input)) {
+                                setValueDrafts((prev) => ({ ...prev, [item.id]: input }));
+                              }
+                            }}
+                            onBlur={() => {
+                              const numValue = parseFloat(valueDrafts[item.id] ?? '') || 0;
+                              setValueDrafts((prev) => {
+                                const { [item.id]: _removed, ...rest } = prev;
+                                return rest;
+                              });
+                              updateLocal(item.id, { value: numValue });
+                              saveField(item.id, { value: numValue });
+                            }}
+                            className="w-28 rounded-lg border border-border px-2 py-1.5 text-right text-text focus:border-primary focus:outline-none"
                           />
                         </td>
                         <td className="py-2 pr-3">

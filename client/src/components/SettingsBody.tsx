@@ -31,7 +31,8 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
 
-  const [nameDraft, setNameDraft] = useState(user?.name ?? '');
+  const [firstNameDraft, setFirstNameDraft] = useState(user?.name.split(' ')[0] ?? '');
+  const [lastNameDraft, setLastNameDraft] = useState(user?.name.split(' ').slice(1).join(' ') ?? '');
   const [savingName, setSavingName] = useState(false);
 
   const [emailModalOpen, setEmailModalOpen] = useState(false);
@@ -54,7 +55,8 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
   }, []);
 
   useEffect(() => {
-    setNameDraft(user?.name ?? '');
+    setFirstNameDraft(user?.name.split(' ')[0] ?? '');
+    setLastNameDraft(user?.name.split(' ').slice(1).join(' ') ?? '');
   }, [user?.name]);
 
   function flashMessage(text: string) {
@@ -63,9 +65,10 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
   }
 
   async function handleNameBlur() {
-    const trimmed = nameDraft.trim();
+    const trimmed = `${firstNameDraft.trim()} ${lastNameDraft.trim()}`.trim();
     if (!trimmed || trimmed === user?.name) {
-      setNameDraft(user?.name ?? '');
+      setFirstNameDraft(user?.name.split(' ')[0] ?? '');
+      setLastNameDraft(user?.name.split(' ').slice(1).join(' ') ?? '');
       return;
     }
     setSavingName(true);
@@ -77,7 +80,8 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
       updateUser(updated);
       flashMessage('Namn uppdaterat');
     } catch (err) {
-      setNameDraft(user?.name ?? '');
+      setFirstNameDraft(user?.name.split(' ')[0] ?? '');
+      setLastNameDraft(user?.name.split(' ').slice(1).join(' ') ?? '');
       flashMessage(err instanceof ApiError ? err.message : 'Kunde inte uppdatera namnet');
     } finally {
       setSavingName(false);
@@ -146,17 +150,32 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
         <div className="mt-4 flex flex-col items-center gap-3">
           <Avatar name={user.name} imageUrl={user.profileImageUrl} userId={user.id} size="lg" />
           <div className="w-full max-w-xs">
-            <label htmlFor="settingsName" className="text-sm text-muted">
-              Namn
+            <label htmlFor="settingsFirstName" className="text-sm text-muted">
+              Förnamn
             </label>
             <input
-              id="settingsName"
+              id="settingsFirstName"
               type="text"
-              value={nameDraft}
-              onChange={(e) => setNameDraft(e.target.value)}
+              value={firstNameDraft}
+              onChange={(e) => setFirstNameDraft(e.target.value)}
               onBlur={handleNameBlur}
               disabled={savingName}
-              maxLength={100}
+              maxLength={50}
+              className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-center text-text focus:border-primary focus:outline-none disabled:opacity-60"
+            />
+          </div>
+          <div className="w-full max-w-xs">
+            <label htmlFor="settingsLastName" className="text-sm text-muted">
+              Efternamn
+            </label>
+            <input
+              id="settingsLastName"
+              type="text"
+              value={lastNameDraft}
+              onChange={(e) => setLastNameDraft(e.target.value)}
+              onBlur={handleNameBlur}
+              disabled={savingName}
+              maxLength={50}
               className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-center text-text focus:border-primary focus:outline-none disabled:opacity-60"
             />
           </div>
