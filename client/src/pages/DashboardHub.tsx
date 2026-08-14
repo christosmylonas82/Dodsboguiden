@@ -125,7 +125,7 @@ export function DashboardHubPage() {
         />
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {PHASES.map((phase) => {
           const tasks = project.tasks.filter((t) => t.phase === phase);
           if (tasks.length === 0) return null;

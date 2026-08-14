@@ -18,6 +18,7 @@ export interface ProjectSummary {
 }
 
 export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'DONE';
+export type TaskPriority = 'NOW' | 'SOON' | 'LATER';
 
 export interface Task {
   id: string;
@@ -26,11 +27,19 @@ export interface Task {
   description: string | null;
   moreInfo: string | null;
   url: string | null;
-  phase: 'Förberedelser' | 'Förrättningen' | 'Efter förrättningen';
+  phase:
+    | 'Direkt efter dödsfall'
+    | 'Begravning & ceremoni'
+    | 'Inför bouppteckning'
+    | 'Under bouppteckning'
+    | 'Avslut & arvskifte';
   completed: boolean;
   completedBy: string | null;
   completedAt: string | null;
   status: TaskStatus;
+  priority: TaskPriority | null;
+  timeEstimate: string | null;
+  responsibleRole: string | null;
   assignedTo: string | null;
   assignedUser: { id: string; name: string; email: string; profileImageUrl: string | null } | null;
   orderIndex: number;

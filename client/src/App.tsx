@@ -36,11 +36,25 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/projects/:id" element={<ProjectRedirect />} />
               <Route path="/projects/:id/dashboard" element={<DashboardHubPage />} />
-              <Route path="/projects/:id/foreberedelser" element={<PhaseDashboardPage phase="Förberedelser" />} />
-              <Route path="/projects/:id/forrattningen" element={<PhaseDashboardPage phase="Förrättningen" />} />
               <Route
-                path="/projects/:id/efter-forrattningen"
-                element={<PhaseDashboardPage phase="Efter förrättningen" />}
+                path="/projects/:id/direkt-efter-dodsfall"
+                element={<PhaseDashboardPage phase="Direkt efter dödsfall" />}
+              />
+              <Route
+                path="/projects/:id/begravning-ceremoni"
+                element={<PhaseDashboardPage phase="Begravning & ceremoni" />}
+              />
+              <Route
+                path="/projects/:id/infor-bouppteckning"
+                element={<PhaseDashboardPage phase="Inför bouppteckning" />}
+              />
+              <Route
+                path="/projects/:id/under-bouppteckning"
+                element={<PhaseDashboardPage phase="Under bouppteckning" />}
+              />
+              <Route
+                path="/projects/:id/avslut-arvskifte"
+                element={<PhaseDashboardPage phase="Avslut & arvskifte" />}
               />
               <Route path="/projects/:id/activity" element={<ProjectActivityPage />} />
               <Route path="/settings" element={<SettingsPage />} />

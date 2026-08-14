@@ -1,9 +1,11 @@
 import type { Task } from './types';
 
 export const PHASE_DESCRIPTIONS: Record<Task['phase'], string> = {
-  Förberedelser: 'Samla underlag och kalla till förrättningen. Ta det i den takt ni orkar.',
-  Förrättningen: 'Mötet där ni går igenom tillgångar och skulder tillsammans.',
-  'Efter förrättningen': 'Skicka in till Skatteverket och avsluta det praktiska.',
+  'Direkt efter dödsfall': 'De första praktiska stegen: informera familjen, säkra hemmet och komma i kontakt med rätt instanser.',
+  'Begravning & ceremoni': 'Planera och genomföra begravningen, från önskemål och praktiska arrangemang till efterarbete.',
+  'Inför bouppteckning': 'Samla dokument, inventera tillgångar och skulder, och förbered allt som behövs för bouppteckningen.',
+  'Under bouppteckning': 'Upprätta och lämna in bouppteckningen, värdera tillgångar och betala dödsboets skulder.',
+  'Avslut & arvskifte': 'Fördela arvet, avsluta konton och avtal, och knyta ihop dödsboet formellt.',
 };
 
 // Fallback descriptions for tasks created before the `description` column existed

@@ -28,6 +28,12 @@ enum TaskStatus {
   DONE
 }
 
+enum TaskPriority {
+  NOW
+  SOON
+  LATER
+}
+
 enum InvitationStatus {
   PENDING
   ACCEPTED
@@ -107,6 +113,9 @@ model Task {
   status      TaskStatus @default(PENDING)
   assignedTo  String?    @map("assigned_to")
   orderIndex  Int        @map("order_index")
+  priority        TaskPriority? @map("priority")
+  timeEstimate    String?       @map("time_estimate")
+  responsibleRole String?       @map("responsible_role")
 
   project         Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   completedByUser User?   @relation("TaskCompletedBy", fields: [completedBy], references: [id])

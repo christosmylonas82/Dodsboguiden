@@ -1,7 +1,13 @@
 import type { Task } from './types';
 import type { BadgeTone } from '../components/Badge';
 
-export const PHASES: Task['phase'][] = ['Förberedelser', 'Förrättningen', 'Efter förrättningen'];
+export const PHASES: Task['phase'][] = [
+  'Direkt efter dödsfall',
+  'Begravning & ceremoni',
+  'Inför bouppteckning',
+  'Under bouppteckning',
+  'Avslut & arvskifte',
+];
 
 export function phaseStatus(tasks: Task[]): { label: string; tone: BadgeTone } {
   const done = tasks.filter((t) => t.completed).length;

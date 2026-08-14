@@ -6,7 +6,13 @@ import { logActivity } from '../lib/activity.js';
 
 const createTaskSchema = z.object({
   title: z.string().min(1),
-  phase: z.enum(['Förberedelser', 'Förrättningen', 'Efter förrättningen']),
+  phase: z.enum([
+    'Direkt efter dödsfall',
+    'Begravning & ceremoni',
+    'Inför bouppteckning',
+    'Under bouppteckning',
+    'Avslut & arvskifte',
+  ]),
 });
 
 export async function createTask(req: Request, res: Response) {
