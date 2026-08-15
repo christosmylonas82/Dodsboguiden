@@ -5,6 +5,7 @@ export interface User {
   role?: 'USER' | 'ADMIN';
   hasSeenTipsOnboarding: boolean;
   profileImageUrl: string | null;
+  createdAt: string;
 }
 
 export interface ProjectSummary {
@@ -102,7 +103,7 @@ export interface Invitation {
   status: InvitationStatus;
   createdAt: string;
   project: { id: string; deceasedName: string };
-  senderUser: { id: string; name: string };
+  senderUser: { id: string; name: string; email: string };
 }
 
 export interface ActivityEntry {

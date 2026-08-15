@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { TbCircleCheck, TbCircleX } from 'react-icons/tb';
+import { TbCircleCheck, TbCircleX, TbMailbox } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { Invitation, InvitationStatus } from '../lib/types';
 import { formatTimestamp } from '../lib/activity';
@@ -80,19 +80,34 @@ export function InvitationsModal({
           <p className="mt-5 text-sm text-muted">Du har inga inbjudningar.</p>
         ) : (
           <>
-            <p className="mt-5 text-sm text-muted">Du är inbjuden till följande dödsbon:</p>
-            <ul className="mt-3 flex flex-col gap-3">
+            <ul className="mt-4 flex flex-col gap-3">
               {invitations.map((invitation) => {
                 const badge = STATUS_BADGE[invitation.status];
                 const isBusy = busyId === invitation.id;
+                const isPending = invitation.status === 'PENDING';
                 return (
-                  <li key={invitation.id} className="rounded-lg border border-border p-4">
+                  <li
+                    key={invitation.id}
+                    className={`rounded-xl border p-4 ${
+                      isPending ? 'border-primary-dark/20 bg-primary-light' : 'border-border'
+                    }`}
+                  >
                     <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-medium text-text">{invitation.project.deceasedName}</p>
-                        <p className="text-sm text-muted">
-                          Inbjuden av: {invitation.senderUser.name} ({formatTimestamp(invitation.createdAt)})
-                        </p>
+                      <div className="flex items-start gap-3">
+                        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface text-primary-dark">
+                          <TbMailbox size={18} />
+                        </span>
+                        <div>
+                          {isPending && (
+                            <p className="text-sm font-semibold text-primary-dark">Du är inbjuden till ett dödsbo!</p>
+                          )}
+                          <p className="mt-0.5 font-medium text-text">{invitation.project.deceasedName}</p>
+                          <p className="mt-0.5 text-sm text-muted">
+                            {invitation.senderUser.name} ({invitation.senderUser.email}) bjuder in dig att
+                            samarbeta för att hålla ordning på dödsboet.
+                          </p>
+                          <p className="mt-1 text-xs text-muted">{formatTimestamp(invitation.createdAt)}</p>
+                        </div>
                       </div>
                       <Badge tone={badge.tone}>{badge.label}</Badge>
                     </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { TbProgress, TbUsers, TbBell, TbUserPlus, TbArrowRight, TbArchive } from 'react-icons/tb';
+import { Link, useParams } from 'react-router-dom';
+import { TbProgress, TbUsers, TbBell, TbUserPlus, TbArrowRight, TbPencil } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { ActivityEntry, ProjectDetail } from '../lib/types';
 import { Badge } from '../components/Badge';
@@ -9,6 +9,7 @@ import { InviteModal } from '../components/InviteModal';
 import { ProgressOverviewModal } from '../components/ProgressOverviewModal';
 import { RecentActivityModal } from '../components/RecentActivityModal';
 import { MembersModal } from '../components/MembersModal';
+import { RenameProjectModal } from '../components/RenameProjectModal';
 import { useAuth } from '../context/AuthContext';
 import { formatActivityAction, formatRelativeTime } from '../lib/activity';
 import { PHASE_DESCRIPTIONS } from '../lib/taskDescriptions';
@@ -17,14 +18,11 @@ import { PHASE_ROUTE_SLUG } from '../lib/phaseRoutes';
 
 export function DashboardHubPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
-  const [openModal, setOpenModal] = useState<'progress' | 'activity' | 'members' | null>(null);
-  const [archiving, setArchiving] = useState(false);
-  const [confirmingArchive, setConfirmingArchive] = useState(false);
+  const [openModal, setOpenModal] = useState<'progress' | 'activity' | 'members' | 'rename' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   function showToast(message: string) {
@@ -60,17 +58,6 @@ export function DashboardHubPage() {
     }
   }
 
-  async function handleArchive() {
-    if (!id) return;
-    setArchiving(true);
-    try {
-      await apiFetch(`/projects/${id}/archive`, { method: 'PATCH' });
-      navigate('/dashboard');
-    } finally {
-      setArchiving(false);
-    }
-  }
-
   if (!project) return <p className="text-muted">Laddar…</p>;
 
   const progress = project.tasks.length
@@ -84,7 +71,20 @@ export function DashboardHubPage() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-3">
           <div>
-            <h1 className="text-3xl font-semibold text-text">{project.deceasedName}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-semibold text-text">{project.deceasedName}</h1>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => setOpenModal('rename')}
+                  aria-label="Redigera namn"
+                  title="Redigera namn"
+                  className="rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
+                >
+                  <TbPencil size={18} />
+                </button>
+              )}
+            </div>
             <p className="mt-1 text-muted">Dödsboets checklista och aktivitet</p>
           </div>
           <Badge tone={progress === 100 ? 'success' : progress === 0 ? 'neutral' : 'warning'}>
@@ -153,40 +153,6 @@ export function DashboardHubPage() {
         })}
       </div>
 
-      {isAdmin && (
-        <div className="mt-8 flex justify-end">
-          {!confirmingArchive ? (
-            <button
-              type="button"
-              onClick={() => setConfirmingArchive(true)}
-              className="flex items-center gap-1.5 bg-transparent text-sm text-muted hover:text-danger"
-            >
-              <TbArchive size={16} />
-              Arkivera dödsbo
-            </button>
-          ) : (
-            <div className="flex items-center gap-3 text-sm">
-              <span className="text-muted">Arkivera detta dödsbo? Det kan återställas i 30 dagar.</span>
-              <button
-                type="button"
-                onClick={() => setConfirmingArchive(false)}
-                className="rounded-lg border border-border bg-transparent px-3 py-1.5 text-text hover:bg-primary-light"
-              >
-                Avbryt
-              </button>
-              <button
-                type="button"
-                onClick={handleArchive}
-                disabled={archiving}
-                className="rounded-lg bg-danger px-3 py-1.5 font-medium text-white hover:opacity-90 disabled:opacity-60"
-              >
-                {archiving ? 'Arkiverar…' : 'Ja, arkivera'}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
       {inviteModalOpen && (
         <InviteModal onClose={() => setInviteModalOpen(false)} onInvite={inviteMember} />
       )}
@@ -215,6 +181,19 @@ export function DashboardHubPage() {
               prev ? { ...prev, invitations: prev.invitations.filter((i) => i.id !== invitationId) } : prev,
             );
             showToast('Inbjudan tillbakadragen');
+          }}
+        />
+      )}
+
+      {openModal === 'rename' && (
+        <RenameProjectModal
+          projectId={id!}
+          currentName={project.deceasedName}
+          onClose={() => setOpenModal(null)}
+          onRenamed={(deceasedName) => {
+            setProject((prev) => (prev ? { ...prev, deceasedName } : prev));
+            window.dispatchEvent(new CustomEvent('dodsbo:project-renamed', { detail: { projectId: id, deceasedName } }));
+            showToast('Dödsboets namn uppdaterat');
           }}
         />
       )}

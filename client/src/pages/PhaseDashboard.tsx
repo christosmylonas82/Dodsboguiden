@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { TbArrowLeft, TbPencil } from 'react-icons/tb';
+import { TbArrowLeft, TbPencil, TbExternalLink } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
 import type { ProjectDetail, Task, TaskStatus } from '../lib/types';
 import { Badge } from '../components/Badge';
@@ -94,6 +94,15 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
         </span>
       </div>
       <p className="mt-1 text-muted">{PHASE_DESCRIPTIONS[phase]}</p>
+      <a
+        href="https://www.efterlevandeguiden.se/checklista-efter-ett-dodsfall.html"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-1 inline-flex items-center gap-1 text-xs text-muted hover:text-primary-dark hover:underline"
+      >
+        📖 Checklista baserad på Efterlevandeguiden
+        <TbExternalLink size={12} />
+      </a>
 
       <div className="mt-4 flex items-center gap-3">
         <div className="flex-1">

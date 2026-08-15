@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, Outlet, useParams } from 'react-router-dom';
+import { Link, Outlet, useNavigate, useParams } from 'react-router-dom';
 import {
   TbHistory,
   TbAddressBook,
@@ -12,6 +12,7 @@ import {
   TbX,
   TbLogout2,
   TbMailbox,
+  TbArchive,
 } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
@@ -22,21 +23,24 @@ import { TipsModal } from './TipsModal';
 import { ActivityLogModal } from './ActivityLogModal';
 import { InvitationsModal } from './InvitationsModal';
 import { SettingsModal } from './SettingsModal';
+import { ArchiveProjectModal } from './ArchiveProjectModal';
 
 const itemClass =
   'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
 
-type ModalKey = 'activity' | 'contacts' | 'inventory' | 'tips' | 'invitations' | 'settings';
+type ModalKey = 'activity' | 'contacts' | 'inventory' | 'tips' | 'invitations' | 'settings' | 'archive';
 
 export function Layout() {
   const { user, logout, markTipsSeen } = useAuth();
   const { id: projectId } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
   const isInProject = Boolean(projectId);
   const [openModal, setOpenModal] = useState<ModalKey | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [invitationCount, setInvitationCount] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
   const [projectName, setProjectName] = useState('');
+  const [projectIsAdmin, setProjectIsAdmin] = useState(false);
 
   useEffect(() => {
     if (user && !user.hasSeenTipsOnboarding) {
@@ -47,11 +51,29 @@ export function Layout() {
   useEffect(() => {
     if (!projectId) {
       setProjectName('');
+      setProjectIsAdmin(false);
       return;
     }
     apiFetch<ProjectDetail>(`/projects/${projectId}`)
-      .then((p) => setProjectName(p.deceasedName))
-      .catch(() => setProjectName(''));
+      .then((p) => {
+        setProjectName(p.deceasedName);
+        setProjectIsAdmin(p.members.some((m) => m.userId === user?.id && m.role === 'ADMIN'));
+      })
+      .catch(() => {
+        setProjectName('');
+        setProjectIsAdmin(false);
+      });
+  }, [projectId, user?.id]);
+
+  useEffect(() => {
+    function handleRenamed(e: Event) {
+      const detail = (e as CustomEvent<{ projectId: string; deceasedName: string }>).detail;
+      if (detail.projectId === projectId) {
+        setProjectName(detail.deceasedName);
+      }
+    }
+    window.addEventListener('dodsbo:project-renamed', handleRenamed);
+    return () => window.removeEventListener('dodsbo:project-renamed', handleRenamed);
   }, [projectId]);
 
   useEffect(() => {
@@ -125,6 +147,12 @@ export function Layout() {
 
   const rightItems = (
     <>
+      {isInProject && projectIsAdmin && (
+        <button type="button" onClick={() => openModalAndCloseMenu('archive')} className={`${itemClass} bg-transparent`}>
+          <TbArchive size={20} />
+          Arkivera dödsbo
+        </button>
+      )}
       <button type="button" onClick={() => openModalAndCloseMenu('settings')} className={`${itemClass} bg-transparent`}>
         <TbSettings size={20} />
         Inställningar
@@ -236,6 +264,18 @@ export function Layout() {
         />
       )}
       {openModal === 'settings' && <SettingsModal onClose={() => setOpenModal(null)} />}
+      {openModal === 'archive' && projectId && (
+        <ArchiveProjectModal
+          projectId={projectId}
+          deceasedName={projectName}
+          onClose={() => setOpenModal(null)}
+          onArchived={() => {
+            setOpenModal(null);
+            navigate('/dashboard');
+            showToast('Dödsboet arkiverat');
+          }}
+        />
+      )}
     </div>
   );
 }

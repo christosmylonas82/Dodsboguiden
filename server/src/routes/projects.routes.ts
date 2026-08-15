@@ -11,6 +11,7 @@ import {
   permanentlyDeleteProject,
   removeMember,
   restoreProject,
+  updateProject,
 } from '../controllers/projects.controller.js';
 import { createTask, listActivity, updateTask } from '../controllers/tasks.controller.js';
 import {
@@ -33,6 +34,7 @@ router.use(requireAuth);
 router.post('/', asyncHandler(createProject));
 router.get('/', asyncHandler(listProjects));
 router.get('/:id', requireProjectMember, asyncHandler(getProject));
+router.patch('/:id', requireProjectAdmin, asyncHandler(updateProject));
 router.post('/:id/invite', requireProjectAdmin, asyncHandler(inviteMember));
 router.patch('/:id/archive', requireProjectAdmin, asyncHandler(archiveProject));
 router.patch('/:id/restore', requireProjectAdmin, asyncHandler(restoreProject));

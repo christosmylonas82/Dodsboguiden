@@ -14,6 +14,7 @@ function toUserResponse(user: User) {
     role: user.role,
     hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
     profileImageUrl: user.profileImageUrl,
+    createdAt: user.createdAt,
   };
 }
 

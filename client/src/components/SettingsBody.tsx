@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TbPencil, TbDownload, TbTrash, TbLogout2 } from 'react-icons/tb';
 import { apiFetch, ApiError, BASE_URL, getToken } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import type { ProjectSummary, User } from '../lib/types';
@@ -7,6 +8,7 @@ import { ChangeEmailModal } from './ChangeEmailModal';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import { DeleteProjectPermanentlyModal } from './DeleteProjectPermanentlyModal';
 import { ImageUploadModal } from './ImageUploadModal';
+import { EditNameModal } from './EditNameModal';
 import { Avatar } from './Avatar';
 
 const RETENTION_DAYS = 30;
@@ -23,6 +25,27 @@ function deletionDate(deletedAt: string): string {
   return date.toLocaleDateString('sv-SE', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
+function memberSinceDate(createdAt: string): string {
+  return new Date(createdAt).toLocaleDateString('sv-SE', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function SectionCard({
+  title,
+  children,
+  danger,
+}: {
+  title: string;
+  children: ReactNode;
+  danger?: boolean;
+}) {
+  return (
+    <div className={`rounded-xl border ${danger ? 'border-danger' : 'border-border'} bg-surface p-4 shadow-sm`}>
+      <h2 className="text-base font-semibold text-text">{title}</h2>
+      <div className="mt-3">{children}</div>
+    </div>
+  );
+}
+
 export function SettingsBody({ onClose }: { onClose?: () => void }) {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
@@ -31,10 +54,7 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
 
-  const [firstNameDraft, setFirstNameDraft] = useState(user?.name.split(' ')[0] ?? '');
-  const [lastNameDraft, setLastNameDraft] = useState(user?.name.split(' ').slice(1).join(' ') ?? '');
-  const [savingName, setSavingName] = useState(false);
-
+  const [editNameModalOpen, setEditNameModalOpen] = useState(false);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
@@ -54,38 +74,9 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
     reload().finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    setFirstNameDraft(user?.name.split(' ')[0] ?? '');
-    setLastNameDraft(user?.name.split(' ').slice(1).join(' ') ?? '');
-  }, [user?.name]);
-
   function flashMessage(text: string) {
     setMessage(text);
     setTimeout(() => setMessage(null), 3000);
-  }
-
-  async function handleNameBlur() {
-    const trimmed = `${firstNameDraft.trim()} ${lastNameDraft.trim()}`.trim();
-    if (!trimmed || trimmed === user?.name) {
-      setFirstNameDraft(user?.name.split(' ')[0] ?? '');
-      setLastNameDraft(user?.name.split(' ').slice(1).join(' ') ?? '');
-      return;
-    }
-    setSavingName(true);
-    try {
-      const updated = await apiFetch<User>('/auth/me', {
-        method: 'PUT',
-        body: JSON.stringify({ name: trimmed }),
-      });
-      updateUser(updated);
-      flashMessage('Namn uppdaterat');
-    } catch (err) {
-      setFirstNameDraft(user?.name.split(' ')[0] ?? '');
-      setLastNameDraft(user?.name.split(' ').slice(1).join(' ') ?? '');
-      flashMessage(err instanceof ApiError ? err.message : 'Kunde inte uppdatera namnet');
-    } finally {
-      setSavingName(false);
-    }
   }
 
   async function handleRestore(project: ProjectSummary) {
@@ -135,129 +126,114 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
     }
   }
 
+  function handleLogout() {
+    logout();
+    navigate('/login');
+  }
+
   if (!user) return null;
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       {message && (
-        <div className="mb-4 rounded-lg border border-border bg-primary-light px-4 py-2.5 text-sm text-text">
+        <div className="rounded-lg border border-border bg-primary-light px-4 py-2.5 text-sm text-text">
           {message}
         </div>
       )}
 
-      <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-text">Min profil</h2>
-        <div className="mt-4 flex flex-col items-center gap-3">
-          <Avatar name={user.name} imageUrl={user.profileImageUrl} userId={user.id} size="lg" />
-          <div className="w-full max-w-xs">
-            <label htmlFor="settingsFirstName" className="text-sm text-muted">
-              Förnamn
-            </label>
-            <input
-              id="settingsFirstName"
-              type="text"
-              value={firstNameDraft}
-              onChange={(e) => setFirstNameDraft(e.target.value)}
-              onBlur={handleNameBlur}
-              disabled={savingName}
-              maxLength={50}
-              className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-center text-text focus:border-primary focus:outline-none disabled:opacity-60"
-            />
-          </div>
-          <div className="w-full max-w-xs">
-            <label htmlFor="settingsLastName" className="text-sm text-muted">
-              Efternamn
-            </label>
-            <input
-              id="settingsLastName"
-              type="text"
-              value={lastNameDraft}
-              onChange={(e) => setLastNameDraft(e.target.value)}
-              onBlur={handleNameBlur}
-              disabled={savingName}
-              maxLength={50}
-              className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-center text-text focus:border-primary focus:outline-none disabled:opacity-60"
-            />
-          </div>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setImageModalOpen(true)}
-              className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
-            >
-              Ladda upp bild
-            </button>
-            {!confirmingImageRemove ? (
-              <button
-                type="button"
-                onClick={() => setConfirmingImageRemove(true)}
-                disabled={!user.profileImageUrl}
-                className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light disabled:opacity-40"
-              >
-                Ta bort bild
-              </button>
-            ) : (
-              <div className="flex items-center gap-2">
+      <SectionCard title="Kontouppgifter">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-center gap-4">
+            <Avatar name={user.name} imageUrl={user.profileImageUrl} userId={user.id} size="lg" />
+            <div className="flex flex-col gap-1 text-sm">
+              <div>
+                <span className="text-muted">Namn</span>{' '}
+                <span className="text-text">{user.name}</span>
+              </div>
+              <div>
+                <span className="text-muted">E-post</span>{' '}
+                <span className="text-text">{user.email}</span>{' '}
                 <button
                   type="button"
-                  onClick={handleRemoveImage}
-                  disabled={removingImage}
-                  className="rounded-lg bg-danger px-3 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+                  onClick={() => setEmailModalOpen(true)}
+                  className="bg-transparent p-0 text-xs text-primary-dark hover:underline"
                 >
-                  {removingImage ? 'Tar bort…' : 'Bekräfta'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirmingImageRemove(false)}
-                  className="rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-text hover:bg-primary-light"
-                >
-                  Avbryt
+                  Ändra
                 </button>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-text">Konto</h2>
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm text-muted">Email</p>
-            <p className="text-text">{user.email}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setEmailModalOpen(true)}
-            className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
-          >
-            Ändra email
-          </button>
-        </div>
-        <hr className="my-4 border-border" />
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm text-muted">Lösenord</p>
-            <p className="text-text">••••••••</p>
+              <div>
+                <span className="text-muted">Lösenord</span>{' '}
+                <span className="text-text">••••••••</span>{' '}
+                <button
+                  type="button"
+                  onClick={() => setPasswordModalOpen(true)}
+                  className="bg-transparent p-0 text-xs text-primary-dark hover:underline"
+                >
+                  Ändra
+                </button>
+              </div>
+              <div>
+                <span className="text-muted">Medlem sedan</span>{' '}
+                <span className="text-text">{memberSinceDate(user.createdAt)}</span>
+              </div>
+            </div>
           </div>
           <button
             type="button"
-            onClick={() => setPasswordModalOpen(true)}
-            className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
+            onClick={() => setEditNameModalOpen(true)}
+            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
           >
-            Ändra lösenord
+            <TbPencil size={16} />
+            Redigera
           </button>
         </div>
-      </div>
 
-      <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-text">Arkiverade dödsbon</h2>
+        <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">
+          <button
+            type="button"
+            onClick={() => setImageModalOpen(true)}
+            className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
+          >
+            Ladda upp bild
+          </button>
+          {!confirmingImageRemove ? (
+            <button
+              type="button"
+              onClick={() => setConfirmingImageRemove(true)}
+              disabled={!user.profileImageUrl}
+              className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light disabled:opacity-40"
+            >
+              Ta bort bild
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                disabled={removingImage}
+                className="rounded-lg bg-danger px-3 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+              >
+                {removingImage ? 'Tar bort…' : 'Bekräfta'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmingImageRemove(false)}
+                className="rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-text hover:bg-primary-light"
+              >
+                Avbryt
+              </button>
+            </div>
+          )}
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Arkiverade dödsbon">
         {loading ? (
-          <p className="mt-4 text-sm text-muted">Laddar…</p>
+          <p className="text-sm text-muted">Laddar…</p>
         ) : archivedProjects.length === 0 ? (
-          <p className="mt-4 text-sm text-muted">Du har inga arkiverade dödsbon.</p>
+          <p className="text-sm text-muted">Du har inga arkiverade dödsbon.</p>
         ) : (
-          <ul className="mt-4 flex flex-col gap-3">
+          <ul className="flex flex-col gap-3">
             {archivedProjects.map((project) => (
               <li key={project.id} className="rounded-lg border border-border p-4">
                 <p className="font-medium text-text">{project.deceasedName}</p>
@@ -284,69 +260,75 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
             ))}
           </ul>
         )}
-      </div>
+      </SectionCard>
 
-      <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-text">Exportera dina uppgifter</h2>
-        <p className="mt-1 text-sm text-muted">Ladda ner en kopia av all data vi har om dig och dina dödsbon.</p>
-        <button
-          type="button"
-          onClick={handleExport}
-          className="mt-4 rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
-        >
-          Exportera data
-        </button>
-      </div>
-
-      <div className="mt-6 rounded-2xl border border-danger bg-surface p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-text">Radera konto</h2>
-        <p className="mt-1 text-sm text-muted">
-          Detta raderar ditt konto permanent. Delade dödsbon påverkas inte för övriga medlemmar.
+      <SectionCard title="Din data">
+        <p className="text-sm leading-relaxed text-muted">
+          Du har rätt att när som helst få ut eller radera dina personuppgifter.
         </p>
-        {!confirmingDelete ? (
+        <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => setConfirmingDelete(true)}
-            className="mt-4 rounded-lg bg-danger px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            onClick={handleExport}
+            className="flex items-center gap-1.5 rounded-lg border border-border bg-transparent px-5 py-3 text-sm text-text hover:bg-primary-light"
           >
-            Radera mitt konto
+            <TbDownload size={16} />
+            Ladda ner min data
           </button>
-        ) : (
-          <div className="mt-4">
-            <p className="text-sm font-medium text-danger">Är du säker? Detta går inte att ångra.</p>
-            <div className="mt-3 flex gap-3">
-              <button
-                type="button"
-                onClick={handleDeleteAccount}
-                disabled={deletingAccount}
-                className="rounded-lg bg-danger px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
-              >
-                {deletingAccount ? 'Raderar…' : 'Ja, radera mitt konto'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setConfirmingDelete(false)}
-                className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
-              >
-                Avbryt
-              </button>
+          {!confirmingDelete ? (
+            <button
+              type="button"
+              onClick={() => setConfirmingDelete(true)}
+              className="flex items-center gap-1.5 rounded-lg border border-danger bg-transparent px-5 py-3 text-sm text-danger hover:bg-danger-light"
+            >
+              <TbTrash size={16} />
+              Radera konto
+            </button>
+          ) : (
+            <div className="flex w-full flex-col gap-2">
+              <p className="text-sm font-medium text-danger">Är du säker? Detta går inte att ångra.</p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={deletingAccount}
+                  className="rounded-lg bg-danger px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+                >
+                  {deletingAccount ? 'Raderar…' : 'Ja, radera mitt konto'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmingDelete(false)}
+                  className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
+                >
+                  Avbryt
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </SectionCard>
 
-      <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-text">Integritetspolicy</h2>
-        <p className="mt-1 text-sm text-muted">
-          Dödsbo Guide samlar bara in de uppgifter som behövs för att koordinera ett enkelt dödsbo: namn,
-          e-post, och de checklistor och aktiviteter du och dina familjemedlemmar skapar tillsammans. Vi ger
-          ingen juridisk rådgivning. Du kan när som helst exportera eller radera dina uppgifter på den här
-          sidan.
+      <SectionCard title="Villkor">
+        <p className="text-sm leading-relaxed text-muted">
+          <span className="font-medium text-text">Integritetspolicy</span> — Dödsbo Guide samlar bara in de
+          uppgifter som behövs för att koordinera ett enkelt dödsbo: namn, e-post, och de checklistor och
+          aktiviteter du och dina familjemedlemmar skapar tillsammans. Vi ger ingen juridisk rådgivning. Du kan
+          när som helst exportera eller radera dina uppgifter på den här sidan.
         </p>
-      </div>
+      </SectionCard>
+
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="flex items-center justify-center gap-2 rounded-lg border border-border bg-transparent px-4 py-3 text-sm font-medium text-text hover:bg-primary-light"
+      >
+        <TbLogout2 size={18} />
+        Logga ut
+      </button>
 
       {onClose && (
-        <div className="mt-6 flex justify-end">
+        <div className="flex justify-end">
           <button
             type="button"
             onClick={onClose}
@@ -357,6 +339,16 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
         </div>
       )}
 
+      {editNameModalOpen && (
+        <EditNameModal
+          currentName={user.name}
+          onClose={() => setEditNameModalOpen(false)}
+          onUpdated={(updated) => {
+            updateUser(updated);
+            flashMessage('Inställningar uppdaterat');
+          }}
+        />
+      )}
       {emailModalOpen && (
         <ChangeEmailModal
           currentEmail={user.email}

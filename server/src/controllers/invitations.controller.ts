@@ -32,7 +32,7 @@ export async function listMyInvitations(req: Request, res: Response) {
     },
     include: {
       project: { select: { id: true, deceasedName: true } },
-      senderUser: { select: { id: true, name: true } },
+      senderUser: { select: { id: true, name: true, email: true } },
     },
     orderBy: { createdAt: 'desc' },
   });
