@@ -4,6 +4,7 @@ import { TbArrowLeft } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
 import type { ActivityEntry } from '../lib/types';
 import { formatActivityAction, formatTimestamp } from '../lib/activity';
+import { Avatar } from '../components/Avatar';
 
 export function ProjectActivityPage() {
   const { id } = useParams<{ id: string }>();
@@ -33,16 +34,14 @@ export function ProjectActivityPage() {
         {activity.length === 0 ? (
           <p className="text-sm text-muted">Ingen aktivitet än.</p>
         ) : (
-          <ul className="flex flex-col gap-4">
+          <ul className="flex flex-col">
             {activity.map((entry) => (
-              <li key={entry.id} className="flex gap-3">
-                <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
-                <div>
-                  <p className="text-sm text-text">
-                    <span className="font-medium">{entry.user.name}</span>{' '}
-                    {formatActivityAction(entry.action)}
-                  </p>
-                  <p className="text-xs text-muted">{formatTimestamp(entry.timestamp)}</p>
+              <li key={entry.id} className="flex gap-3 border-b border-border py-3 first:pt-0 last:border-0 last:pb-0">
+                <Avatar name={entry.user.name} imageUrl={entry.user.profileImageUrl} userId={entry.user.id} size="md" />
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-semibold text-text">{entry.user.name}</span>
+                  <span className="text-sm text-muted">{formatActivityAction(entry.action)}</span>
+                  <span className="text-xs text-muted/80">{formatTimestamp(entry.timestamp)}</span>
                 </div>
               </li>
             ))}

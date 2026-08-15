@@ -33,13 +33,19 @@ export function RecentActivityModal({
         {recent.length === 0 ? (
           <p className="mt-5 text-sm text-muted">Ingen aktivitet än.</p>
         ) : (
-          <ul className="mt-5 flex flex-col gap-3">
-            {recent.map((entry) => (
-              <li key={entry.id} className="flex items-start gap-3 text-sm text-text">
-                <Avatar name={entry.user.name} imageUrl={entry.user.profileImageUrl} userId={entry.user.id} size="sm" />
-                <div>
-                  <span className="font-medium">{entry.user.name}</span> {formatActivityAction(entry.action)}
-                  <p className="text-xs text-muted">{formatTimestamp(entry.timestamp)}</p>
+          <ul className="mt-5 flex flex-col">
+            {recent.map((entry, index) => (
+              <li
+                key={entry.id}
+                className={`flex items-start gap-3 py-3 first:pt-0 last:pb-0 ${
+                  index < recent.length - 1 ? 'border-b border-border' : ''
+                }`}
+              >
+                <Avatar name={entry.user.name} imageUrl={entry.user.profileImageUrl} userId={entry.user.id} size="md" />
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-semibold text-text">{entry.user.name}</span>
+                  <span className="text-sm text-muted">{formatActivityAction(entry.action)}</span>
+                  <span className="text-xs text-muted/80">{formatTimestamp(entry.timestamp)}</span>
                 </div>
               </li>
             ))}

@@ -1,0 +1,73 @@
+import { useState, type FormEvent } from 'react';
+import { apiFetch, ApiError } from '../lib/api';
+import { ModalOverlay } from './ModalOverlay';
+
+export function CreateProjectModal({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void;
+  onCreated: (projectId: string) => void;
+}) {
+  const [deceasedName, setDeceasedName] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleCreate(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setCreating(true);
+    try {
+      const project = await apiFetch<{ id: string }>('/projects', {
+        method: 'POST',
+        body: JSON.stringify({ deceasedName }),
+      });
+      onCreated(project.id);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Kunde inte skapa dödsbo');
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  return (
+    <ModalOverlay onClose={onClose}>
+      <div className="rounded-2xl border border-border bg-surface p-6 shadow-lg">
+        <h3 className="text-lg font-semibold text-text">Skapa dödsbo</h3>
+        <form onSubmit={handleCreate} className="mt-5">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="deceasedName" className="text-sm text-muted">
+              Den avlidnes namn
+            </label>
+            <input
+              id="deceasedName"
+              type="text"
+              autoFocus
+              required
+              value={deceasedName}
+              onChange={(e) => setDeceasedName(e.target.value)}
+              className="rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
+            />
+          </div>
+          {error && <p className="mt-2 text-sm text-danger">{error}</p>}
+          <div className="mt-6 flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-border bg-surface px-4 py-2 text-text hover:bg-primary-light"
+            >
+              Avbryt
+            </button>
+            <button
+              type="submit"
+              disabled={creating}
+              className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+            >
+              {creating ? 'Skapar…' : 'Skapa dödsbo'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </ModalOverlay>
+  );
+}

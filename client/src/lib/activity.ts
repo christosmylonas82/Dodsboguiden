@@ -3,7 +3,12 @@ import type { TaskStatus } from './types';
 
 export function formatActivityAction(action: string): string {
   if (action === 'project_created') return 'skapade dödsboet';
+  if (action === 'accepted invite') return 'accepterade inbjudan';
   if (action.startsWith('invited ')) return `bjöd in ${action.slice('invited '.length)}`;
+  if (action.startsWith('removed member ')) return `tog bort medlem ${action.slice('removed member '.length)}`;
+  if (action.startsWith('renamed the dödsbo to ')) {
+    return `bytte namn på dödsboet till ${action.slice('renamed the dödsbo to '.length)}`;
+  }
   if (action.startsWith('completed task ')) return `avklarade ${action.slice('completed task '.length)}`;
   if (action.startsWith('reopened task ')) return `återöppnade ${action.slice('reopened task '.length)}`;
   if (action.startsWith('added task ')) return `lade till ${action.slice('added task '.length)}`;
