@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Link, Outlet, useParams } from 'react-router-dom';
 import {
   TbHistory,
   TbAddressBook,
@@ -12,7 +12,6 @@ import {
   TbX,
   TbLogout2,
   TbMailbox,
-  TbArchive,
 } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
@@ -23,7 +22,6 @@ import { TipsModal } from './TipsModal';
 import { ActivityLogModal } from './ActivityLogModal';
 import { InvitationsModal } from './InvitationsModal';
 import { SettingsModal } from './SettingsModal';
-import { ArchiveProjectModal } from './ArchiveProjectModal';
 import { Footer } from './Footer';
 import { CookieBanner } from './CookieBanner';
 import { PolicyModal } from './PolicyModal';
@@ -34,19 +32,17 @@ import { useTheme } from '../hooks/useTheme';
 const itemClass =
   'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
 
-type ModalKey = 'activity' | 'contacts' | 'inventory' | 'tips' | 'invitations' | 'settings' | 'archive';
+type ModalKey = 'activity' | 'contacts' | 'inventory' | 'tips' | 'invitations' | 'settings';
 
 export function Layout() {
   const { user, logout, markTipsSeen } = useAuth();
   const { id: projectId } = useParams<{ id?: string }>();
-  const navigate = useNavigate();
   const isInProject = Boolean(projectId);
   const [openModal, setOpenModal] = useState<ModalKey | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [invitationCount, setInvitationCount] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
   const [projectName, setProjectName] = useState('');
-  const [projectIsAdmin, setProjectIsAdmin] = useState(false);
   const [cookiesModalOpen, setCookiesModalOpen] = useState(false);
   const { shouldShowBanner, dismiss: dismissCookieBanner } = useCookieConsent();
   useTheme();
@@ -54,18 +50,11 @@ export function Layout() {
   useEffect(() => {
     if (!projectId) {
       setProjectName('');
-      setProjectIsAdmin(false);
       return;
     }
     apiFetch<ProjectDetail>(`/projects/${projectId}`)
-      .then((p) => {
-        setProjectName(p.deceasedName);
-        setProjectIsAdmin(p.members.some((m) => m.userId === user?.id && m.role === 'ADMIN'));
-      })
-      .catch(() => {
-        setProjectName('');
-        setProjectIsAdmin(false);
-      });
+      .then((p) => setProjectName(p.deceasedName))
+      .catch(() => setProjectName(''));
   }, [projectId, user?.id]);
 
   useEffect(() => {
@@ -78,6 +67,15 @@ export function Layout() {
     window.addEventListener('dodsbo:project-renamed', handleRenamed);
     return () => window.removeEventListener('dodsbo:project-renamed', handleRenamed);
   }, [projectId]);
+
+  useEffect(() => {
+    function handleArchived() {
+      showToast('Dödsboet arkiverat');
+    }
+    window.addEventListener('dodsbo:project-archived', handleArchived);
+    return () => window.removeEventListener('dodsbo:project-archived', handleArchived);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -165,12 +163,6 @@ export function Layout() {
 
   const rightItems = (
     <>
-      {isInProject && projectIsAdmin && (
-        <button type="button" onClick={() => openModalAndCloseMenu('archive')} className={`${itemClass} bg-transparent`}>
-          <TbArchive size={20} />
-          Arkivera dödsbo
-        </button>
-      )}
       <button
         type="button"
         data-tour="settings"
@@ -311,18 +303,6 @@ export function Layout() {
         />
       )}
       {openModal === 'settings' && <SettingsModal onClose={() => setOpenModal(null)} />}
-      {openModal === 'archive' && projectId && (
-        <ArchiveProjectModal
-          projectId={projectId}
-          deceasedName={projectName}
-          onClose={() => setOpenModal(null)}
-          onArchived={() => {
-            setOpenModal(null);
-            navigate('/dashboard');
-            showToast('Dödsboet arkiverat');
-          }}
-        />
-      )}
     </div>
   );
 }

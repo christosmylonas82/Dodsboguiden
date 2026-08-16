@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { TbProgress, TbUsers, TbBell, TbUserPlus, TbArrowRight, TbPencil } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { ActivityEntry, ProjectDetail } from '../lib/types';
@@ -10,6 +10,7 @@ import { ProgressOverviewModal } from '../components/ProgressOverviewModal';
 import { RecentActivityModal } from '../components/RecentActivityModal';
 import { MembersModal } from '../components/MembersModal';
 import { RenameProjectModal } from '../components/RenameProjectModal';
+import { DodsboDropdown } from '../components/DodsboDropdown';
 import { GuidedTour } from '../components/GuidedTour';
 import { useAuth } from '../context/AuthContext';
 import { formatActivityAction, formatRelativeTime } from '../lib/activity';
@@ -19,6 +20,7 @@ import { PHASE_ROUTE_SLUG } from '../lib/phaseRoutes';
 
 export function DashboardHubPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user, markTipsSeen } = useAuth();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
@@ -98,6 +100,16 @@ export function DashboardHubPage() {
                 >
                   <TbPencil size={18} />
                 </button>
+              )}
+              {isAdmin && (
+                <DodsboDropdown
+                  projectId={id!}
+                  deceasedName={project.deceasedName}
+                  onArchived={() => {
+                    window.dispatchEvent(new CustomEvent('dodsbo:project-archived'));
+                    navigate('/dashboard');
+                  }}
+                />
               )}
             </div>
             <p className="mt-1 text-muted">Dödsboets checklista och aktivitet</p>
