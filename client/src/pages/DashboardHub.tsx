@@ -10,6 +10,7 @@ import { ProgressOverviewModal } from '../components/ProgressOverviewModal';
 import { RecentActivityModal } from '../components/RecentActivityModal';
 import { MembersModal } from '../components/MembersModal';
 import { RenameProjectModal } from '../components/RenameProjectModal';
+import { GuidedTour } from '../components/GuidedTour';
 import { useAuth } from '../context/AuthContext';
 import { formatActivityAction, formatRelativeTime } from '../lib/activity';
 import { PHASE_DESCRIPTIONS } from '../lib/taskDescriptions';
@@ -18,12 +19,13 @@ import { PHASE_ROUTE_SLUG } from '../lib/phaseRoutes';
 
 export function DashboardHubPage() {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
+  const { user, markTipsSeen } = useAuth();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [openModal, setOpenModal] = useState<'progress' | 'activity' | 'members' | 'rename' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [showTour, setShowTour] = useState(false);
 
   function showToast(message: string) {
     setToast(message);
@@ -44,6 +46,19 @@ export function DashboardHubPage() {
     reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  useEffect(() => {
+    if (project && user && !user.hasSeenTipsOnboarding) {
+      setShowTour(true);
+    }
+  }, [project, user]);
+
+  function finishTour() {
+    setShowTour(false);
+    if (user && !user.hasSeenTipsOnboarding) {
+      markTipsSeen();
+    }
+  }
 
   async function inviteMember(email: string) {
     if (!id) return;
@@ -102,20 +117,24 @@ export function DashboardHubPage() {
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <MetricCard
-          icon={<TbProgress size={20} />}
-          label="Framsteg"
-          value={`${progress}%`}
-          hint={`${project.tasks.filter((t) => t.completed).length} av ${project.tasks.length} klara`}
-          onClick={() => setOpenModal('progress')}
-        />
-        <MetricCard
-          icon={<TbUsers size={20} />}
-          label="Familjemedlemmar"
-          value={project.members.length}
-          hint={project.members.length === 1 ? '1 medlem' : `${project.members.length} medlemmar`}
-          onClick={() => setOpenModal('members')}
-        />
+        <div data-tour="progress">
+          <MetricCard
+            icon={<TbProgress size={20} />}
+            label="Framsteg"
+            value={`${progress}%`}
+            hint={`${project.tasks.filter((t) => t.completed).length} av ${project.tasks.length} klara`}
+            onClick={() => setOpenModal('progress')}
+          />
+        </div>
+        <div data-tour="members">
+          <MetricCard
+            icon={<TbUsers size={20} />}
+            label="Familjemedlemmar"
+            value={project.members.length}
+            hint={project.members.length === 1 ? '1 medlem' : `${project.members.length} medlemmar`}
+            onClick={() => setOpenModal('members')}
+          />
+        </div>
         <MetricCard
           icon={<TbBell size={20} />}
           label="Senaste aktivitet"
@@ -125,7 +144,7 @@ export function DashboardHubPage() {
         />
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div data-tour="phases" className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {PHASES.map((phase) => {
           const tasks = project.tasks.filter((t) => t.phase === phase);
           if (tasks.length === 0) return null;
@@ -203,6 +222,8 @@ export function DashboardHubPage() {
           {toast}
         </div>
       )}
+
+      <GuidedTour isOpen={showTour} onFinish={finishTour} />
     </div>
   );
 }

@@ -15,7 +15,8 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-icons": "^5.7.0",
-    "react-router-dom": "^6.28.1"
+    "react-router-dom": "^6.28.1",
+    "shepherd.js": "^15.2.3"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

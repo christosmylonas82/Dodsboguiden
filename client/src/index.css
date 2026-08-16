@@ -22,3 +22,67 @@
 html, body, #root {
   height: 100%;
 }
+
+.dodsbo-shepherd.shepherd-element {
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  max-width: 360px;
+}
+
+.dodsbo-shepherd .shepherd-header {
+  background: var(--color-primary);
+  padding: 16px;
+  border-radius: 12px 12px 0 0;
+}
+
+.dodsbo-shepherd .shepherd-title {
+  color: white;
+  font-weight: 600;
+}
+
+.dodsbo-shepherd .shepherd-cancel-icon {
+  color: white;
+}
+
+.dodsbo-shepherd .shepherd-text {
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.dodsbo-shepherd .shepherd-footer {
+  padding: 0 16px 16px;
+  gap: 8px;
+}
+
+.dodsbo-shepherd .shepherd-button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dodsbo-shepherd .shepherd-button:not(.shepherd-button-secondary) {
+  background: var(--color-primary);
+  color: white;
+}
+
+.dodsbo-shepherd .shepherd-button:not(.shepherd-button-secondary):hover {
+  background: var(--color-primary-dark);
+}
+
+.dodsbo-shepherd .shepherd-button-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.dodsbo-shepherd .shepherd-button-secondary:hover {
+  background: var(--color-primary-light);
+}
+
+.shepherd-modal-overlay-container {
+  opacity: 0.5;
+}

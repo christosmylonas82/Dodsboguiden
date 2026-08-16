@@ -43,12 +43,6 @@ export function Layout() {
   const [projectIsAdmin, setProjectIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (user && !user.hasSeenTipsOnboarding) {
-      setOpenModal('tips');
-    }
-  }, [user]);
-
-  useEffect(() => {
     if (!projectId) {
       setProjectName('');
       setProjectIsAdmin(false);
@@ -110,15 +104,30 @@ export function Layout() {
 
   const navItems = isInProject ? (
     <>
-      <button type="button" onClick={() => openModalAndCloseMenu('activity')} className={`${itemClass} bg-transparent`}>
+      <button
+        type="button"
+        data-tour="activity"
+        onClick={() => openModalAndCloseMenu('activity')}
+        className={`${itemClass} bg-transparent`}
+      >
         <TbHistory size={20} />
         Aktivitetslogg
       </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('contacts')} className={`${itemClass} bg-transparent`}>
+      <button
+        type="button"
+        data-tour="contacts"
+        onClick={() => openModalAndCloseMenu('contacts')}
+        className={`${itemClass} bg-transparent`}
+      >
         <TbAddressBook size={20} />
         Kontaktlista
       </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('inventory')} className={`${itemClass} bg-transparent`}>
+      <button
+        type="button"
+        data-tour="inventory"
+        onClick={() => openModalAndCloseMenu('inventory')}
+        className={`${itemClass} bg-transparent`}
+      >
         <TbClipboardList size={20} />
         Inventarielista
       </button>
@@ -153,7 +162,12 @@ export function Layout() {
           Arkivera dödsbo
         </button>
       )}
-      <button type="button" onClick={() => openModalAndCloseMenu('settings')} className={`${itemClass} bg-transparent`}>
+      <button
+        type="button"
+        data-tour="settings"
+        onClick={() => openModalAndCloseMenu('settings')}
+        className={`${itemClass} bg-transparent`}
+      >
         <TbSettings size={20} />
         Inställningar
       </button>
