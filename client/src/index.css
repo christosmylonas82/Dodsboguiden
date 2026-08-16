@@ -86,3 +86,68 @@ html, body, #root {
 .shepherd-modal-overlay-container {
   opacity: 0.5;
 }
+
+.policy-markdown h1 {
+  margin: 0 0 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.policy-markdown h2 {
+  margin: 24px 0 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.policy-markdown h3 {
+  margin: 16px 0 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.policy-markdown h4 {
+  margin: 12px 0 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.policy-markdown p {
+  margin: 0 0 10px;
+}
+
+.policy-markdown ul,
+.policy-markdown ol {
+  margin: 0 0 10px;
+  padding-left: 1.4rem;
+}
+
+.policy-markdown li {
+  margin-bottom: 4px;
+}
+
+.policy-markdown ul {
+  list-style: disc;
+}
+
+.policy-markdown ol {
+  list-style: decimal;
+}
+
+.policy-markdown a {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+.policy-markdown hr {
+  margin: 16px 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.policy-markdown strong {
+  font-weight: 600;
+}

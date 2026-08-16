@@ -24,6 +24,10 @@ import { ActivityLogModal } from './ActivityLogModal';
 import { InvitationsModal } from './InvitationsModal';
 import { SettingsModal } from './SettingsModal';
 import { ArchiveProjectModal } from './ArchiveProjectModal';
+import { Footer } from './Footer';
+import { CookieBanner } from './CookieBanner';
+import { PolicyModal } from './PolicyModal';
+import { useCookieConsent } from '../hooks/useCookieConsent';
 
 const itemClass =
   'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
@@ -41,6 +45,8 @@ export function Layout() {
   const [toast, setToast] = useState<string | null>(null);
   const [projectName, setProjectName] = useState('');
   const [projectIsAdmin, setProjectIsAdmin] = useState(false);
+  const [cookiesModalOpen, setCookiesModalOpen] = useState(false);
+  const { shouldShowBanner, dismiss: dismissCookieBanner } = useCookieConsent();
 
   useEffect(() => {
     if (!projectId) {
@@ -251,6 +257,25 @@ export function Layout() {
       <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
         <Outlet />
       </main>
+
+      <Footer />
+
+      {shouldShowBanner && (
+        <CookieBanner
+          onClose={dismissCookieBanner}
+          onViewCookies={() => {
+            dismissCookieBanner();
+            setCookiesModalOpen(true);
+          }}
+        />
+      )}
+      {cookiesModalOpen && (
+        <PolicyModal
+          title="Cookiespolicy"
+          path="/policies/cookies.md"
+          onClose={() => setCookiesModalOpen(false)}
+        />
+      )}
 
       {toast && (
         <div className="fixed bottom-6 right-6 z-[60] rounded-lg border border-border bg-surface px-4 py-2.5 text-sm text-text shadow-lg">
