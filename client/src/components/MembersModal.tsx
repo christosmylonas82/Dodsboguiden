@@ -78,12 +78,15 @@ export function MembersModal({
                   <Badge tone={m.role === 'ADMIN' ? 'success' : 'neutral'}>
                     {`${m.role === 'ADMIN' ? 'Admin' : 'Medlem'}${isSelf ? ' (Du)' : ''}`}
                   </Badge>
-                  {isAdmin && !isSelf && (
+                  {isAdmin && (
                     <button
                       type="button"
                       onClick={() => setMemberToDelete(m)}
                       aria-label="Ta bort medlem"
-                      className="flex items-center justify-center rounded-lg bg-transparent p-1.5 text-muted hover:bg-danger-light hover:text-danger"
+                      tabIndex={isSelf ? -1 : 0}
+                      className={`flex items-center justify-center rounded-lg bg-transparent p-1.5 text-muted hover:bg-danger-light hover:text-danger ${
+                        isSelf ? 'invisible' : ''
+                      }`}
                     >
                       <TbTrash size={16} />
                     </button>
