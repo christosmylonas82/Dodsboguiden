@@ -4,8 +4,7 @@ import { Layout } from './components/Layout';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 import { ProjectRedirect } from './components/ProjectRedirect';
 import { LandingPage } from './pages/Landing';
-import { LoginPage } from './pages/Login';
-import { RegisterPage } from './pages/Register';
+import { AuthPage } from './pages/Auth';
 import { DashboardPage } from './pages/Dashboard';
 import { DashboardHubPage } from './pages/DashboardHub';
 import { PhaseDashboardPage } from './pages/PhaseDashboard';
@@ -29,8 +28,8 @@ function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<HomeRoute />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<AuthPage />} />
+            <Route path="/register" element={<AuthPage />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />
