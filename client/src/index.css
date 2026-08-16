@@ -23,6 +23,28 @@ html, body, #root {
   height: 100%;
 }
 
+[data-theme='dark'] {
+  --color-bg: #1c1a17;
+  --color-surface: #262320;
+  --color-text: #ede9e4;
+  --color-muted: #a89f92;
+  --color-primary: #7c9279;
+  --color-primary-dark: #9db299;
+  --color-primary-light: #2a3328;
+  --color-border: #3a352f;
+  --color-danger: #d97b6e;
+  --color-danger-light: #3d2420;
+  --color-success: #6fa87f;
+  --color-success-light: #22332a;
+  --color-success-dark: #8fc49f;
+  --color-warning: #d1a15e;
+  --color-warning-light: #3a2f1c;
+}
+
+body {
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
 .dodsbo-shepherd.shepherd-element {
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);

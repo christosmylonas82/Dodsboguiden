@@ -27,7 +27,9 @@ import { ArchiveProjectModal } from './ArchiveProjectModal';
 import { Footer } from './Footer';
 import { CookieBanner } from './CookieBanner';
 import { PolicyModal } from './PolicyModal';
+import { ThemeToggle } from './ThemeToggle';
 import { useCookieConsent } from '../hooks/useCookieConsent';
+import { useTheme } from '../hooks/useTheme';
 
 const itemClass =
   'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
@@ -47,6 +49,7 @@ export function Layout() {
   const [projectIsAdmin, setProjectIsAdmin] = useState(false);
   const [cookiesModalOpen, setCookiesModalOpen] = useState(false);
   const { shouldShowBanner, dismiss: dismissCookieBanner } = useCookieConsent();
+  useTheme();
 
   useEffect(() => {
     if (!projectId) {
@@ -223,19 +226,24 @@ export function Layout() {
                 {navItems}
                 <div className="mx-2 h-5 w-px bg-border" />
                 {rightItems}
+                <ThemeToggle />
               </nav>
 
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen((open) => !open)}
-                aria-label={mobileMenuOpen ? 'Stäng meny' : 'Öppna meny'}
-                className="rounded-lg p-2 text-text hover:bg-primary-light md:hidden"
-              >
-                {mobileMenuOpen ? <TbX size={22} /> : <TbMenu2 size={22} />}
-              </button>
+              <div className="flex items-center gap-2 md:hidden">
+                <ThemeToggle />
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen((open) => !open)}
+                  aria-label={mobileMenuOpen ? 'Stäng meny' : 'Öppna meny'}
+                  className="rounded-lg p-2 text-text hover:bg-primary-light"
+                >
+                  {mobileMenuOpen ? <TbX size={22} /> : <TbMenu2 size={22} />}
+                </button>
+              </div>
             </>
           ) : (
             <nav className="flex items-center gap-3 text-sm">
+              <ThemeToggle />
               <Link to="/login" className="text-text hover:text-primary-dark">
                 Logga in
               </Link>
