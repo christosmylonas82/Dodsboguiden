@@ -65,7 +65,7 @@ export function MembersModal({
           {members.map((m) => {
             const isSelf = m.userId === currentUserId;
             return (
-              <li key={m.id} className="flex min-h-[60px] items-center justify-between gap-3">
+              <li key={m.id} className="flex min-h-[64px] items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <Avatar name={m.user?.name ?? m.email} imageUrl={m.user?.profileImageUrl} userId={m.userId ?? m.id} />
                   <div className="min-w-0">
@@ -76,8 +76,7 @@ export function MembersModal({
                 </div>
                 <div className="flex h-full shrink-0 items-center gap-2">
                   <Badge tone={m.role === 'ADMIN' ? 'success' : 'neutral'}>
-                    {m.role === 'ADMIN' ? 'Admin' : 'Medlem'}
-                    {isSelf ? ' (Du)' : ''}
+                    {`${m.role === 'ADMIN' ? 'Admin' : 'Medlem'}${isSelf ? ' (Du)' : ''}`}
                   </Badge>
                   {isAdmin && !isSelf && (
                     <button
@@ -102,7 +101,7 @@ export function MembersModal({
             </p>
             <ul className="mt-2 flex flex-col gap-3">
               {pendingInvitations.map((invite) => (
-                <li key={invite.id} className="flex min-h-[60px] items-center justify-between gap-3">
+                <li key={invite.id} className="flex min-h-[64px] items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
                     <Avatar
                       name={invite.invitedUser?.name ?? invite.invitedEmail}

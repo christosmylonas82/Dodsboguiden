@@ -12,7 +12,7 @@ const TONE_CLASSES: Record<BadgeTone, string> = {
 export function Badge({ tone, children }: { tone: BadgeTone; children: ReactNode }) {
   return (
     <span
-      className={`inline-flex h-6 items-center gap-1 whitespace-nowrap rounded-full px-2.5 text-xs font-medium leading-none ${TONE_CLASSES[tone]}`}
+      className={`inline-flex h-6 items-center justify-center gap-1 whitespace-nowrap rounded-full px-2.5 align-middle text-xs font-medium leading-none ${TONE_CLASSES[tone]}`}
     >
       {children}
     </span>
