@@ -5,6 +5,7 @@ import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 import { ProjectRedirect } from './components/ProjectRedirect';
 import { LandingPage } from './pages/Landing';
 import { AuthPage } from './pages/Auth';
+import { ResetPasswordPage } from './pages/ResetPassword';
 import { DashboardPage } from './pages/Dashboard';
 import { DashboardHubPage } from './pages/DashboardHub';
 import { PhaseDashboardPage } from './pages/PhaseDashboard';
@@ -31,6 +32,7 @@ function App() {
             <Route path="/" element={<HomeRoute />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="/register" element={<AuthPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />

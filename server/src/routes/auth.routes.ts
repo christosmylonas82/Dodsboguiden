@@ -5,6 +5,7 @@ import {
   me,
   register,
   removeProfileImage,
+  resetPassword,
   updateEmail,
   updateName,
   updatePassword,
@@ -18,6 +19,7 @@ const router = Router();
 
 router.post('/register', asyncHandler(register));
 router.post('/login', asyncHandler(login));
+router.post('/reset-password', asyncHandler(resetPassword));
 router.get('/me', requireAuth, asyncHandler(me));
 router.put('/me', requireAuth, asyncHandler(updateName));
 router.put('/me/seen-tips', requireAuth, asyncHandler(markTipsSeen));

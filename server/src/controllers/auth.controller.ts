@@ -5,6 +5,7 @@ import { prisma } from '../lib/prisma.js';
 import { hashPassword, verifyPassword } from '../lib/password.js';
 import { signToken } from '../lib/jwt.js';
 import { HttpError } from '../middleware/errorHandler.js';
+import { usePasswordResetToken } from '../lib/passwordReset.js';
 
 function toUserResponse(user: User) {
   return {
@@ -168,6 +169,32 @@ export async function updatePassword(req: Request, res: Response) {
 
   await prisma.user.update({
     where: { id: userId },
+    data: { passwordHash: await hashPassword(body.newPassword) },
+  });
+
+  res.json({ success: true });
+}
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(1),
+  newPassword: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[a-z]/, 'Password must contain a lowercase letter')
+    .regex(/[A-Z]/, 'Password must contain an uppercase letter')
+    .regex(/[0-9]/, 'Password must contain a number'),
+});
+
+export async function resetPassword(req: Request, res: Response) {
+  const body = resetPasswordSchema.parse(req.body);
+
+  const reset = await usePasswordResetToken(body.token);
+  if (!reset) {
+    throw new HttpError(400, 'This reset link is invalid or has expired');
+  }
+
+  await prisma.user.update({
+    where: { id: reset.userId },
     data: { passwordHash: await hashPassword(body.newPassword) },
   });
 
