@@ -13,6 +13,7 @@ import { SettingsPage } from './pages/Settings';
 import { AdminDashboardPage } from './pages/admin/AdminDashboard';
 import { AdminUsersPage } from './pages/admin/AdminUsers';
 import { AdminAuditLogPage } from './pages/admin/AdminAuditLog';
+import { AdminLayout } from './layouts/AdminLayout';
 import './App.css';
 
 function HomeRoute() {
@@ -59,13 +60,35 @@ function App() {
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
 
-            <Route element={<AdminRoute />}>
-              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-              <Route path="/admin/users" element={<AdminUsersPage />} />
-              <Route path="/admin/audit-log" element={<AdminAuditLogPage />} />
-            </Route>
-
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Route>
+
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <AdminLayout>
+                  <AdminDashboardPage />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <AdminLayout>
+                  <AdminUsersPage />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/audit-log"
+              element={
+                <AdminLayout>
+                  <AdminAuditLogPage />
+                </AdminLayout>
+              }
+            />
           </Route>
         </Routes>
       </AuthProvider>

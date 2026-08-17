@@ -28,23 +28,36 @@ export async function listAllProjects(_req: Request, res: Response) {
 }
 
 export async function statistics(_req: Request, res: Response) {
-  const [totalUsers, activeUsers, totalProjects, activeProjects, totalTasks, completedTasks] =
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const [totalUsers, activeUsers, newUsers7Days, totalProjects, activeProjects, totalTasks, completedTasks, activeProjectMemberCounts] =
     await Promise.all([
       prisma.user.count(),
       prisma.user.count({ where: { deletedAt: null } }),
+      prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
       prisma.project.count(),
       prisma.project.count({ where: { deletedAt: null } }),
       prisma.task.count(),
       prisma.task.count({ where: { completed: true } }),
+      prisma.project.findMany({
+        where: { deletedAt: null },
+        select: { _count: { select: { members: true } } },
+      }),
     ]);
+
+  const avgMembersPerProject = activeProjectMemberCounts.length
+    ? activeProjectMemberCounts.reduce((sum, p) => sum + p._count.members, 0) / activeProjectMemberCounts.length
+    : 0;
 
   res.json({
     totalUsers,
     activeUsers,
+    newUsers7Days,
     totalProjects,
     activeProjects,
     totalTasks,
     completedTasks,
+    avgMembersPerProject: Number(avgMembersPerProject.toFixed(1)),
   });
 }
 

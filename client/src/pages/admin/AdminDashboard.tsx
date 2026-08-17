@@ -4,10 +4,12 @@ import { apiFetch } from '../../lib/api';
 interface Statistics {
   totalUsers: number;
   activeUsers: number;
+  newUsers7Days: number;
   totalProjects: number;
   activeProjects: number;
   totalTasks: number;
   completedTasks: number;
+  avgMembersPerProject: number;
 }
 
 export function AdminDashboardPage() {
@@ -22,8 +24,10 @@ export function AdminDashboardPage() {
   const tiles: [string, number][] = [
     ['Aktiva användare', stats.activeUsers],
     ['Totalt användare', stats.totalUsers],
+    ['Nya användare (7 dagar)', stats.newUsers7Days],
     ['Aktiva dödsbon', stats.activeProjects],
     ['Totalt dödsbon', stats.totalProjects],
+    ['Snitt medlemmar per dödsbo', stats.avgMembersPerProject],
     ['Uppgifter klara', stats.completedTasks],
     ['Uppgifter totalt', stats.totalTasks],
   ];
