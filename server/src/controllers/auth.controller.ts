@@ -6,6 +6,7 @@ import { hashPassword, verifyPassword } from '../lib/password.js';
 import { signToken } from '../lib/jwt.js';
 import { HttpError } from '../middleware/errorHandler.js';
 import { usePasswordResetToken } from '../lib/passwordReset.js';
+import { logAuthEvent } from '../lib/authEvent.js';
 
 function toUserResponse(user: User) {
   return {
@@ -70,13 +71,17 @@ export async function login(req: Request, res: Response) {
 
   const user = await prisma.user.findUnique({ where: { email: body.email } });
   if (!user || user.deletedAt) {
+    await logAuthEvent({ email: body.email, action: 'login_failed' });
     throw new HttpError(401, 'Invalid email or password');
   }
 
   const valid = await verifyPassword(body.password, user.passwordHash);
   if (!valid) {
+    await logAuthEvent({ userId: user.id, email: user.email, action: 'login_failed' });
     throw new HttpError(401, 'Invalid email or password');
   }
+
+  await logAuthEvent({ userId: user.id, email: user.email, action: 'login_success' });
 
   const token = signToken({ userId: user.id, role: user.role });
   res.json({ token, user: toUserResponse(user) });

@@ -3,13 +3,17 @@ import { requireAuth } from '../middleware/auth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import {
+  accountStats,
   auditLog,
+  authActivityLog,
   deleteUser,
+  failedLoginStats,
   featureUsage,
   listAllProjects,
   listUsers,
   projectsPerDay,
   requestPasswordReset,
+  resetStats,
   statistics,
   updateUserRole,
 } from '../controllers/admin.controller.js';
@@ -26,6 +30,10 @@ router.get('/projects', asyncHandler(listAllProjects));
 router.get('/statistics', asyncHandler(statistics));
 router.get('/stats/projects-per-day', asyncHandler(projectsPerDay));
 router.get('/stats/feature-usage', asyncHandler(featureUsage));
+router.get('/auth/account-stats', asyncHandler(accountStats));
+router.get('/auth/reset-stats', asyncHandler(resetStats));
+router.get('/auth/failed-login-stats', asyncHandler(failedLoginStats));
+router.get('/auth/activity-log', asyncHandler(authActivityLog));
 router.get('/audit-log', asyncHandler(auditLog));
 
 export default router;

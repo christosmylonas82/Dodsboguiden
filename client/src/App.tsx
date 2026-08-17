@@ -14,6 +14,7 @@ import { SettingsPage } from './pages/Settings';
 import { AdminDashboardPage } from './pages/admin/AdminDashboard';
 import { AdminUsersPage } from './pages/admin/AdminUsers';
 import { AdminStatsPage } from './pages/admin/AdminStats';
+import { AdminAuthPage } from './pages/admin/AdminAuth';
 import { AdminAuditLogPage } from './pages/admin/AdminAuditLog';
 import { AdminLayout } from './layouts/AdminLayout';
 import './App.css';
@@ -89,6 +90,14 @@ function App() {
               element={
                 <AdminLayout>
                   <AdminStatsPage />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/autentisering"
+              element={
+                <AdminLayout>
+                  <AdminAuthPage />
                 </AdminLayout>
               }
             />

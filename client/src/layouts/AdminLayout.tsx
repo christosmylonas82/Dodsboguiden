@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { TbLayoutDashboard, TbUsers, TbClipboardList, TbChevronLeft, TbChevronRight, TbLogout2, TbBook2, TbChartBar } from 'react-icons/tb';
+import { TbLayoutDashboard, TbUsers, TbClipboardList, TbChevronLeft, TbChevronRight, TbLogout2, TbBook2, TbChartBar, TbShieldLock } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 import { ThemeToggle } from '../components/ThemeToggle';
 
@@ -8,6 +8,7 @@ const MENU_ITEMS = [
   { label: 'Översikt', path: '/admin/dashboard', icon: TbLayoutDashboard },
   { label: 'Användare', path: '/admin/users', icon: TbUsers },
   { label: 'Statistik', path: '/admin/statistik', icon: TbChartBar },
+  { label: 'Autentisering', path: '/admin/autentisering', icon: TbShieldLock },
   { label: 'Granskningslogg', path: '/admin/audit-log', icon: TbClipboardList },
 ];
 

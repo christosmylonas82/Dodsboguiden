@@ -267,3 +267,110 @@ export async function requestPasswordReset(req: Request, res: Response) {
   // returned here too — otherwise the admin would have no way to actually deliver it.
   res.json({ email: user.email, resetLink });
 }
+
+function startOfToday(): Date {
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+export async function accountStats(_req: Request, res: Response) {
+  const today = startOfToday();
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const [newToday, newThisWeek, totalActive] = await Promise.all([
+    prisma.user.count({ where: { createdAt: { gte: today } } }),
+    prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
+    prisma.user.count({ where: { deletedAt: null } }),
+  ]);
+
+  res.json({ accounts: { newToday, newThisWeek, totalActive } });
+}
+
+export async function resetStats(_req: Request, res: Response) {
+  const today = startOfToday();
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const [requestsToday, requestsThisWeek, usedToday, expiredUnused] = await Promise.all([
+    prisma.passwordReset.count({ where: { createdAt: { gte: today } } }),
+    prisma.passwordReset.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
+    prisma.passwordReset.count({ where: { usedAt: { gte: today } } }),
+    prisma.passwordReset.count({ where: { usedAt: null, expiresAt: { lt: new Date() } } }),
+  ]);
+
+  res.json({ reset: { requestsToday, requestsThisWeek, usedToday, expiredUnused } });
+}
+
+export async function failedLoginStats(_req: Request, res: Response) {
+  const today = startOfToday();
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const [failedToday, failedThisWeek, successToday] = await Promise.all([
+    prisma.authEvent.count({ where: { action: 'login_failed', timestamp: { gte: today } } }),
+    prisma.authEvent.count({ where: { action: 'login_failed', timestamp: { gte: sevenDaysAgo } } }),
+    prisma.authEvent.count({ where: { action: 'login_success', timestamp: { gte: today } } }),
+  ]);
+
+  res.json({ failedLogin: { failedToday, failedThisWeek, successToday } });
+}
+
+const AUTH_ACTION_LABELS: Record<string, string> = {
+  login_success: 'Lyckad inloggning',
+  login_failed: 'Misslyckad inloggning',
+  password_reset_requested: 'Lösenordsåterställning begärd',
+  password_reset_completed: 'Lösenord återställt',
+};
+
+const authActivityLogQuerySchema = z.object({
+  range: z.enum(['today', 'week', 'all']).optional(),
+  limit: z.coerce.number().int().positive().max(200).optional(),
+});
+
+export async function authActivityLog(req: Request, res: Response) {
+  const query = authActivityLogQuerySchema.parse(req.query);
+  const limit = query.limit ?? 50;
+
+  const since =
+    query.range === 'today' ? startOfToday() : query.range === 'week' ? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) : undefined;
+
+  const [authEvents, resets] = await Promise.all([
+    prisma.authEvent.findMany({
+      where: since ? { timestamp: { gte: since } } : undefined,
+      orderBy: { timestamp: 'desc' },
+      take: limit,
+    }),
+    prisma.passwordReset.findMany({
+      where: since ? { createdAt: { gte: since } } : undefined,
+      include: { user: { select: { email: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    }),
+  ]);
+
+  const events = [
+    ...authEvents.map((e) => ({
+      id: e.id,
+      action: AUTH_ACTION_LABELS[e.action] ?? e.action,
+      email: e.email,
+      timestamp: e.timestamp,
+    })),
+    ...resets.map((r) => ({
+      id: `${r.id}-requested`,
+      action: AUTH_ACTION_LABELS.password_reset_requested,
+      email: r.user.email,
+      timestamp: r.createdAt,
+    })),
+    ...resets
+      .filter((r) => r.usedAt)
+      .map((r) => ({
+        id: `${r.id}-used`,
+        action: AUTH_ACTION_LABELS.password_reset_completed,
+        email: r.user.email,
+        timestamp: r.usedAt as Date,
+      })),
+  ]
+    .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+    .slice(0, limit);
+
+  res.json({ events });
+}

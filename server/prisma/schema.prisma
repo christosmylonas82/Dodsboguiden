@@ -62,6 +62,7 @@ model User {
   sentInvitations     Invitation[] @relation("InvitationSender")
   receivedInvitations Invitation[] @relation("InvitationRecipient")
   passwordResets      PasswordReset[]
+  authEvents          AuthEvent[]
 
   @@map("users")
 }
@@ -78,6 +79,19 @@ model PasswordReset {
 
   @@index([userId])
   @@map("password_resets")
+}
+
+model AuthEvent {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  email     String
+  action    String
+  timestamp DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([timestamp])
+  @@map("auth_events")
 }
 
 model Project {
