@@ -13,6 +13,7 @@ import { ProjectActivityPage } from './pages/ProjectActivity';
 import { SettingsPage } from './pages/Settings';
 import { AdminDashboardPage } from './pages/admin/AdminDashboard';
 import { AdminUsersPage } from './pages/admin/AdminUsers';
+import { AdminStatsPage } from './pages/admin/AdminStats';
 import { AdminAuditLogPage } from './pages/admin/AdminAuditLog';
 import { AdminLayout } from './layouts/AdminLayout';
 import './App.css';
@@ -80,6 +81,14 @@ function App() {
               element={
                 <AdminLayout>
                   <AdminUsersPage />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/statistik"
+              element={
+                <AdminLayout>
+                  <AdminStatsPage />
                 </AdminLayout>
               }
             />

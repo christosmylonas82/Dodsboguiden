@@ -54,21 +54,34 @@ export async function listAllProjects(_req: Request, res: Response) {
 
 export async function statistics(_req: Request, res: Response) {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-  const [totalUsers, activeUsers, newUsers7Days, totalProjects, activeProjects, totalTasks, completedTasks, activeProjectMemberCounts] =
-    await Promise.all([
-      prisma.user.count(),
-      prisma.user.count({ where: { deletedAt: null } }),
-      prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
-      prisma.project.count(),
-      prisma.project.count({ where: { deletedAt: null } }),
-      prisma.task.count(),
-      prisma.task.count({ where: { completed: true } }),
-      prisma.project.findMany({
-        where: { deletedAt: null },
-        select: { _count: { select: { members: true } } },
-      }),
-    ]);
+  const [
+    totalUsers,
+    activeUsers,
+    newUsers7Days,
+    totalProjects,
+    activeProjects,
+    projectsLast7Days,
+    projectsLast30Days,
+    totalTasks,
+    completedTasks,
+    activeProjectMemberCounts,
+  ] = await Promise.all([
+    prisma.user.count(),
+    prisma.user.count({ where: { deletedAt: null } }),
+    prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
+    prisma.project.count(),
+    prisma.project.count({ where: { deletedAt: null } }),
+    prisma.project.count({ where: { deletedAt: null, createdAt: { gte: sevenDaysAgo } } }),
+    prisma.project.count({ where: { deletedAt: null, createdAt: { gte: thirtyDaysAgo } } }),
+    prisma.task.count(),
+    prisma.task.count({ where: { completed: true } }),
+    prisma.project.findMany({
+      where: { deletedAt: null },
+      select: { _count: { select: { members: true } } },
+    }),
+  ]);
 
   const avgMembersPerProject = activeProjectMemberCounts.length
     ? activeProjectMemberCounts.reduce((sum, p) => sum + p._count.members, 0) / activeProjectMemberCounts.length
@@ -80,10 +93,78 @@ export async function statistics(_req: Request, res: Response) {
     newUsers7Days,
     totalProjects,
     activeProjects,
+    projectsLast7Days,
+    projectsLast30Days,
     totalTasks,
     completedTasks,
+    completionRate: totalTasks > 0 ? Number(((completedTasks / totalTasks) * 100).toFixed(1)) : 0,
     avgMembersPerProject: Number(avgMembersPerProject.toFixed(1)),
   });
+}
+
+export async function projectsPerDay(_req: Request, res: Response) {
+  const sevenDaysAgo = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000);
+  sevenDaysAgo.setHours(0, 0, 0, 0);
+
+  const projects = await prisma.project.findMany({
+    where: { deletedAt: null, createdAt: { gte: sevenDaysAgo } },
+    select: { createdAt: true },
+  });
+
+  const dataByDay = new Map<string, number>();
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+    dataByDay.set(date.toISOString().split('T')[0], 0);
+  }
+
+  for (const project of projects) {
+    const dateStr = project.createdAt.toISOString().split('T')[0];
+    if (dataByDay.has(dateStr)) {
+      dataByDay.set(dateStr, (dataByDay.get(dateStr) ?? 0) + 1);
+    }
+  }
+
+  const data = Array.from(dataByDay.entries()).map(([date, count]) => ({ date, projects: count }));
+  res.json({ data });
+}
+
+const FEATURE_LABELS: [string, string][] = [
+  ['project_created', 'Skapa dödsbo'],
+  ['added task', 'Lägg till uppgift'],
+  ['changed status of', 'Uppdatera uppgift'],
+  ['invited', 'Bjuda in medlem'],
+  ['renamed the dödsbo', 'Byta namn'],
+  ['removed member', 'Ta bort medlem'],
+  ['accepted invite', 'Acceptera inbjudan'],
+];
+
+function labelForAction(action: string): string {
+  for (const [key, label] of FEATURE_LABELS) {
+    if (action.includes(key)) return label;
+  }
+  return 'Övrigt';
+}
+
+export async function featureUsage(_req: Request, res: Response) {
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+  const entries = await prisma.activityLog.findMany({
+    where: { timestamp: { gte: thirtyDaysAgo } },
+    select: { action: true },
+  });
+
+  const counts = new Map<string, number>();
+  for (const entry of entries) {
+    const label = labelForAction(entry.action);
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+
+  const data = Array.from(counts.entries())
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 10)
+    .map(([feature, uses]) => ({ feature, uses }));
+
+  res.json({ data });
 }
 
 export async function auditLog(_req: Request, res: Response) {

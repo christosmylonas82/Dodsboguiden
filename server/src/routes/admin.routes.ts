@@ -5,8 +5,10 @@ import { asyncHandler } from '../lib/asyncHandler.js';
 import {
   auditLog,
   deleteUser,
+  featureUsage,
   listAllProjects,
   listUsers,
+  projectsPerDay,
   requestPasswordReset,
   statistics,
   updateUserRole,
@@ -22,6 +24,8 @@ router.delete('/users/:userId', asyncHandler(deleteUser));
 router.post('/users/:userId/reset-password', asyncHandler(requestPasswordReset));
 router.get('/projects', asyncHandler(listAllProjects));
 router.get('/statistics', asyncHandler(statistics));
+router.get('/stats/projects-per-day', asyncHandler(projectsPerDay));
+router.get('/stats/feature-usage', asyncHandler(featureUsage));
 router.get('/audit-log', asyncHandler(auditLog));
 
 export default router;
