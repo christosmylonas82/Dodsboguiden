@@ -10,6 +10,7 @@ export function CreateProjectModal({
   onCreated: (projectId: string) => void;
 }) {
   const [deceasedName, setDeceasedName] = useState('');
+  const [deceasedDate, setDeceasedDate] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +21,10 @@ export function CreateProjectModal({
     try {
       const project = await apiFetch<{ id: string }>('/projects', {
         method: 'POST',
-        body: JSON.stringify({ deceasedName }),
+        body: JSON.stringify({
+          deceasedName,
+          ...(deceasedDate ? { deceasedDate: new Date(`${deceasedDate}T00:00:00Z`).toISOString() } : {}),
+        }),
       });
       onCreated(project.id);
     } catch (err) {
@@ -48,6 +52,22 @@ export function CreateProjectModal({
               onChange={(e) => setDeceasedName(e.target.value)}
               className="rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
             />
+          </div>
+          <div className="mt-4 flex flex-col gap-1.5">
+            <label htmlFor="deceasedDate" className="text-sm text-muted">
+              Dödsdatum (valfritt)
+            </label>
+            <input
+              id="deceasedDate"
+              type="date"
+              max={new Date().toISOString().split('T')[0]}
+              value={deceasedDate}
+              onChange={(e) => setDeceasedDate(e.target.value)}
+              className="rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
+            />
+            <p className="text-xs text-muted">
+              Om du anger ett datum räknar vi ut deadlinen för bouppteckning (4 månader) automatiskt.
+            </p>
           </div>
           {error && <p className="mt-2 text-sm text-danger">{error}</p>}
           <div className="mt-6 flex justify-end gap-3">

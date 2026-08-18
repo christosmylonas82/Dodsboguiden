@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
 import { logActivity } from '../lib/activity.js';
+import { getDueDateStatus } from '../lib/dueDate.js';
 
 const createTaskSchema = z.object({
   title: z.string().min(1),
@@ -118,7 +119,7 @@ export async function updateTask(req: Request, res: Response) {
     });
   }
 
-  res.json(task);
+  res.json({ ...task, dueDateStatus: getDueDateStatus(task.dueDate) });
 }
 
 export async function listActivity(req: Request, res: Response) {

@@ -5,9 +5,11 @@ import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
 import { DEFAULT_CHECKLIST } from '../lib/checklistTemplate.js';
 import { logActivity } from '../lib/activity.js';
+import { calculateDueDate, getDueDateStatus, TASK_DAY_OFFSETS } from '../lib/dueDate.js';
 
 const createProjectSchema = z.object({
   deceasedName: z.string().min(1),
+  deceasedDate: z.string().datetime().optional(),
 });
 
 export async function createProject(req: Request, res: Response) {
@@ -19,10 +21,13 @@ export async function createProject(req: Request, res: Response) {
     throw new HttpError(404, 'User not found');
   }
 
+  const deceasedDate = body.deceasedDate ? new Date(body.deceasedDate) : undefined;
+
   const project = await prisma.project.create({
     data: {
       ownerId: userId,
       deceasedName: body.deceasedName,
+      deceasedDate,
       members: {
         create: { userId, email: user.email, role: 'ADMIN' },
       },
@@ -37,6 +42,10 @@ export async function createProject(req: Request, res: Response) {
           timeEstimate: item.timeEstimate,
           responsibleRole: item.responsibleRole,
           orderIndex: index,
+          dueDate:
+            deceasedDate && TASK_DAY_OFFSETS[item.title] !== undefined
+              ? calculateDueDate(deceasedDate, TASK_DAY_OFFSETS[item.title])
+              : undefined,
         })),
       },
     },
@@ -99,7 +108,10 @@ export async function getProject(req: Request, res: Response) {
     throw new HttpError(404, 'Project not found');
   }
 
-  res.json(project);
+  res.json({
+    ...project,
+    tasks: project.tasks.map((task) => ({ ...task, dueDateStatus: getDueDateStatus(task.dueDate) })),
+  });
 }
 
 const inviteSchema = z.object({

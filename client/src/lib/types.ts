@@ -20,6 +20,7 @@ export interface ProjectSummary {
 
 export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'DONE';
 export type TaskPriority = 'NOW' | 'SOON' | 'LATER';
+export type DueDateStatus = 'overdue' | 'due_soon' | 'on_time' | 'no_date';
 
 export interface Task {
   id: string;
@@ -46,6 +47,7 @@ export interface Task {
   orderIndex: number;
   notes: string | null;
   dueDate: string | null;
+  dueDateStatus?: DueDateStatus;
 }
 
 export interface ProjectMember {
@@ -60,6 +62,7 @@ export interface ProjectMember {
 export interface ProjectDetail {
   id: string;
   deceasedName: string;
+  deceasedDate: string | null;
   status: 'ACTIVE' | 'COMPLETED';
   createdAt: string;
   tasks: Task[];

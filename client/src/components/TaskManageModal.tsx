@@ -3,6 +3,7 @@ import type { ProjectMember, Task, TaskStatus } from '../lib/types';
 import { TASK_STATUS_LABELS, TASK_STATUS_ORDER } from '../lib/taskStatus';
 import { TASK_STATUS_BADGE_CLASSES } from './TaskStatusBadge';
 import { ModalOverlay } from './ModalOverlay';
+import { DUE_DATE_LABEL, DUE_DATE_TEXT_CLASS, daysUntilDue, getDueDateStatus } from '../lib/dueDateUtils';
 
 export function TaskManageModal({
   task,
@@ -98,13 +99,20 @@ export function TaskManageModal({
           <label htmlFor="dueDate" className="text-sm font-medium text-muted">
             Deadline
           </label>
-          <input
-            id="dueDate"
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            className="mt-2 w-full rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
-          />
+          <div className="mt-2 flex items-center gap-3">
+            <input
+              id="dueDate"
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="flex-1 rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
+            />
+            {dueDate && (
+              <span className={`text-xs font-semibold whitespace-nowrap ${DUE_DATE_TEXT_CLASS[getDueDateStatus(dueDate)]}`}>
+                {DUE_DATE_LABEL[getDueDateStatus(dueDate)]} ({Math.abs(daysUntilDue(dueDate))} d)
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="mt-5">

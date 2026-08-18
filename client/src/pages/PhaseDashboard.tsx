@@ -11,6 +11,7 @@ import { TaskStatusBadge } from '../components/TaskStatusBadge';
 import { formatTimestamp } from '../lib/activity';
 import { PHASE_DESCRIPTIONS, TASK_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { phaseStatus } from '../lib/phases';
+import { DUE_DATE_LABEL, DUE_DATE_TEXT_CLASS, daysUntilDue } from '../lib/dueDateUtils';
 
 const STATUS_BORDER_CLASS: Record<TaskStatus, string> = {
   PENDING: 'border-l-border',
@@ -215,8 +216,11 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
                     </div>
                   )}
                   {!isDone && task.dueDate && (
-                    <p className={`mt-1 text-xs ${new Date(task.dueDate) < new Date() ? 'text-danger' : 'text-muted'}`}>
+                    <p className={`mt-1 text-xs font-medium ${DUE_DATE_TEXT_CLASS[task.dueDateStatus ?? 'no_date']}`}>
                       Deadline: {new Date(task.dueDate).toLocaleDateString('sv-SE')}
+                      {task.dueDateStatus && task.dueDateStatus !== 'no_date' && task.dueDateStatus !== 'on_time' && (
+                        <> ({DUE_DATE_LABEL[task.dueDateStatus]}, {Math.abs(daysUntilDue(task.dueDate))} dagar)</>
+                      )}
                     </p>
                   )}
                   {task.notes && <p className="mt-1 text-xs whitespace-pre-wrap text-muted">📝 {task.notes}</p>}
