@@ -153,6 +153,8 @@ model Task {
   priority        TaskPriority? @map("priority")
   timeEstimate    String?       @map("time_estimate")
   responsibleRole String?       @map("responsible_role")
+  notes           String?
+  dueDate         DateTime?     @map("due_date")
 
   project         Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   completedByUser User?   @relation("TaskCompletedBy", fields: [completedBy], references: [id])

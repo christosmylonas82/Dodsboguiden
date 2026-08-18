@@ -61,7 +61,10 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
     reload();
   }
 
-  async function saveTask(task: Task, updates: { status: TaskStatus; assignedTo: string | null }) {
+  async function saveTask(
+    task: Task,
+    updates: { status: TaskStatus; assignedTo: string | null; notes: string | null; dueDate: string | null },
+  ) {
     if (!id) return;
     await apiFetch(`/projects/${id}/tasks/${task.id}`, {
       method: 'PUT',
@@ -211,6 +214,12 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
                       <span className="text-xs text-muted">Tilldelad {task.assignedUser.name}</span>
                     </div>
                   )}
+                  {!isDone && task.dueDate && (
+                    <p className={`mt-1 text-xs ${new Date(task.dueDate) < new Date() ? 'text-danger' : 'text-muted'}`}>
+                      Deadline: {new Date(task.dueDate).toLocaleDateString('sv-SE')}
+                    </p>
+                  )}
+                  {task.notes && <p className="mt-1 text-xs whitespace-pre-wrap text-muted">📝 {task.notes}</p>}
                   {isDone && completedByName && task.completedAt && (
                     <p className="mt-0.5 text-xs text-muted">
                       Slutförd av {completedByName} den {formatTimestamp(task.completedAt)}

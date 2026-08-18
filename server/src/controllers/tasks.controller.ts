@@ -50,6 +50,8 @@ const updateTaskSchema = z.object({
   completed: z.boolean().optional(),
   status: z.enum(TASK_STATUSES).optional(),
   assignedTo: z.string().uuid().nullable().optional(),
+  notes: z.string().max(2000).nullable().optional(),
+  dueDate: z.string().datetime().nullable().optional(),
 });
 
 export async function updateTask(req: Request, res: Response) {
@@ -88,6 +90,8 @@ export async function updateTask(req: Request, res: Response) {
           }
         : {}),
       ...(body.assignedTo !== undefined ? { assignedTo: body.assignedTo } : {}),
+      ...(body.notes !== undefined ? { notes: body.notes } : {}),
+      ...(body.dueDate !== undefined ? { dueDate: body.dueDate ? new Date(body.dueDate) : null } : {}),
     },
     include: {
       assignedUser: { select: { id: true, name: true, email: true, profileImageUrl: true } },

@@ -13,10 +13,17 @@ export function TaskManageModal({
   task: Task;
   members: ProjectMember[];
   onClose: () => void;
-  onSave: (updates: { status: TaskStatus; assignedTo: string | null }) => Promise<void>;
+  onSave: (updates: {
+    status: TaskStatus;
+    assignedTo: string | null;
+    notes: string | null;
+    dueDate: string | null;
+  }) => Promise<void>;
 }) {
   const [status, setStatus] = useState<TaskStatus>(task.status);
   const [assignedTo, setAssignedTo] = useState<string>(task.assignedTo ?? '');
+  const [notes, setNotes] = useState<string>(task.notes ?? '');
+  const [dueDate, setDueDate] = useState<string>(task.dueDate ? task.dueDate.split('T')[0] : '');
   const [saving, setSaving] = useState(false);
 
   const assignableMembers = members.filter((m) => m.userId && m.user);
@@ -31,7 +38,12 @@ export function TaskManageModal({
   async function handleSave() {
     setSaving(true);
     try {
-      await onSave({ status, assignedTo: assignedTo || null });
+      await onSave({
+        status,
+        assignedTo: assignedTo || null,
+        notes: notes.trim() || null,
+        dueDate: dueDate ? new Date(`${dueDate}T00:00:00`).toISOString() : null,
+      });
       onClose();
     } finally {
       setSaving(false);
@@ -80,6 +92,32 @@ export function TaskManageModal({
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="mt-5">
+          <label htmlFor="dueDate" className="text-sm font-medium text-muted">
+            Deadline
+          </label>
+          <input
+            id="dueDate"
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            className="mt-2 w-full rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
+          />
+        </div>
+
+        <div className="mt-5">
+          <label htmlFor="notes" className="text-sm font-medium text-muted">
+            Anteckningar
+          </label>
+          <textarea
+            id="notes"
+            rows={3}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            className="mt-2 w-full rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
+          />
         </div>
 
         <div className="mt-6 flex justify-end gap-3">

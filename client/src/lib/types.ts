@@ -44,6 +44,8 @@ export interface Task {
   assignedTo: string | null;
   assignedUser: { id: string; name: string; email: string; profileImageUrl: string | null } | null;
   orderIndex: number;
+  notes: string | null;
+  dueDate: string | null;
 }
 
 export interface ProjectMember {
