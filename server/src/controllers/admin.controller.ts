@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
@@ -9,25 +10,27 @@ import { scrubAuthEventsForUser } from '../lib/authEvent.js';
 
 const listUsersQuerySchema = z.object({
   search: z.string().optional(),
-  sort: z.enum(['createdAt', 'email', 'name', 'role']).optional(),
-  order: z.enum(['asc', 'desc']).optional(),
+  range: z.enum(['today', 'week', 'all']).optional(),
 });
 
 export async function listUsers(req: Request, res: Response) {
   const query = listUsersQuerySchema.parse(req.query);
   const search = query.search?.trim();
-  const sortField = query.sort ?? 'createdAt';
-  const order = query.order ?? 'desc';
+  const since =
+    query.range === 'today' ? startOfToday() : query.range === 'week' ? new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) : undefined;
+
+  const conditions: Prisma.UserWhereInput[] = [];
+  if (search) {
+    conditions.push({
+      OR: [{ email: { contains: search, mode: 'insensitive' } }, { name: { contains: search, mode: 'insensitive' } }],
+    });
+  }
+  if (since) {
+    conditions.push({ createdAt: { gte: since } });
+  }
 
   const users = await prisma.user.findMany({
-    where: search
-      ? {
-          OR: [
-            { email: { contains: search, mode: 'insensitive' } },
-            { name: { contains: search, mode: 'insensitive' } },
-          ],
-        }
-      : undefined,
+    where: conditions.length ? { AND: conditions } : undefined,
     select: {
       id: true,
       email: true,
@@ -37,7 +40,7 @@ export async function listUsers(req: Request, res: Response) {
       deletedAt: true,
       _count: { select: { memberships: true } },
     },
-    orderBy: { [sortField]: order },
+    orderBy: { createdAt: 'desc' },
   });
 
   const recentLogins = await prisma.authEvent.findMany({

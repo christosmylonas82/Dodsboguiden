@@ -15,15 +15,20 @@ interface AdminUser {
   lastLogin: { ipAddress: string | null; country: string | null; city: string | null; timestamp: string } | null;
 }
 
-type SortField = 'createdAt' | 'email' | 'name' | 'role';
+type Range = 'today' | 'week' | 'all';
+
+const RANGE_OPTIONS: { label: string; value: Range }[] = [
+  { label: 'Idag', value: 'today' },
+  { label: 'Denna vecka', value: 'week' },
+  { label: 'Alla', value: 'all' },
+];
 
 export function AdminUsersPage() {
   const { user: currentUser } = useAdmin();
   const [users, setUsers] = useState<AdminUser[] | null>(null);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [sort, setSort] = useState<SortField>('createdAt');
-  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
+  const [range, setRange] = useState<Range>('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ text: string; tone: 'success' | 'error' } | null>(null);
@@ -35,10 +40,10 @@ export function AdminUsersPage() {
   }, [search]);
 
   useEffect(() => {
-    const params = new URLSearchParams({ sort, order });
+    const params = new URLSearchParams({ range });
     if (debouncedSearch.trim()) params.set('search', debouncedSearch.trim());
     apiFetch<AdminUser[]>(`/admin/users?${params.toString()}`).then(setUsers);
-  }, [debouncedSearch, sort, order]);
+  }, [debouncedSearch, range]);
 
   function flashMessage(text: string, tone: 'success' | 'error' = 'success') {
     setMessage({ text, tone });
@@ -147,23 +152,22 @@ export function AdminUsersPage() {
             className="w-full rounded-lg border border-border py-2 pl-9 pr-3 text-sm text-text focus:border-primary focus:outline-none"
           />
         </div>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortField)}
-          className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
-        >
-          <option value="createdAt">Datum</option>
-          <option value="email">E-post</option>
-          <option value="name">Namn</option>
-          <option value="role">Roll</option>
-        </select>
-        <button
-          type="button"
-          onClick={() => setOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
-          className="rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-text hover:bg-primary-light"
-        >
-          {order === 'desc' ? '↓ Fallande' : '↑ Stigande'}
-        </button>
+        <div className="flex gap-1.5">
+          {RANGE_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setRange(opt.value)}
+              className={`rounded-lg border px-3 py-2 text-xs font-medium transition ${
+                range === opt.value
+                  ? 'border-primary bg-primary text-white'
+                  : 'border-border bg-transparent text-text hover:bg-primary-light'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {users === null ? (
@@ -197,13 +201,8 @@ export function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-3 text-text">{u._count.memberships}</td>
                     <td className="px-4 py-3 text-text">
-                      {u.lastLogin?.ipAddress ? (
-                        <div title={`${u.lastLogin.country ?? '?'} — ${u.lastLogin.city ?? '?'}`}>
-                          <div>{u.lastLogin.ipAddress}</div>
-                          <div className="mt-0.5 text-xs text-muted">
-                            {u.lastLogin.city ?? 'Okänd plats'}, {u.lastLogin.country ?? '?'}
-                          </div>
-                        </div>
+                      {u.lastLogin ? (
+                        new Date(u.lastLogin.timestamp).toLocaleString('sv-SE')
                       ) : (
                         <span className="text-muted">Aldrig</span>
                       )}
