@@ -8,6 +8,8 @@ import { errorHandler } from './middleware/errorHandler.js';
 
 export const app = express();
 
+app.set('trust proxy', process.env.TRUST_PROXY === 'true');
+
 app.use(
   cors({
     origin: process.env.CLIENT_ORIGIN ?? 'http://localhost:5173',

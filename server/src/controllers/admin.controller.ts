@@ -38,7 +38,31 @@ export async function listUsers(req: Request, res: Response) {
     },
     orderBy: { [sortField]: order },
   });
-  res.json(users);
+
+  const recentLogins = await prisma.authEvent.findMany({
+    where: { userId: { in: users.map((u) => u.id) }, action: 'login_success' },
+    select: { userId: true, ipAddress: true, country: true, city: true, timestamp: true },
+    orderBy: { timestamp: 'desc' },
+  });
+
+  const lastLoginByUser = new Map<string, (typeof recentLogins)[number]>();
+  for (const login of recentLogins) {
+    if (login.userId && !lastLoginByUser.has(login.userId)) {
+      lastLoginByUser.set(login.userId, login);
+    }
+  }
+
+  const usersWithLastLogin = users.map((u) => {
+    const login = lastLoginByUser.get(u.id);
+    return {
+      ...u,
+      lastLogin: login
+        ? { ipAddress: login.ipAddress, country: login.country, city: login.city, timestamp: login.timestamp }
+        : null,
+    };
+  });
+
+  res.json(usersWithLastLogin);
 }
 
 export async function listAllProjects(_req: Request, res: Response) {
@@ -347,17 +371,50 @@ export async function authActivityLog(req: Request, res: Response) {
     }),
   ]);
 
+  const successUserIds = Array.from(
+    new Set(authEvents.filter((e) => e.action === 'login_success' && e.userId).map((e) => e.userId as string)),
+  );
+  const loginHistory = successUserIds.length
+    ? await prisma.authEvent.findMany({
+        where: { userId: { in: successUserIds }, action: 'login_success' },
+        select: { id: true, userId: true, ipAddress: true, timestamp: true },
+        orderBy: { timestamp: 'asc' },
+      })
+    : [];
+
+  const newIpEventIds = new Set<string>();
+  const seenIpsByUser = new Map<string, Set<string>>();
+  for (const login of loginHistory) {
+    if (!login.userId || !login.ipAddress) continue;
+    const seen = seenIpsByUser.get(login.userId) ?? new Set<string>();
+    if (seen.size > 0 && !seen.has(login.ipAddress)) {
+      newIpEventIds.add(login.id);
+    }
+    seen.add(login.ipAddress);
+    seenIpsByUser.set(login.userId, seen);
+  }
+
   const events = [
     ...authEvents.map((e) => ({
       id: e.id,
       action: AUTH_ACTION_LABELS[e.action] ?? e.action,
       email: e.email,
+      ipAddress: e.ipAddress,
+      country: e.country,
+      city: e.city,
+      userAgent: e.userAgent,
+      isNewIp: newIpEventIds.has(e.id),
       timestamp: e.timestamp,
     })),
     ...resets.map((r) => ({
       id: `${r.id}-requested`,
       action: AUTH_ACTION_LABELS.password_reset_requested,
       email: r.user.email,
+      ipAddress: null,
+      country: null,
+      city: null,
+      userAgent: null,
+      isNewIp: false,
       timestamp: r.createdAt,
     })),
     ...resets
@@ -366,6 +423,11 @@ export async function authActivityLog(req: Request, res: Response) {
         id: `${r.id}-used`,
         action: AUTH_ACTION_LABELS.password_reset_completed,
         email: r.user.email,
+        ipAddress: null,
+        country: null,
+        city: null,
+        userAgent: null,
+        isNewIp: false,
         timestamp: r.usedAt as Date,
       })),
   ]

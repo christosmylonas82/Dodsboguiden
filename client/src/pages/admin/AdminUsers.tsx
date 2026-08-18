@@ -12,6 +12,7 @@ interface AdminUser {
   createdAt: string;
   deletedAt: string | null;
   _count: { memberships: number };
+  lastLogin: { ipAddress: string | null; country: string | null; city: string | null; timestamp: string } | null;
 }
 
 type SortField = 'createdAt' | 'email' | 'name' | 'role';
@@ -178,6 +179,7 @@ export function AdminUsersPage() {
                 <th className="px-4 py-3 font-medium">E-post</th>
                 <th className="px-4 py-3 font-medium">Roll</th>
                 <th className="px-4 py-3 font-medium">Dödsbon</th>
+                <th className="px-4 py-3 font-medium">Senaste inloggning</th>
                 <th className="px-4 py-3 font-medium">Skapad</th>
                 <th className="px-4 py-3 text-right font-medium">Åtgärder</th>
               </tr>
@@ -194,6 +196,18 @@ export function AdminUsersPage() {
                       <Badge tone={u.role === 'ADMIN' ? 'success' : 'neutral'}>{u.role === 'ADMIN' ? 'Admin' : 'Medlem'}</Badge>
                     </td>
                     <td className="px-4 py-3 text-text">{u._count.memberships}</td>
+                    <td className="px-4 py-3 text-text">
+                      {u.lastLogin?.ipAddress ? (
+                        <div title={`${u.lastLogin.country ?? '?'} — ${u.lastLogin.city ?? '?'}`}>
+                          <div>{u.lastLogin.ipAddress}</div>
+                          <div className="mt-0.5 text-xs text-muted">
+                            {u.lastLogin.city ?? 'Okänd plats'}, {u.lastLogin.country ?? '?'}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-muted">Aldrig</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-muted">{new Date(u.createdAt).toLocaleDateString('sv-SE')}</td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap items-center justify-end gap-2">

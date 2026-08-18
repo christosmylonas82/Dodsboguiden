@@ -68,20 +68,22 @@ const loginSchema = z.object({
 
 export async function login(req: Request, res: Response) {
   const body = loginSchema.parse(req.body);
+  const ipAddress = req.ip;
+  const userAgent = req.headers['user-agent'];
 
   const user = await prisma.user.findUnique({ where: { email: body.email } });
   if (!user || user.deletedAt) {
-    await logAuthEvent({ email: body.email, action: 'login_failed' });
+    await logAuthEvent({ email: body.email, action: 'login_failed', ipAddress, userAgent });
     throw new HttpError(401, 'Invalid email or password');
   }
 
   const valid = await verifyPassword(body.password, user.passwordHash);
   if (!valid) {
-    await logAuthEvent({ userId: user.id, email: user.email, action: 'login_failed' });
+    await logAuthEvent({ userId: user.id, email: user.email, action: 'login_failed', ipAddress, userAgent });
     throw new HttpError(401, 'Invalid email or password');
   }
 
-  await logAuthEvent({ userId: user.id, email: user.email, action: 'login_success' });
+  await logAuthEvent({ userId: user.id, email: user.email, action: 'login_success', ipAddress, userAgent });
 
   const token = signToken({ userId: user.id, role: user.role });
   res.json({ token, user: toUserResponse(user) });

@@ -86,11 +86,19 @@ model AuthEvent {
   userId    String?  @map("user_id")
   email     String
   action    String
+  ipAddress String?  @map("ip_address")
+  country   String?
+  city      String?
+  latitude  Float?
+  longitude Float?
+  userAgent String?  @map("user_agent")
   timestamp DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id])
 
   @@index([timestamp])
+  @@index([userId])
+  @@index([ipAddress])
   @@map("auth_events")
 }
 

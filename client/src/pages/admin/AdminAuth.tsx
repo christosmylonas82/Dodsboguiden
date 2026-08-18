@@ -24,6 +24,10 @@ interface AuthEvent {
   id: string;
   action: string;
   email: string;
+  ipAddress: string | null;
+  country: string | null;
+  city: string | null;
+  isNewIp: boolean;
   timestamp: string;
 }
 
@@ -121,27 +125,40 @@ export function AdminAuthPage() {
               <tr className="border-b border-border text-muted">
                 <th className="px-4 py-3 font-medium">Åtgärd</th>
                 <th className="px-4 py-3 font-medium">Användare</th>
+                <th className="px-4 py-3 font-medium">IP-adress</th>
+                <th className="px-4 py-3 font-medium">Plats</th>
                 <th className="px-4 py-3 font-medium">Tidpunkt</th>
               </tr>
             </thead>
             <tbody>
               {eventsLoading ? (
                 <tr>
-                  <td colSpan={3} className="px-4 py-6 text-center text-muted">
+                  <td colSpan={5} className="px-4 py-6 text-center text-muted">
                     Laddar…
                   </td>
                 </tr>
               ) : events.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-4 py-6 text-center text-muted">
+                  <td colSpan={5} className="px-4 py-6 text-center text-muted">
                     Inga events
                   </td>
                 </tr>
               ) : (
                 events.map((event) => (
                   <tr key={event.id} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3 text-text">{event.action}</td>
+                    <td className="px-4 py-3 text-text">
+                      {event.action}
+                      {event.isNewIp && (
+                        <span className="ml-2 rounded-full bg-warning-light px-2 py-0.5 text-xs font-medium text-warning">
+                          Ny IP
+                        </span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-text">{event.email}</td>
+                    <td className="px-4 py-3 text-muted">{event.ipAddress ?? '—'}</td>
+                    <td className="px-4 py-3 text-muted">
+                      {event.city || event.country ? `${event.city ?? '?'}, ${event.country ?? '?'}` : '—'}
+                    </td>
                     <td className="px-4 py-3 text-muted">{new Date(event.timestamp).toLocaleString('sv-SE')}</td>
                   </tr>
                 ))
