@@ -23,6 +23,19 @@ export async function exportData(req: Request, res: Response) {
     },
   });
 
+  const [loginHistory, passwordResetHistory] = await Promise.all([
+    prisma.authEvent.findMany({
+      where: { userId },
+      select: { action: true, ipAddress: true, country: true, city: true, userAgent: true, timestamp: true },
+      orderBy: { timestamp: 'desc' },
+    }),
+    prisma.passwordReset.findMany({
+      where: { userId },
+      select: { expiresAt: true, usedAt: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+    }),
+  ]);
+
   const exportPayload = {
     user: {
       id: user.id,
@@ -39,6 +52,19 @@ export async function exportData(req: Request, res: Response) {
       status: m.project.status,
       tasks: m.project.tasks,
       myActivity: m.project.activity,
+    })),
+    loginHistory: loginHistory.map((event) => ({
+      action: event.action,
+      timestamp: event.timestamp,
+      ipAddress: event.ipAddress,
+      location: event.city && event.country ? `${event.city}, ${event.country}` : 'Okänd',
+      device: event.userAgent,
+    })),
+    passwordResetHistory: passwordResetHistory.map((reset) => ({
+      requestedAt: reset.createdAt,
+      expiresAt: reset.expiresAt,
+      used: reset.usedAt !== null,
+      usedAt: reset.usedAt,
     })),
   };
 
