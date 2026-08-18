@@ -127,19 +127,61 @@ export async function statistics(_req: Request, res: Response) {
   });
 }
 
-export async function projectsPerDay(_req: Request, res: Response) {
-  const sevenDaysAgo = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000);
-  sevenDaysAgo.setHours(0, 0, 0, 0);
+const MAX_RANGE_DAYS = 366;
+
+const dateRangeQuerySchema = z.object({
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+});
+
+function resolveDateRange(query: { startDate?: string; endDate?: string }, defaultDays: number): { start: Date; end: Date } {
+  const end = query.endDate ? new Date(query.endDate) : new Date();
+  if (query.endDate) end.setHours(23, 59, 59, 999);
+
+  const start = query.startDate ? new Date(query.startDate) : new Date(Date.now() - defaultDays * 24 * 60 * 60 * 1000);
+  start.setHours(0, 0, 0, 0);
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start > end) {
+    throw new HttpError(400, 'Invalid date range');
+  }
+  const spanDays = (end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000);
+  if (spanDays > MAX_RANGE_DAYS) {
+    throw new HttpError(400, `Date range cannot exceed ${MAX_RANGE_DAYS} days`);
+  }
+
+  return { start, end };
+}
+
+function calculateTrend(data: { projects: number }[]): { direction: 'up' | 'down' | 'flat'; percentChange: number } {
+  if (data.length < 2) return { direction: 'flat', percentChange: 0 };
+
+  const mid = Math.floor(data.length / 2);
+  const firstHalf = data.slice(0, mid);
+  const secondHalf = data.slice(mid);
+
+  const firstAvg = firstHalf.reduce((sum, d) => sum + d.projects, 0) / firstHalf.length;
+  const secondAvg = secondHalf.reduce((sum, d) => sum + d.projects, 0) / secondHalf.length;
+
+  const percentChange = firstAvg > 0 ? ((secondAvg - firstAvg) / firstAvg) * 100 : 0;
+
+  return {
+    direction: percentChange > 5 ? 'up' : percentChange < -5 ? 'down' : 'flat',
+    percentChange: Math.round(percentChange * 10) / 10,
+  };
+}
+
+export async function projectsPerDay(req: Request, res: Response) {
+  const query = dateRangeQuerySchema.parse(req.query);
+  const { start, end } = resolveDateRange(query, 30);
 
   const projects = await prisma.project.findMany({
-    where: { deletedAt: null, createdAt: { gte: sevenDaysAgo } },
+    where: { deletedAt: null, createdAt: { gte: start, lte: end } },
     select: { createdAt: true },
   });
 
   const dataByDay = new Map<string, number>();
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-    dataByDay.set(date.toISOString().split('T')[0], 0);
+  for (const cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
+    dataByDay.set(cursor.toISOString().split('T')[0], 0);
   }
 
   for (const project of projects) {
@@ -150,7 +192,7 @@ export async function projectsPerDay(_req: Request, res: Response) {
   }
 
   const data = Array.from(dataByDay.entries()).map(([date, count]) => ({ date, projects: count }));
-  res.json({ data });
+  res.json({ data, trend: calculateTrend(data) });
 }
 
 const FEATURE_LABELS: [string, string][] = [
@@ -170,11 +212,12 @@ function labelForAction(action: string): string {
   return 'Övrigt';
 }
 
-export async function featureUsage(_req: Request, res: Response) {
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+export async function featureUsage(req: Request, res: Response) {
+  const query = dateRangeQuerySchema.parse(req.query);
+  const { start, end } = resolveDateRange(query, 30);
 
   const entries = await prisma.activityLog.findMany({
-    where: { timestamp: { gte: thirtyDaysAgo } },
+    where: { timestamp: { gte: start, lte: end } },
     select: { action: true },
   });
 
@@ -190,6 +233,64 @@ export async function featureUsage(_req: Request, res: Response) {
     .map(([feature, uses]) => ({ feature, uses }));
 
   res.json({ data });
+}
+
+// Prevents CSV/formula injection when a cell is opened in Excel/Sheets and
+// guards against embedded commas, quotes, or newlines in free-text fields.
+function csvCell(value: string | number): string {
+  const str = String(value);
+  const escaped = /^[=+\-@]/.test(str) ? `'${str}` : str;
+  return `"${escaped.replace(/"/g, '""')}"`;
+}
+
+const exportCsvQuerySchema = dateRangeQuerySchema.extend({
+  dataType: z.enum(['projects', 'features']).optional(),
+});
+
+export async function exportStatsCsv(req: Request, res: Response) {
+  const query = exportCsvQuerySchema.parse(req.query);
+  const { start, end } = resolveDateRange(query, 30);
+  const dataType = query.dataType ?? 'projects';
+
+  let csvContent = '';
+
+  if (dataType === 'projects') {
+    const projects = await prisma.project.findMany({
+      where: { createdAt: { gte: start, lte: end }, deletedAt: null },
+      select: { id: true, deceasedName: true, createdAt: true, _count: { select: { members: true } } },
+    });
+
+    csvContent = 'Datum,Dödsbo-ID,Namn,Medlemmar\n';
+    for (const p of projects) {
+      const date = p.createdAt.toISOString().split('T')[0];
+      csvContent += [csvCell(date), csvCell(p.id), csvCell(p.deceasedName), csvCell(p._count.members)].join(',') + '\n';
+    }
+  } else {
+    const activities = await prisma.activityLog.findMany({
+      where: { timestamp: { gte: start, lte: end } },
+      select: { action: true, timestamp: true },
+    });
+
+    const counts = new Map<string, { count: number; lastUsed: Date }>();
+    for (const entry of activities) {
+      const label = labelForAction(entry.action);
+      const existing = counts.get(label);
+      if (!existing || entry.timestamp > existing.lastUsed) {
+        counts.set(label, { count: (existing?.count ?? 0) + 1, lastUsed: existing ? existing.lastUsed : entry.timestamp });
+      } else {
+        existing.count += 1;
+      }
+    }
+
+    csvContent = 'Funktion,Antal,Senast använd\n';
+    for (const [feature, stats] of Array.from(counts.entries()).sort(([, a], [, b]) => b.count - a.count)) {
+      csvContent += [csvCell(feature), csvCell(stats.count), csvCell(stats.lastUsed.toISOString())].join(',') + '\n';
+    }
+  }
+
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="dodsboguiden-stats-${dataType}-${Date.now()}.csv"`);
+  res.send(csvContent);
 }
 
 export async function auditLog(_req: Request, res: Response) {

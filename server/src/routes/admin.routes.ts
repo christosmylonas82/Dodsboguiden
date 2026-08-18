@@ -7,6 +7,7 @@ import {
   auditLog,
   authActivityLog,
   deleteUser,
+  exportStatsCsv,
   failedLoginStats,
   featureUsage,
   listAllProjects,
@@ -30,6 +31,7 @@ router.get('/projects', asyncHandler(listAllProjects));
 router.get('/statistics', asyncHandler(statistics));
 router.get('/stats/projects-per-day', asyncHandler(projectsPerDay));
 router.get('/stats/feature-usage', asyncHandler(featureUsage));
+router.get('/stats/export/csv', asyncHandler(exportStatsCsv));
 router.get('/auth/account-stats', asyncHandler(accountStats));
 router.get('/auth/reset-stats', asyncHandler(resetStats));
 router.get('/auth/failed-login-stats', asyncHandler(failedLoginStats));
