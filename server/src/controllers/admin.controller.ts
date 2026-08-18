@@ -5,6 +5,7 @@ import { HttpError } from '../middleware/errorHandler.js';
 import { logAudit } from '../lib/audit.js';
 import { createPasswordResetToken } from '../lib/passwordReset.js';
 import { sendPasswordResetEmail } from '../lib/email.js';
+import { scrubAuthEventsForUser } from '../lib/authEvent.js';
 
 const listUsersQuerySchema = z.object({
   search: z.string().optional(),
@@ -255,6 +256,8 @@ export async function deleteUser(req: Request, res: Response) {
       passwordHash: '',
     },
   });
+
+  await scrubAuthEventsForUser(userId);
 
   await logAudit({
     adminId,

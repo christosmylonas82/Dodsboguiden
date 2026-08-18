@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
+import { scrubAuthEventsForUser } from '../lib/authEvent.js';
 
 export async function exportData(req: Request, res: Response) {
   const userId = req.user!.userId;
@@ -82,6 +83,8 @@ export async function deleteAccount(req: Request, res: Response) {
       });
     }
   });
+
+  await scrubAuthEventsForUser(userId);
 
   res.status(204).send();
 }
