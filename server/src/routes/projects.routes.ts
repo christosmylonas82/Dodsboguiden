@@ -32,6 +32,12 @@ import {
   listTransactions,
   updateTransaction,
 } from '../controllers/transactions.controller.js';
+import {
+  createDocument,
+  deleteDocument,
+  getDocumentFile,
+  listDocuments,
+} from '../controllers/documents.controller.js';
 
 const router = Router();
 
@@ -66,5 +72,10 @@ router.get('/:id/transactions', requireProjectMember, asyncHandler(listTransacti
 router.post('/:id/transactions', requireProjectMember, asyncHandler(createTransaction));
 router.patch('/:id/transactions/:transactionId', requireProjectMember, asyncHandler(updateTransaction));
 router.delete('/:id/transactions/:transactionId', requireProjectMember, asyncHandler(deleteTransaction));
+
+router.get('/:id/documents', requireProjectMember, asyncHandler(listDocuments));
+router.post('/:id/documents', requireProjectMember, asyncHandler(createDocument));
+router.get('/:id/documents/:documentId/file', requireProjectMember, asyncHandler(getDocumentFile));
+router.delete('/:id/documents/:documentId', requireProjectMember, asyncHandler(deleteDocument));
 
 export default router;

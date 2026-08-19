@@ -14,6 +14,7 @@ import {
   TbMailbox,
   TbPhoneCall,
   TbCoin,
+  TbFiles,
 } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
@@ -22,6 +23,7 @@ import { ContactsModal } from './ContactsModal';
 import { ContactRegistryModal } from './ContactRegistryModal';
 import { InventoryModal } from './InventoryModal';
 import { TransactionsModal } from './TransactionsModal';
+import { DocumentsModal } from './DocumentsModal';
 import { TipsModal } from './TipsModal';
 import { ActivityLogModal } from './ActivityLogModal';
 import { InvitationsModal } from './InvitationsModal';
@@ -36,7 +38,16 @@ import { useTheme } from '../hooks/useTheme';
 const itemClass =
   'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
 
-type ModalKey = 'activity' | 'contacts' | 'contactRegistry' | 'inventory' | 'transactions' | 'tips' | 'invitations' | 'settings';
+type ModalKey =
+  | 'activity'
+  | 'contacts'
+  | 'contactRegistry'
+  | 'inventory'
+  | 'transactions'
+  | 'documents'
+  | 'tips'
+  | 'invitations'
+  | 'settings';
 
 export function Layout() {
   const { user, logout, markTipsSeen } = useAuth();
@@ -149,6 +160,10 @@ export function Layout() {
       <button type="button" onClick={() => openModalAndCloseMenu('transactions')} className={`${itemClass} bg-transparent`}>
         <TbCoin size={20} />
         Ekonomi
+      </button>
+      <button type="button" onClick={() => openModalAndCloseMenu('documents')} className={`${itemClass} bg-transparent`}>
+        <TbFiles size={20} />
+        Dokument
       </button>
     </>
   ) : (
@@ -307,6 +322,9 @@ export function Layout() {
       )}
       {openModal === 'transactions' && projectId && (
         <TransactionsModal projectId={projectId} projectName={projectName} onClose={() => setOpenModal(null)} />
+      )}
+      {openModal === 'documents' && projectId && (
+        <DocumentsModal projectId={projectId} projectName={projectName} onClose={() => setOpenModal(null)} />
       )}
       {openModal === 'tips' && <TipsModal onClose={closeTipsModal} />}
       {openModal === 'invitations' && (

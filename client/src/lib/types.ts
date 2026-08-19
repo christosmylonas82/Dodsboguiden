@@ -119,6 +119,22 @@ export interface Transaction {
   createdAt: string;
 }
 
+export type DocumentType = 'DODSFALLSINTYG' | 'TESTAMENTE' | 'FULLMAKT' | 'FORSAKRING' | 'OVRIGT';
+
+export interface ProjectDocument {
+  id: string;
+  projectId: string;
+  title: string;
+  type: DocumentType;
+  description: string | null;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  uploadedBy: string;
+  uploadedAt: string;
+  uploadedByUser: { id: string; name: string };
+}
+
 export interface Invitation {
   id: string;
   projectId: string;

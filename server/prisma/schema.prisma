@@ -48,6 +48,14 @@ enum TransactionCategory {
   OVRIGT
 }
 
+enum DocumentType {
+  DODSFALLSINTYG
+  TESTAMENTE
+  FULLMAKT
+  FORSAKRING
+  OVRIGT
+}
+
 enum TaskPriority {
   NOW
   SOON
@@ -83,6 +91,7 @@ model User {
   receivedInvitations Invitation[] @relation("InvitationRecipient")
   passwordResets      PasswordReset[]
   authEvents          AuthEvent[]
+  uploadedDocuments   Document[]
 
   @@map("users")
 }
@@ -139,6 +148,7 @@ model Project {
   inventoryItems InventoryItem[]
   invitations    Invitation[]
   transactions   Transaction[]
+  documents      Document[]
 
   @@map("projects")
 }
@@ -245,6 +255,26 @@ model Transaction {
 
   @@index([projectId])
   @@map("transactions")
+}
+
+model Document {
+  id          String       @id @default(uuid())
+  projectId   String       @map("project_id")
+  title       String
+  type        DocumentType
+  description String?
+  fileData    String       @db.Text
+  fileName    String       @map("file_name")
+  fileSize    Int          @map("file_size")
+  mimeType    String       @map("mime_type")
+  uploadedBy  String       @map("uploaded_by")
+  uploadedAt  DateTime     @default(now()) @map("uploaded_at")
+
+  project        Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploadedByUser User    @relation(fields: [uploadedBy], references: [id])
+
+  @@index([projectId])
+  @@map("documents")
 }
 
 model Invitation {
