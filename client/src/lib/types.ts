@@ -90,12 +90,15 @@ export interface Contact {
   createdAt: string;
 }
 
+export type InventoryStatus = 'NOT_INVENTORIED' | 'INVENTORIED' | 'VALUED' | 'SOLD';
+
 export interface InventoryItem {
   id: string;
   projectId: string;
   type: string;
   value: number;
   comments: string | null;
+  status: InventoryStatus;
   createdAt: string;
 }
 

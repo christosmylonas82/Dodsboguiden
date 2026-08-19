@@ -28,6 +28,13 @@ enum TaskStatus {
   DONE
 }
 
+enum InventoryStatus {
+  NOT_INVENTORIED
+  INVENTORIED
+  VALUED
+  SOLD
+}
+
 enum TaskPriority {
   NOW
   SOON
@@ -196,12 +203,13 @@ model Contact {
 }
 
 model InventoryItem {
-  id        String   @id @default(uuid())
-  projectId String   @map("project_id")
+  id        String          @id @default(uuid())
+  projectId String          @map("project_id")
   type      String
   value     Int
   comments  String?
-  createdAt DateTime @default(now()) @map("created_at")
+  status    InventoryStatus @default(NOT_INVENTORIED)
+  createdAt DateTime        @default(now()) @map("created_at")
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 

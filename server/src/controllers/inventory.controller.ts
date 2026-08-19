@@ -3,16 +3,20 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
 
+const INVENTORY_STATUSES = ['NOT_INVENTORIED', 'INVENTORIED', 'VALUED', 'SOLD'] as const;
+
 const createInventoryItemSchema = z.object({
   type: z.string(),
   value: z.number().int(),
   comments: z.string().optional(),
+  status: z.enum(INVENTORY_STATUSES).optional(),
 });
 
 const updateInventoryItemSchema = z.object({
   type: z.string().optional(),
   value: z.number().int().optional(),
   comments: z.string().nullable().optional(),
+  status: z.enum(INVENTORY_STATUSES).optional(),
 });
 
 export async function listInventory(req: Request, res: Response) {
