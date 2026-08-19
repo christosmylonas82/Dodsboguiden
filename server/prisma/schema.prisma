@@ -35,6 +35,19 @@ enum InventoryStatus {
   SOLD
 }
 
+enum TransactionType {
+  COST
+  INCOME
+}
+
+enum TransactionCategory {
+  BEGRAVNING
+  JURIDIK
+  MYNDIGHETER
+  FORSALJNING
+  OVRIGT
+}
+
 enum TaskPriority {
   NOW
   SOON
@@ -125,6 +138,7 @@ model Project {
   contacts       Contact[]
   inventoryItems InventoryItem[]
   invitations    Invitation[]
+  transactions   Transaction[]
 
   @@map("projects")
 }
@@ -214,6 +228,23 @@ model InventoryItem {
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("inventory_items")
+}
+
+model Transaction {
+  id          String              @id @default(uuid())
+  projectId   String              @map("project_id")
+  type        TransactionType
+  category    TransactionCategory
+  description String
+  amount      Int
+  date        DateTime            @default(now())
+  notes       String?
+  createdAt   DateTime            @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("transactions")
 }
 
 model Invitation {

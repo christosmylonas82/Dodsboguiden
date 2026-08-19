@@ -13,6 +13,7 @@ import {
   TbLogout2,
   TbMailbox,
   TbPhoneCall,
+  TbCoin,
 } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
@@ -20,6 +21,7 @@ import type { Invitation, ProjectDetail } from '../lib/types';
 import { ContactsModal } from './ContactsModal';
 import { ContactRegistryModal } from './ContactRegistryModal';
 import { InventoryModal } from './InventoryModal';
+import { TransactionsModal } from './TransactionsModal';
 import { TipsModal } from './TipsModal';
 import { ActivityLogModal } from './ActivityLogModal';
 import { InvitationsModal } from './InvitationsModal';
@@ -34,7 +36,7 @@ import { useTheme } from '../hooks/useTheme';
 const itemClass =
   'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
 
-type ModalKey = 'activity' | 'contacts' | 'contactRegistry' | 'inventory' | 'tips' | 'invitations' | 'settings';
+type ModalKey = 'activity' | 'contacts' | 'contactRegistry' | 'inventory' | 'transactions' | 'tips' | 'invitations' | 'settings';
 
 export function Layout() {
   const { user, logout, markTipsSeen } = useAuth();
@@ -143,6 +145,10 @@ export function Layout() {
       <button type="button" onClick={() => openModalAndCloseMenu('contactRegistry')} className={`${itemClass} bg-transparent`}>
         <TbPhoneCall size={20} />
         Myndigheter & företag
+      </button>
+      <button type="button" onClick={() => openModalAndCloseMenu('transactions')} className={`${itemClass} bg-transparent`}>
+        <TbCoin size={20} />
+        Ekonomi
       </button>
     </>
   ) : (
@@ -298,6 +304,9 @@ export function Layout() {
       {openModal === 'contactRegistry' && <ContactRegistryModal onClose={() => setOpenModal(null)} />}
       {openModal === 'inventory' && projectId && (
         <InventoryModal projectId={projectId} projectName={projectName} onClose={() => setOpenModal(null)} />
+      )}
+      {openModal === 'transactions' && projectId && (
+        <TransactionsModal projectId={projectId} projectName={projectName} onClose={() => setOpenModal(null)} />
       )}
       {openModal === 'tips' && <TipsModal onClose={closeTipsModal} />}
       {openModal === 'invitations' && (

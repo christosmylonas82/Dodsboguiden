@@ -26,6 +26,12 @@ import {
   listInventory,
   updateInventoryItem,
 } from '../controllers/inventory.controller.js';
+import {
+  createTransaction,
+  deleteTransaction,
+  listTransactions,
+  updateTransaction,
+} from '../controllers/transactions.controller.js';
 
 const router = Router();
 
@@ -55,5 +61,10 @@ router.get('/:id/inventory', requireProjectMember, asyncHandler(listInventory));
 router.post('/:id/inventory', requireProjectMember, asyncHandler(createInventoryItem));
 router.patch('/:id/inventory/:itemId', requireProjectMember, asyncHandler(updateInventoryItem));
 router.delete('/:id/inventory/:itemId', requireProjectMember, asyncHandler(deleteInventoryItem));
+
+router.get('/:id/transactions', requireProjectMember, asyncHandler(listTransactions));
+router.post('/:id/transactions', requireProjectMember, asyncHandler(createTransaction));
+router.patch('/:id/transactions/:transactionId', requireProjectMember, asyncHandler(updateTransaction));
+router.delete('/:id/transactions/:transactionId', requireProjectMember, asyncHandler(deleteTransaction));
 
 export default router;

@@ -104,6 +104,21 @@ export interface InventoryItem {
 
 export type InvitationStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED';
 
+export type TransactionType = 'COST' | 'INCOME';
+export type TransactionCategory = 'BEGRAVNING' | 'JURIDIK' | 'MYNDIGHETER' | 'FORSALJNING' | 'OVRIGT';
+
+export interface Transaction {
+  id: string;
+  projectId: string;
+  type: TransactionType;
+  category: TransactionCategory;
+  description: string;
+  amount: number;
+  date: string;
+  notes: string | null;
+  createdAt: string;
+}
+
 export interface Invitation {
   id: string;
   projectId: string;

@@ -28,6 +28,26 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+// Prevents CSV/formula injection when a cell is opened in Excel/Sheets and
+// guards against embedded commas, quotes, or newlines in free-text fields.
+function csvCell(value: string): string {
+  const escaped = /^[=+\-@]/.test(value) ? `'${value}` : value;
+  return `"${escaped.replace(/"/g, '""')}"`;
+}
+
+export function exportTableToCsv(opts: ExportTableOptions): void {
+  const lines = [
+    opts.headers.map(csvCell).join(','),
+    ...opts.rows.map((row) => row.map(csvCell).join(',')),
+  ];
+  if (opts.footerLines?.length) {
+    lines.push('');
+    lines.push(...opts.footerLines.map((line) => csvCell(line)));
+  }
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  downloadBlob(blob, `${opts.filenamePrefix}-${slugify(opts.deceasedName)}.csv`);
+}
+
 export async function exportTableToPdf(opts: ExportTableOptions): Promise<void> {
   const container = document.createElement('div');
   container.style.padding = '24px';
