@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
+import { logActivity } from '../lib/activity.js';
 
 const TRANSACTION_TYPES = ['COST', 'INCOME'] as const;
 const TRANSACTION_CATEGORIES = ['BEGRAVNING', 'JURIDIK', 'MYNDIGHETER', 'FORSALJNING', 'OVRIGT'] as const;
@@ -41,6 +42,14 @@ export async function createTransaction(req: Request, res: Response) {
       projectId: req.params.id,
     },
   });
+
+  await logActivity({
+    projectId: req.params.id,
+    userId: req.user!.userId,
+    action: `added transaction "${transaction.description}"`,
+    notify: true,
+  });
+
   res.status(201).json(transaction);
 }
 

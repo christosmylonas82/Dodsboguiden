@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
+import { logActivity } from '../lib/activity.js';
 
 const INVENTORY_STATUSES = ['NOT_INVENTORIED', 'INVENTORIED', 'VALUED', 'SOLD'] as const;
 
@@ -32,6 +33,14 @@ export async function createInventoryItem(req: Request, res: Response) {
   const item = await prisma.inventoryItem.create({
     data: { ...body, projectId: req.params.id },
   });
+
+  await logActivity({
+    projectId: req.params.id,
+    userId: req.user!.userId,
+    action: `added inventory item "${item.type || 'Utan namn'}"`,
+    notify: true,
+  });
+
   res.status(201).json(item);
 }
 

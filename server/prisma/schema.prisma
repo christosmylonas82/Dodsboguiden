@@ -92,6 +92,7 @@ model User {
   passwordResets      PasswordReset[]
   authEvents          AuthEvent[]
   uploadedDocuments   Document[]
+  notifications       Notification[]
 
   @@map("users")
 }
@@ -149,6 +150,7 @@ model Project {
   invitations    Invitation[]
   transactions   Transaction[]
   documents      Document[]
+  notifications  Notification[]
 
   @@map("projects")
 }
@@ -275,6 +277,23 @@ model Document {
 
   @@index([projectId])
   @@map("documents")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  userId    String   @map("user_id")
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([projectId])
+  @@map("notifications")
 }
 
 model Invitation {

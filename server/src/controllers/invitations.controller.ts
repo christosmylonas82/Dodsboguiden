@@ -76,6 +76,7 @@ export async function acceptInvitation(req: Request, res: Response) {
     projectId: invitation.projectId,
     userId,
     action: 'accepted invite',
+    notify: true,
   });
 
   res.json({ projectId: invitation.projectId });

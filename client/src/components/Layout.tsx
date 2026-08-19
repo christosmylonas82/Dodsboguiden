@@ -24,6 +24,7 @@ import { ContactRegistryModal } from './ContactRegistryModal';
 import { InventoryModal } from './InventoryModal';
 import { TransactionsModal } from './TransactionsModal';
 import { DocumentsModal } from './DocumentsModal';
+import { NotificationsBell } from './NotificationsBell';
 import { TipsModal } from './TipsModal';
 import { ActivityLogModal } from './ActivityLogModal';
 import { InvitationsModal } from './InvitationsModal';
@@ -245,10 +246,12 @@ export function Layout() {
                 {navItems}
                 <div className="mx-2 h-5 w-px bg-border" />
                 {rightItems}
+                <NotificationsBell />
                 <ThemeToggle />
               </nav>
 
               <div className="flex items-center gap-2 md:hidden">
+                <NotificationsBell />
                 <ThemeToggle />
                 <button
                   type="button"

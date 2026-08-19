@@ -105,6 +105,7 @@ export async function updateTask(req: Request, res: Response) {
       userId,
       taskId: task.id,
       action: `changed status of "${task.title}" to ${nextStatus}`,
+      notify: nextStatus === 'DONE',
     });
   }
 
@@ -116,6 +117,7 @@ export async function updateTask(req: Request, res: Response) {
       action: task.assignedUser
         ? `assigned "${task.title}" to ${task.assignedUser.name}`
         : `unassigned "${task.title}"`,
+      notify: true,
     });
   }
 

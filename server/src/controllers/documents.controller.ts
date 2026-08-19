@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
+import { logActivity } from '../lib/activity.js';
 
 const DOCUMENT_TYPES = ['DODSFALLSINTYG', 'TESTAMENTE', 'FULLMAKT', 'FORSAKRING', 'OVRIGT'] as const;
 
@@ -91,6 +92,13 @@ export async function createDocument(req: Request, res: Response) {
       uploadedAt: true,
       uploadedByUser: { select: { id: true, name: true } },
     },
+  });
+
+  await logActivity({
+    projectId,
+    userId,
+    action: `uploaded document "${document.title}"`,
+    notify: true,
   });
 
   res.status(201).json(document);
