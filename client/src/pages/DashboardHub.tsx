@@ -182,6 +182,18 @@ export function DashboardHubPage() {
             </Link>
           );
         })}
+        <Link
+          to={`/projects/${id}/bouppteckning`}
+          className="flex flex-col rounded-2xl border border-border bg-surface p-6 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <h2 className="text-lg font-semibold text-text">Boupptecknings-guide</h2>
+          <p className="mt-2 flex-1 text-sm text-muted">
+            Steg-för-steg genom Skatteverkets bouppteckningsprocess, med din inventering och ekonomi sammanställd.
+          </p>
+          <p className="mt-4 flex items-center gap-1 text-sm font-medium text-primary-dark">
+            Öppna guiden <TbArrowRight size={16} />
+          </p>
+        </Link>
       </div>
 
       {inviteModalOpen && (
@@ -220,9 +232,10 @@ export function DashboardHubPage() {
         <RenameProjectModal
           projectId={id!}
           currentName={project.deceasedName}
+          currentDeceasedDate={project.deceasedDate}
           onClose={() => setOpenModal(null)}
-          onRenamed={(deceasedName) => {
-            setProject((prev) => (prev ? { ...prev, deceasedName } : prev));
+          onRenamed={(deceasedName, deceasedDate) => {
+            setProject((prev) => (prev ? { ...prev, deceasedName, deceasedDate } : prev));
             window.dispatchEvent(new CustomEvent('dodsbo:project-renamed', { detail: { projectId: id, deceasedName } }));
             showToast('Dödsboets namn uppdaterat');
           }}

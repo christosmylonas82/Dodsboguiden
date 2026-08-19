@@ -10,6 +10,7 @@ import { DashboardPage } from './pages/Dashboard';
 import { DashboardHubPage } from './pages/DashboardHub';
 import { PhaseDashboardPage } from './pages/PhaseDashboard';
 import { ProjectActivityPage } from './pages/ProjectActivity';
+import { BouppteckningGuidePage } from './pages/BouppteckningGuide';
 import { SettingsPage } from './pages/Settings';
 import { AdminDashboardPage } from './pages/admin/AdminDashboard';
 import { AdminUsersPage } from './pages/admin/AdminUsers';
@@ -61,6 +62,7 @@ function App() {
                 element={<PhaseDashboardPage phase="Avslut & arvskifte" />}
               />
               <Route path="/projects/:id/activity" element={<ProjectActivityPage />} />
+              <Route path="/projects/:id/bouppteckning" element={<BouppteckningGuidePage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
 

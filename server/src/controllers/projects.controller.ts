@@ -165,6 +165,7 @@ const permanentDeleteSchema = z.object({
 
 const updateProjectSchema = z.object({
   deceasedName: z.string().min(1).max(100),
+  deceasedDate: z.string().datetime().nullable().optional(),
 });
 
 export async function updateProject(req: Request, res: Response) {
@@ -172,7 +173,10 @@ export async function updateProject(req: Request, res: Response) {
 
   const project = await prisma.project.update({
     where: { id: req.params.id },
-    data: { deceasedName: body.deceasedName },
+    data: {
+      deceasedName: body.deceasedName,
+      ...(body.deceasedDate !== undefined ? { deceasedDate: body.deceasedDate ? new Date(body.deceasedDate) : null } : {}),
+    },
   });
 
   await logActivity({

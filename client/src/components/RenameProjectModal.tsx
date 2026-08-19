@@ -6,15 +6,18 @@ import { ModalOverlay } from './ModalOverlay';
 export function RenameProjectModal({
   projectId,
   currentName,
+  currentDeceasedDate,
   onClose,
   onRenamed,
 }: {
   projectId: string;
   currentName: string;
+  currentDeceasedDate?: string | null;
   onClose: () => void;
-  onRenamed: (deceasedName: string) => void;
+  onRenamed: (deceasedName: string, deceasedDate: string | null) => void;
 }) {
   const [name, setName] = useState(currentName);
+  const [deceasedDate, setDeceasedDate] = useState(currentDeceasedDate ? currentDeceasedDate.split('T')[0] : '');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -27,9 +30,12 @@ export function RenameProjectModal({
     try {
       const updated = await apiFetch<ProjectDetail>(`/projects/${projectId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ deceasedName: trimmed }),
+        body: JSON.stringify({
+          deceasedName: trimmed,
+          deceasedDate: deceasedDate ? new Date(`${deceasedDate}T00:00:00Z`).toISOString() : null,
+        }),
       });
-      onRenamed(updated.deceasedName);
+      onRenamed(updated.deceasedName, updated.deceasedDate);
       onClose();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Kunde inte uppdatera namnet');
@@ -56,6 +62,20 @@ export function RenameProjectModal({
             onChange={(e) => setName(e.target.value)}
             className="mt-1.5 w-full rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
           />
+
+          <label htmlFor="deceasedDate" className="mt-4 block text-sm text-muted">
+            Dödsdatum (valfritt)
+          </label>
+          <input
+            id="deceasedDate"
+            type="date"
+            max={new Date().toISOString().split('T')[0]}
+            value={deceasedDate}
+            onChange={(e) => setDeceasedDate(e.target.value)}
+            className="mt-1.5 w-full rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
+          />
+          <p className="mt-1 text-xs text-muted">Används för att räkna ut deadlinen för bouppteckning (4 månader).</p>
+
           {error && <p className="mt-2 text-sm text-danger">{error}</p>}
           <div className="mt-6 flex justify-end gap-3">
             <button
