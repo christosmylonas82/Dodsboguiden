@@ -36,7 +36,15 @@ function aprilDeadline(deceasedDate: string): { label: string; daysLeft: number 
   return { label: `april ${deadlineYear}`, daysLeft };
 }
 
-export function PostManagementModal({ projectId, onClose }: { projectId: string; onClose: () => void }) {
+export function PostManagementModal({
+  projectId,
+  onClose,
+  variant = 'modal',
+}: {
+  projectId: string;
+  onClose?: () => void;
+  variant?: 'modal' | 'inline';
+}) {
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [tasks, setTasks] = useState<PostManagementTask[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,15 +104,16 @@ export function PostManagementModal({ projectId, onClose }: { projectId: string;
 
   const deadline = project?.deceasedDate ? aprilDeadline(project.deceasedDate) : null;
 
-  return (
-    <ModalOverlay onClose={onClose} maxWidthClassName="max-w-2xl">
-      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
-        <div className="flex items-start justify-between gap-4">
-          <h3 className="text-lg font-semibold text-text">Post- & adresshantering</h3>
-          <button type="button" onClick={onClose} aria-label="Stäng" className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text">
-            ✕
-          </button>
-        </div>
+  const body = (
+    <>
+        {variant === 'modal' && (
+          <div className="flex items-start justify-between gap-4">
+            <h3 className="text-lg font-semibold text-text">Post- & adresshantering</h3>
+            <button type="button" onClick={onClose} aria-label="Stäng" className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text">
+              ✕
+            </button>
+          </div>
+        )}
 
         {loading ? (
           <p className="mt-5 text-sm text-muted">Laddar…</p>
@@ -192,12 +201,21 @@ export function PostManagementModal({ projectId, onClose }: { projectId: string;
           </>
         )}
 
-        <div className="mt-6 flex justify-end border-t border-border pt-5">
-          <button type="button" onClick={onClose} className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light">
-            Stäng
-          </button>
-        </div>
-      </div>
+        {variant === 'modal' && (
+          <div className="mt-6 flex justify-end border-t border-border pt-5">
+            <button type="button" onClick={onClose} className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light">
+              Stäng
+            </button>
+          </div>
+        )}
+    </>
+  );
+
+  if (variant === 'inline') return body;
+
+  return (
+    <ModalOverlay onClose={onClose ?? (() => {})} maxWidthClassName="max-w-2xl">
+      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">{body}</div>
     </ModalOverlay>
   );
 }

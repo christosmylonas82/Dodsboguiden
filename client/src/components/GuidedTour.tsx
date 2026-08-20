@@ -61,17 +61,6 @@ export function GuidedTour({ isOpen, onFinish }: { isOpen: boolean; onFinish: ()
     });
 
     tour.addStep({
-      id: 'activity',
-      title: 'Aktivitetslogg',
-      text: 'Här ser du all aktivitet i dödsboet – vem som gjorde vad och när. Det hjälper familjen att hålla sig uppdaterad.',
-      attachTo: { element: '[data-tour="activity"]', on: 'bottom' },
-      buttons: [
-        { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
-        { text: 'Nästa', action: () => tour.next() },
-      ],
-    });
-
-    tour.addStep({
       id: 'contacts',
       title: 'Kontaktlista',
       text: 'Spara alla viktiga kontakter här – begravningsbyrå, advokat, banker, försäkringsbolag och andra.',

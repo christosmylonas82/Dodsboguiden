@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useParams } from 'react-router-dom';
 import {
-  TbHistory,
   TbAddressBook,
   TbClipboardList,
   TbBulb,
@@ -15,10 +14,6 @@ import {
   TbPhoneCall,
   TbCoin,
   TbFiles,
-  TbMailboxOff,
-  TbDeviceDesktopHeart,
-  TbUmbrella,
-  TbHomeDollar,
 } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
@@ -29,13 +24,9 @@ import { InventoryModal } from './InventoryModal';
 import { TransactionsModal } from './TransactionsModal';
 import { DocumentsModal } from './DocumentsModal';
 import { NotificationsBell } from './NotificationsBell';
-import { PostManagementModal } from './PostManagementModal';
-import { DigitalHeritageModal } from './DigitalHeritageModal';
-import { SurvivingPensionModal } from './SurvivingPensionModal';
-import { HousingBenefitModal } from './HousingBenefitModal';
 import { TipsModal } from './TipsModal';
-import { ActivityLogModal } from './ActivityLogModal';
 import { InvitationsModal } from './InvitationsModal';
+import { HelpIcon } from './HelpIcon';
 import { SettingsModal } from './SettingsModal';
 import { Footer } from './Footer';
 import { CookieBanner } from './CookieBanner';
@@ -48,16 +39,11 @@ const itemClass =
   'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
 
 type ModalKey =
-  | 'activity'
   | 'contacts'
   | 'contactRegistry'
   | 'inventory'
   | 'transactions'
   | 'documents'
-  | 'postManagement'
-  | 'digitalHeritage'
-  | 'survivingPension'
-  | 'housingBenefit'
   | 'tips'
   | 'invitations'
   | 'settings';
@@ -141,21 +127,13 @@ export function Layout() {
     <>
       <button
         type="button"
-        data-tour="activity"
-        onClick={() => openModalAndCloseMenu('activity')}
-        className={`${itemClass} bg-transparent`}
-      >
-        <TbHistory size={20} />
-        Aktivitetslogg
-      </button>
-      <button
-        type="button"
         data-tour="contacts"
         onClick={() => openModalAndCloseMenu('contacts')}
         className={`${itemClass} bg-transparent`}
       >
         <TbAddressBook size={20} />
         Kontaktlista
+        <HelpIcon text="Håll koll på familj, vänner, myndigheter och andra kontakter som behöver informeras eller kontaktas." />
       </button>
       <button
         type="button"
@@ -165,34 +143,22 @@ export function Layout() {
       >
         <TbClipboardList size={20} />
         Inventarielista
+        <HelpIcon text="Kataloger allt som fanns i dödsboet — bankkonton, fastigheter, fordon, skulder. Automatisk sammanfattning av tillgångar och skulder." />
       </button>
       <button type="button" onClick={() => openModalAndCloseMenu('contactRegistry')} className={`${itemClass} bg-transparent`}>
         <TbPhoneCall size={20} />
         Myndigheter & företag
+        <HelpIcon text="Direktlänkar till alla myndigheter som är relevanta för dödsboet — Skatteverket, Pensionsmyndigheten, etc. Sorgestöd-organisationer här också." />
       </button>
       <button type="button" onClick={() => openModalAndCloseMenu('transactions')} className={`${itemClass} bg-transparent`}>
         <TbCoin size={20} />
         Ekonomi
+        <HelpIcon text="Spåra ekonomiska utgifter för dödsboet. Här finns även guides för efterlevandepension och bostadstillägg." />
       </button>
       <button type="button" onClick={() => openModalAndCloseMenu('documents')} className={`${itemClass} bg-transparent`}>
         <TbFiles size={20} />
         Dokument
-      </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('postManagement')} className={`${itemClass} bg-transparent`}>
-        <TbMailboxOff size={20} />
-        Post & adress
-      </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('digitalHeritage')} className={`${itemClass} bg-transparent`}>
-        <TbDeviceDesktopHeart size={20} />
-        Digitalt arv
-      </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('survivingPension')} className={`${itemClass} bg-transparent`}>
-        <TbUmbrella size={20} />
-        Efterlevandepension
-      </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('housingBenefit')} className={`${itemClass} bg-transparent`}>
-        <TbHomeDollar size={20} />
-        Bostadstillägg
+        <HelpIcon text="Ladda upp och hantera juridiska dokument — dödsattesten, testamente, bouppteckning, kontrakt." />
       </button>
     </>
   ) : (
@@ -227,6 +193,7 @@ export function Layout() {
       >
         <TbSettings size={20} />
         Inställningar
+        <HelpIcon text="Justera projektinställningar, användarroller och uppgifter för dödsboet." />
       </button>
       {user?.role === 'ADMIN' && (
         <Link to="/admin/dashboard" className={itemClass} onClick={() => setMobileMenuOpen(false)}>
@@ -341,9 +308,6 @@ export function Layout() {
         </div>
       )}
 
-      {openModal === 'activity' && projectId && (
-        <ActivityLogModal projectId={projectId} projectName={projectName} onClose={() => setOpenModal(null)} />
-      )}
       {openModal === 'contacts' && projectId && (
         <ContactsModal projectId={projectId} projectName={projectName} onClose={() => setOpenModal(null)} />
       )}
@@ -356,18 +320,6 @@ export function Layout() {
       )}
       {openModal === 'documents' && projectId && (
         <DocumentsModal projectId={projectId} projectName={projectName} onClose={() => setOpenModal(null)} />
-      )}
-      {openModal === 'postManagement' && projectId && (
-        <PostManagementModal projectId={projectId} onClose={() => setOpenModal(null)} />
-      )}
-      {openModal === 'digitalHeritage' && projectId && (
-        <DigitalHeritageModal projectId={projectId} onClose={() => setOpenModal(null)} />
-      )}
-      {openModal === 'survivingPension' && projectId && (
-        <SurvivingPensionModal projectId={projectId} onClose={() => setOpenModal(null)} />
-      )}
-      {openModal === 'housingBenefit' && projectId && (
-        <HousingBenefitModal projectId={projectId} onClose={() => setOpenModal(null)} />
       )}
       {openModal === 'tips' && <TipsModal onClose={closeTipsModal} />}
       {openModal === 'invitations' && (

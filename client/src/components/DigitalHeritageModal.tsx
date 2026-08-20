@@ -30,7 +30,15 @@ const STATUS_LABELS: Record<DigitalHeritageStatus, string> = {
 
 const STATUS_ORDER: DigitalHeritageStatus[] = ['NOT_STARTED', 'MEMORIAL', 'DELETED', 'ARCHIVED'];
 
-export function DigitalHeritageModal({ projectId, onClose }: { projectId: string; onClose: () => void }) {
+export function DigitalHeritageModal({
+  projectId,
+  onClose,
+  variant = 'modal',
+}: {
+  projectId: string;
+  onClose?: () => void;
+  variant?: 'modal' | 'inline';
+}) {
   const [tab, setTab] = useState<'social' | 'archive'>('social');
   const [items, setItems] = useState<DigitalHeritageItem[]>([]);
   const [selectedArchive, setSelectedArchive] = useState<string | null>(null);
@@ -78,15 +86,16 @@ export function DigitalHeritageModal({ projectId, onClose }: { projectId: string
     });
   }
 
-  return (
-    <ModalOverlay onClose={onClose} maxWidthClassName="max-w-2xl">
-      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
-        <div className="flex items-start justify-between gap-4">
-          <h3 className="text-lg font-semibold text-text">Digitalt arv</h3>
-          <button type="button" onClick={onClose} aria-label="Stäng" className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text">
-            ✕
-          </button>
-        </div>
+  const body = (
+    <>
+        {variant === 'modal' && (
+          <div className="flex items-start justify-between gap-4">
+            <h3 className="text-lg font-semibold text-text">Digitalt arv</h3>
+            <button type="button" onClick={onClose} aria-label="Stäng" className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text">
+              ✕
+            </button>
+          </div>
+        )}
 
         <div className="mt-4 flex gap-1.5 border-b border-border">
           <button
@@ -178,12 +187,21 @@ export function DigitalHeritageModal({ projectId, onClose }: { projectId: string
           </div>
         )}
 
-        <div className="mt-6 flex justify-end border-t border-border pt-5">
-          <button type="button" onClick={onClose} className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light">
-            Stäng
-          </button>
-        </div>
-      </div>
+        {variant === 'modal' && (
+          <div className="mt-6 flex justify-end border-t border-border pt-5">
+            <button type="button" onClick={onClose} className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light">
+              Stäng
+            </button>
+          </div>
+        )}
+    </>
+  );
+
+  if (variant === 'inline') return body;
+
+  return (
+    <ModalOverlay onClose={onClose ?? (() => {})} maxWidthClassName="max-w-2xl">
+      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">{body}</div>
     </ModalOverlay>
   );
 }

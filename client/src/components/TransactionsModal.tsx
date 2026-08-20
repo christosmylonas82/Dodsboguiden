@@ -1,9 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { TbTrash } from 'react-icons/tb';
+import { TbTrash, TbUmbrella, TbHomeDollar, TbChevronRight } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { Transaction, TransactionCategory, TransactionType } from '../lib/types';
 import { ExportMenu } from './ExportMenu';
 import { ModalOverlay } from './ModalOverlay';
+import { SurvivingPensionModal } from './SurvivingPensionModal';
+import { HousingBenefitModal } from './HousingBenefitModal';
 
 const TYPE_LABELS: Record<TransactionType, string> = { COST: 'Kostnad', INCOME: 'Intäkt' };
 
@@ -34,6 +36,7 @@ export function TransactionsModal({
   const [submitting, setSubmitting] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [filter, setFilter] = useState<Filter>('ALL');
+  const [guideModal, setGuideModal] = useState<'pension' | 'housing' | null>(null);
 
   const [type, setType] = useState<TransactionType>('COST');
   const [category, setCategory] = useState<TransactionCategory>('OVRIGT');
@@ -165,6 +168,31 @@ export function TransactionsModal({
                 </div>
               </div>
             )}
+
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setGuideModal('pension')}
+                className="flex items-center justify-between gap-2 rounded-lg border border-border bg-bg p-3 text-left hover:bg-primary-light"
+              >
+                <span className="flex items-center gap-2 text-sm font-medium text-text">
+                  <TbUmbrella size={18} className="text-primary-dark" />
+                  Efterlevandepension
+                </span>
+                <TbChevronRight size={16} className="text-muted" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setGuideModal('housing')}
+                className="flex items-center justify-between gap-2 rounded-lg border border-border bg-bg p-3 text-left hover:bg-primary-light"
+              >
+                <span className="flex items-center gap-2 text-sm font-medium text-text">
+                  <TbHomeDollar size={18} className="text-primary-dark" />
+                  Bostadstillägg
+                </span>
+                <TbChevronRight size={16} className="text-muted" />
+              </button>
+            </div>
 
             {transactions.length > 0 && (
               <div className="mt-3 flex gap-1.5">
@@ -320,6 +348,12 @@ export function TransactionsModal({
           </>
         )}
       </div>
+      {guideModal === 'pension' && (
+        <SurvivingPensionModal projectId={projectId} onClose={() => setGuideModal(null)} />
+      )}
+      {guideModal === 'housing' && (
+        <HousingBenefitModal projectId={projectId} onClose={() => setGuideModal(null)} />
+      )}
     </ModalOverlay>
   );
 }

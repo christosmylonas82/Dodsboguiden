@@ -1,17 +1,87 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { TbArrowLeft, TbPencil, TbExternalLink } from 'react-icons/tb';
+import { TbArrowLeft, TbPencil, TbExternalLink, TbChevronDown, TbMailboxOff, TbDeviceDesktopHeart } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
-import type { ProjectDetail, Task, TaskStatus } from '../lib/types';
+import type { ProjectDetail, Task, TaskStatus, PostManagementTask, DigitalHeritageItem } from '../lib/types';
 import { Badge } from '../components/Badge';
 import { Avatar } from '../components/Avatar';
 import { ProgressBar } from '../components/ProgressBar';
 import { TaskManageModal } from '../components/TaskManageModal';
 import { TaskStatusBadge } from '../components/TaskStatusBadge';
+import { PostManagementModal } from '../components/PostManagementModal';
+import { DigitalHeritageModal } from '../components/DigitalHeritageModal';
 import { formatTimestamp } from '../lib/activity';
 import { PHASE_DESCRIPTIONS, TASK_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { phaseStatus } from '../lib/phases';
 import { DUE_DATE_LABEL, DUE_DATE_TEXT_CLASS, daysUntilDue } from '../lib/dueDateUtils';
+
+const DIGITAL_HERITAGE_PLATFORM_COUNT = 7;
+
+function PostManagementSection({ projectId }: { projectId: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [tasks, setTasks] = useState<PostManagementTask[]>([]);
+
+  useEffect(() => {
+    apiFetch<PostManagementTask[]>(`/projects/${projectId}/post-management`).then(setTasks);
+  }, [projectId]);
+
+  const doneCount = tasks.filter((t) => t.status === 'DONE').length;
+
+  return (
+    <div className="mt-6 rounded-2xl border border-border bg-surface shadow-sm">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 rounded-2xl bg-transparent p-6 text-left"
+      >
+        <span className="flex items-center gap-2">
+          <TbMailboxOff size={20} className="text-primary-dark" />
+          <span className="text-base font-semibold text-text">Post- & adresshantering</span>
+          <span className="text-sm text-muted">({doneCount} av {tasks.length || 3} steg klara)</span>
+        </span>
+        <TbChevronDown size={20} className={`shrink-0 text-muted transition-transform ${expanded ? 'rotate-180' : ''}`} />
+      </button>
+      {expanded && (
+        <div className="border-t border-border px-6 pb-6">
+          <PostManagementModal projectId={projectId} variant="inline" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DigitalHeritageSection({ projectId }: { projectId: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [items, setItems] = useState<DigitalHeritageItem[]>([]);
+
+  useEffect(() => {
+    apiFetch<{ items: DigitalHeritageItem[] }>(`/projects/${projectId}/digital-heritage`).then((data) => setItems(data.items));
+  }, [projectId]);
+
+  const handledCount = items.filter((i) => i.status !== 'NOT_STARTED').length;
+
+  return (
+    <div className="mt-6 rounded-2xl border border-border bg-surface shadow-sm">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 rounded-2xl bg-transparent p-6 text-left"
+      >
+        <span className="flex items-center gap-2">
+          <TbDeviceDesktopHeart size={20} className="text-primary-dark" />
+          <span className="text-base font-semibold text-text">Digitalt arv</span>
+          <span className="text-sm text-muted">({handledCount} av {DIGITAL_HERITAGE_PLATFORM_COUNT} plattformar hanterade)</span>
+        </span>
+        <TbChevronDown size={20} className={`shrink-0 text-muted transition-transform ${expanded ? 'rotate-180' : ''}`} />
+      </button>
+      {expanded && (
+        <div className="border-t border-border px-6 pb-6">
+          <DigitalHeritageModal projectId={projectId} variant="inline" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 const STATUS_BORDER_CLASS: Record<TaskStatus, string> = {
   PENDING: 'border-l-border',
@@ -235,6 +305,9 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
           })}
         </div>
       </div>
+
+      {phase === 'Avslut & arvskifte' && id && <PostManagementSection projectId={id} />}
+      {phase === 'Under bouppteckning' && id && <DigitalHeritageSection projectId={id} />}
 
       {managingTask && (
         <TaskManageModal
