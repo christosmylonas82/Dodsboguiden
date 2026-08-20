@@ -68,6 +68,29 @@ enum InvitationStatus {
   DECLINED
 }
 
+enum PostTaskType {
+  ADDRESS_CHANGE
+  MAIL_FORWARDING
+  AD_BLOCK
+}
+
+enum PostTaskStatus {
+  PENDING
+  DONE
+}
+
+enum DigitalHeritageStatus {
+  NOT_STARTED
+  MEMORIAL
+  DELETED
+  ARCHIVED
+}
+
+enum PensionType {
+  BARNPENSION
+  OMSTALLNINGSPENSION
+}
+
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
@@ -138,6 +161,7 @@ model Project {
   deceasedName  String        @map("deceased_name")
   deceasedDate  DateTime?     @map("deceased_date")
   status        ProjectStatus @default(ACTIVE)
+  selectedArchive String?     @map("selected_archive")
   createdAt     DateTime      @default(now()) @map("created_at")
   deletedAt     DateTime?     @map("deleted_at")
 
@@ -151,6 +175,10 @@ model Project {
   transactions   Transaction[]
   documents      Document[]
   notifications  Notification[]
+  postManagementTasks   PostManagementTask[]
+  digitalHeritageItems  DigitalHeritageItem[]
+  survivingPensionNotes SurvivingPensionNote[]
+  housingBenefitNotes   HousingBenefitNote[]
 
   @@map("projects")
 }
@@ -294,6 +322,74 @@ model Notification {
   @@index([userId])
   @@index([projectId])
   @@map("notifications")
+}
+
+model PostManagementTask {
+  id          String         @id @default(uuid())
+  projectId   String         @map("project_id")
+  taskType    PostTaskType   @map("task_type")
+  status      PostTaskStatus @default(PENDING)
+  newAddress  String?        @map("new_address")
+  notes       String?
+  completedAt DateTime?      @map("completed_at")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, taskType])
+  @@index([projectId])
+  @@map("post_management_tasks")
+}
+
+model DigitalHeritageItem {
+  id        String                @id @default(uuid())
+  projectId String                @map("project_id")
+  platform  String
+  status    DigitalHeritageStatus @default(NOT_STARTED)
+  notes     String?
+  createdAt DateTime              @default(now()) @map("created_at")
+  updatedAt DateTime              @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, platform])
+  @@index([projectId])
+  @@map("digital_heritage_items")
+}
+
+model SurvivingPensionNote {
+  id                String      @id @default(uuid())
+  projectId         String      @map("project_id")
+  pensionType       PensionType @map("pension_type")
+  childAge          Int?        @map("child_age")
+  studyingGymnasium Boolean?    @map("studying_gymnasium")
+  survivorAge       Int?        @map("survivor_age")
+  hasChildren       Boolean?    @map("has_children")
+  notes             String?
+  createdAt         DateTime    @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("surviving_pension_notes")
+}
+
+model HousingBenefitNote {
+  id              String   @id @default(uuid())
+  projectId       String   @map("project_id")
+  age             Int
+  incomeBeforeTax Int      @map("income_before_tax")
+  assets          Int
+  housingCost     Int      @map("housing_cost")
+  meetsAgeRequirement Boolean @map("meets_age_requirement")
+  notes           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("housing_benefit_notes")
 }
 
 model Invitation {

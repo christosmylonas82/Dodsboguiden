@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TbChevronDown, TbCopy, TbCheck, TbPhone } from 'react-icons/tb';
+import { TbChevronDown, TbCopy, TbCheck, TbPhone, TbExternalLink } from 'react-icons/tb';
 import { CONTACT_REGISTRY } from '../lib/contactRegistry';
 import { ModalOverlay } from './ModalOverlay';
 
@@ -38,8 +38,8 @@ export function ContactRegistryModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <p className="mt-2 text-xs text-muted">
-          Vanliga kontakter för dödsbohantering. Kopiera meddelandemallen, fyll i informationen inom hakparenteser och
-          skicka via mejl, sms eller ring direkt.
+          Vanliga kontakter, sorgestöd och arkiv för dödsbohantering. Kopiera meddelandemallar där de finns, eller gå
+          direkt till organisationens webbplats.
         </p>
 
         <div className="mt-5 flex flex-col gap-3">
@@ -76,19 +76,23 @@ export function ContactRegistryModal({ onClose }: { onClose: () => void }) {
                         </div>
                         <div className="mt-0.5 text-xs text-muted">{contact.description}</div>
 
-                        <div className="mt-2 rounded-md bg-surface p-2 text-xs text-muted italic">
-                          &ldquo;{contact.template}&rdquo;
-                        </div>
+                        {contact.template && (
+                          <div className="mt-2 rounded-md bg-surface p-2 text-xs text-muted italic">
+                            &ldquo;{contact.template}&rdquo;
+                          </div>
+                        )}
 
                         <div className="mt-2 flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => copyTemplate(contact.template, id)}
-                            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs font-medium text-text hover:bg-primary-light"
-                          >
-                            {copiedId === id ? <TbCheck size={14} /> : <TbCopy size={14} />}
-                            {copiedId === id ? 'Kopierad!' : 'Kopiera meddelande'}
-                          </button>
+                          {contact.template && (
+                            <button
+                              type="button"
+                              onClick={() => copyTemplate(contact.template as string, id)}
+                              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs font-medium text-text hover:bg-primary-light"
+                            >
+                              {copiedId === id ? <TbCheck size={14} /> : <TbCopy size={14} />}
+                              {copiedId === id ? 'Kopierad!' : 'Kopiera meddelande'}
+                            </button>
+                          )}
                           {contact.phone && (
                             <a
                               href={`tel:${contact.phone.replace(/\s/g, '')}`}
@@ -96,6 +100,17 @@ export function ContactRegistryModal({ onClose }: { onClose: () => void }) {
                             >
                               <TbPhone size={14} />
                               Ring
+                            </a>
+                          )}
+                          {contact.website && (
+                            <a
+                              href={`https://${contact.website}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary bg-transparent px-3 py-1.5 text-xs font-medium text-primary-dark hover:bg-primary-light"
+                            >
+                              <TbExternalLink size={14} />
+                              Öppna webbplats
                             </a>
                           )}
                         </div>

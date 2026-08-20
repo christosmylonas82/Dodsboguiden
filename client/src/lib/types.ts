@@ -135,6 +135,59 @@ export interface ProjectDocument {
   uploadedByUser: { id: string; name: string };
 }
 
+export type PostTaskType = 'ADDRESS_CHANGE' | 'MAIL_FORWARDING' | 'AD_BLOCK';
+export type PostTaskStatus = 'PENDING' | 'DONE';
+
+export interface PostManagementTask {
+  id: string;
+  projectId: string;
+  taskType: PostTaskType;
+  status: PostTaskStatus;
+  newAddress: string | null;
+  notes: string | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type DigitalHeritageStatus = 'NOT_STARTED' | 'MEMORIAL' | 'DELETED' | 'ARCHIVED';
+
+export interface DigitalHeritageItem {
+  id: string;
+  projectId: string;
+  platform: string;
+  status: DigitalHeritageStatus;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type PensionType = 'BARNPENSION' | 'OMSTALLNINGSPENSION';
+
+export interface SurvivingPensionNote {
+  id: string;
+  projectId: string;
+  pensionType: PensionType;
+  childAge: number | null;
+  studyingGymnasium: boolean | null;
+  survivorAge: number | null;
+  hasChildren: boolean | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface HousingBenefitNote {
+  id: string;
+  projectId: string;
+  age: number;
+  incomeBeforeTax: number;
+  assets: number;
+  housingCost: number;
+  meetsAgeRequirement: boolean;
+  notes: string | null;
+  createdAt: string;
+}
+
 export interface Invitation {
   id: string;
   projectId: string;

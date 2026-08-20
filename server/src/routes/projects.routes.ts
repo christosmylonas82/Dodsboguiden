@@ -38,6 +38,28 @@ import {
   getDocumentFile,
   listDocuments,
 } from '../controllers/documents.controller.js';
+import {
+  createPostManagementTask,
+  deletePostManagementTask,
+  listPostManagementTasks,
+  updatePostManagementTask,
+} from '../controllers/postManagement.controller.js';
+import {
+  createDigitalHeritageItem,
+  getDigitalHeritage,
+  updateDigitalHeritageItem,
+  updateSelectedArchive,
+} from '../controllers/digitalHeritage.controller.js';
+import {
+  createSurvivingPensionNote,
+  deleteSurvivingPensionNote,
+  listSurvivingPensionNotes,
+} from '../controllers/survivingPension.controller.js';
+import {
+  createHousingBenefitNote,
+  deleteHousingBenefitNote,
+  listHousingBenefitNotes,
+} from '../controllers/housingBenefit.controller.js';
 
 const router = Router();
 
@@ -77,5 +99,23 @@ router.get('/:id/documents', requireProjectMember, asyncHandler(listDocuments));
 router.post('/:id/documents', requireProjectMember, asyncHandler(createDocument));
 router.get('/:id/documents/:documentId/file', requireProjectMember, asyncHandler(getDocumentFile));
 router.delete('/:id/documents/:documentId', requireProjectMember, asyncHandler(deleteDocument));
+
+router.get('/:id/post-management', requireProjectMember, asyncHandler(listPostManagementTasks));
+router.post('/:id/post-management', requireProjectMember, asyncHandler(createPostManagementTask));
+router.patch('/:id/post-management/:taskId', requireProjectMember, asyncHandler(updatePostManagementTask));
+router.delete('/:id/post-management/:taskId', requireProjectMember, asyncHandler(deletePostManagementTask));
+
+router.get('/:id/digital-heritage', requireProjectMember, asyncHandler(getDigitalHeritage));
+router.post('/:id/digital-heritage', requireProjectMember, asyncHandler(createDigitalHeritageItem));
+router.patch('/:id/digital-heritage/archive', requireProjectMember, asyncHandler(updateSelectedArchive));
+router.patch('/:id/digital-heritage/:itemId', requireProjectMember, asyncHandler(updateDigitalHeritageItem));
+
+router.get('/:id/surviving-pension', requireProjectMember, asyncHandler(listSurvivingPensionNotes));
+router.post('/:id/surviving-pension', requireProjectMember, asyncHandler(createSurvivingPensionNote));
+router.delete('/:id/surviving-pension/:noteId', requireProjectMember, asyncHandler(deleteSurvivingPensionNote));
+
+router.get('/:id/housing-benefit', requireProjectMember, asyncHandler(listHousingBenefitNotes));
+router.post('/:id/housing-benefit', requireProjectMember, asyncHandler(createHousingBenefitNote));
+router.delete('/:id/housing-benefit/:noteId', requireProjectMember, asyncHandler(deleteHousingBenefitNote));
 
 export default router;

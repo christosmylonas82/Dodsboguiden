@@ -15,6 +15,10 @@ import {
   TbPhoneCall,
   TbCoin,
   TbFiles,
+  TbMailboxOff,
+  TbDeviceDesktopHeart,
+  TbUmbrella,
+  TbHomeDollar,
 } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
@@ -25,6 +29,10 @@ import { InventoryModal } from './InventoryModal';
 import { TransactionsModal } from './TransactionsModal';
 import { DocumentsModal } from './DocumentsModal';
 import { NotificationsBell } from './NotificationsBell';
+import { PostManagementModal } from './PostManagementModal';
+import { DigitalHeritageModal } from './DigitalHeritageModal';
+import { SurvivingPensionModal } from './SurvivingPensionModal';
+import { HousingBenefitModal } from './HousingBenefitModal';
 import { TipsModal } from './TipsModal';
 import { ActivityLogModal } from './ActivityLogModal';
 import { InvitationsModal } from './InvitationsModal';
@@ -46,6 +54,10 @@ type ModalKey =
   | 'inventory'
   | 'transactions'
   | 'documents'
+  | 'postManagement'
+  | 'digitalHeritage'
+  | 'survivingPension'
+  | 'housingBenefit'
   | 'tips'
   | 'invitations'
   | 'settings';
@@ -165,6 +177,22 @@ export function Layout() {
       <button type="button" onClick={() => openModalAndCloseMenu('documents')} className={`${itemClass} bg-transparent`}>
         <TbFiles size={20} />
         Dokument
+      </button>
+      <button type="button" onClick={() => openModalAndCloseMenu('postManagement')} className={`${itemClass} bg-transparent`}>
+        <TbMailboxOff size={20} />
+        Post & adress
+      </button>
+      <button type="button" onClick={() => openModalAndCloseMenu('digitalHeritage')} className={`${itemClass} bg-transparent`}>
+        <TbDeviceDesktopHeart size={20} />
+        Digitalt arv
+      </button>
+      <button type="button" onClick={() => openModalAndCloseMenu('survivingPension')} className={`${itemClass} bg-transparent`}>
+        <TbUmbrella size={20} />
+        Efterlevandepension
+      </button>
+      <button type="button" onClick={() => openModalAndCloseMenu('housingBenefit')} className={`${itemClass} bg-transparent`}>
+        <TbHomeDollar size={20} />
+        Bostadstillägg
       </button>
     </>
   ) : (
@@ -328,6 +356,18 @@ export function Layout() {
       )}
       {openModal === 'documents' && projectId && (
         <DocumentsModal projectId={projectId} projectName={projectName} onClose={() => setOpenModal(null)} />
+      )}
+      {openModal === 'postManagement' && projectId && (
+        <PostManagementModal projectId={projectId} onClose={() => setOpenModal(null)} />
+      )}
+      {openModal === 'digitalHeritage' && projectId && (
+        <DigitalHeritageModal projectId={projectId} onClose={() => setOpenModal(null)} />
+      )}
+      {openModal === 'survivingPension' && projectId && (
+        <SurvivingPensionModal projectId={projectId} onClose={() => setOpenModal(null)} />
+      )}
+      {openModal === 'housingBenefit' && projectId && (
+        <HousingBenefitModal projectId={projectId} onClose={() => setOpenModal(null)} />
       )}
       {openModal === 'tips' && <TipsModal onClose={closeTipsModal} />}
       {openModal === 'invitations' && (
