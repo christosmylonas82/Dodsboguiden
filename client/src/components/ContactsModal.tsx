@@ -100,6 +100,11 @@ export function ContactsModal({
           </div>
         </div>
 
+        <p className="mt-2 text-sm text-muted italic">
+          Håll ordning på familj, vänner, myndigheter och andra som behöver informeras eller kontaktas. En central
+          plats för alla dödsboets viktiga kontaktuppgifter.
+        </p>
+
         {loading ? (
           <p className="mt-5 text-sm text-muted">Laddar…</p>
         ) : contacts.length === 0 ? (

@@ -102,6 +102,11 @@ export function InventoryModal({
           </div>
         </div>
 
+        <p className="mt-2 text-sm text-muted italic">
+          Kataloger allt som fanns i dödsboet — bankkonton, fastigheter, fordon, skulder. Systemet räknar automatiskt
+          sammanfattning av tillgångar och skulder.
+        </p>
+
         {loading ? (
           <p className="mt-5 text-sm text-muted">Laddar…</p>
         ) : (

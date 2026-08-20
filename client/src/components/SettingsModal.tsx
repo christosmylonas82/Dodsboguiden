@@ -16,6 +16,10 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             ✕
           </button>
         </div>
+        <p className="mt-2 text-sm text-muted italic">
+          Justera projektinställningar, användarroller och uppgifter för dödsboet. Hantera vem som har åtkomst och
+          vad de kan göra.
+        </p>
         <div className="mt-5">
           <SettingsBody onClose={onClose} />
         </div>

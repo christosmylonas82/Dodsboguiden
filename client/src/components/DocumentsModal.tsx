@@ -147,6 +147,11 @@ export function DocumentsModal({
           </button>
         </div>
 
+        <p className="mt-2 text-sm text-muted italic">
+          Ladda upp och hantera juridiska dokument — dödsattesten, testamente, bouppteckning, kontrakt och andra
+          viktiga papper som gäller dödsboet.
+        </p>
+
         {loading ? (
           <p className="mt-5 text-sm text-muted">Laddar…</p>
         ) : documents.length === 0 ? (

@@ -37,9 +37,9 @@ export function ContactRegistryModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <p className="mt-2 text-xs text-muted">
-          Vanliga kontakter, sorgestöd och arkiv för dödsbohantering. Kopiera meddelandemallar där de finns, eller gå
-          direkt till organisationens webbplats.
+        <p className="mt-2 text-sm text-muted italic">
+          Direktlänkar till alla myndigheter som är relevanta för dödsboet — Skatteverket, Pensionsmyndigheten,
+          Lantmäteriet och andra. Sorgestöd-organisationer finns här också.
         </p>
 
         <div className="mt-5 flex flex-col gap-3">

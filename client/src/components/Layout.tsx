@@ -27,7 +27,6 @@ import { DocumentsModal } from './DocumentsModal';
 import { NotificationsBell } from './NotificationsBell';
 import { TipsModal } from './TipsModal';
 import { InvitationsModal } from './InvitationsModal';
-import { HelpIcon } from './HelpIcon';
 import { SettingsModal } from './SettingsModal';
 import { Footer } from './Footer';
 import { CookieBanner } from './CookieBanner';
@@ -146,9 +145,8 @@ export function Layout() {
         onClick={() => openModalAndCloseMenu('contacts')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbAddressBook size={20} />
+        <TbAddressBook size={24} />
         <NavLabel text="Kontaktlista" />
-        <HelpIcon text="Håll koll på familj, vänner, myndigheter och andra kontakter som behöver informeras eller kontaktas." />
       </button>
       <button
         type="button"
@@ -156,24 +154,20 @@ export function Layout() {
         onClick={() => openModalAndCloseMenu('inventory')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbClipboardList size={20} />
+        <TbClipboardList size={24} />
         <NavLabel text="Inventarielista" />
-        <HelpIcon text="Kataloger allt som fanns i dödsboet — bankkonton, fastigheter, fordon, skulder. Automatisk sammanfattning av tillgångar och skulder." />
       </button>
       <button type="button" onClick={() => openModalAndCloseMenu('contactRegistry')} className={`${navButtonClass} bg-transparent`}>
-        <TbPhoneCall size={20} />
+        <TbPhoneCall size={24} />
         <NavLabel text="Myndigheter & företag" />
-        <HelpIcon text="Direktlänkar till alla myndigheter som är relevanta för dödsboet — Skatteverket, Pensionsmyndigheten, etc. Sorgestöd-organisationer här också." />
       </button>
       <button type="button" onClick={() => openModalAndCloseMenu('transactions')} className={`${navButtonClass} bg-transparent`}>
-        <TbCoin size={20} />
+        <TbCoin size={24} />
         <NavLabel text="Ekonomi" />
-        <HelpIcon text="Spåra ekonomiska utgifter för dödsboet. Här finns även guides för efterlevandepension och bostadstillägg." />
       </button>
       <button type="button" onClick={() => openModalAndCloseMenu('documents')} className={`${navButtonClass} bg-transparent`}>
-        <TbFiles size={20} />
+        <TbFiles size={24} />
         <NavLabel text="Dokument" />
-        <HelpIcon text="Ladda upp och hantera juridiska dokument — dödsattesten, testamente, bouppteckning, kontrakt." />
       </button>
     </>
   ) : (
@@ -206,9 +200,8 @@ export function Layout() {
         onClick={() => openModalAndCloseMenu('settings')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbSettings size={20} />
+        <TbSettings size={24} />
         <NavLabel text="Inställningar" />
-        <HelpIcon text="Justera projektinställningar, användarroller och uppgifter för dödsboet." />
       </button>
       {user?.role === 'ADMIN' && (
         <Link
@@ -216,7 +209,7 @@ export function Layout() {
           className={`${navButtonClass} bg-transparent`}
           onClick={() => setMobileMenuOpen(false)}
         >
-          <TbShieldLock size={20} />
+          <TbShieldLock size={24} />
           <NavLabel text="Admin" />
         </Link>
       )}
