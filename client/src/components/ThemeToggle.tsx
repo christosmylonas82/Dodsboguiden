@@ -1,10 +1,9 @@
-import { TbSun, TbMoon, TbDeviceDesktop } from 'react-icons/tb';
+import { TbSun, TbMoon } from 'react-icons/tb';
 import { useTheme } from '../hooks/useTheme';
 
 const OPTIONS = [
   { value: 'light' as const, label: 'Ljust tema', icon: TbSun },
   { value: 'dark' as const, label: 'Mörkt tema', icon: TbMoon },
-  { value: 'auto' as const, label: 'Följ systemet', icon: TbDeviceDesktop },
 ];
 
 export function ThemeToggle() {

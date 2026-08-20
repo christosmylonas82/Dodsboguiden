@@ -14,6 +14,7 @@ import {
   TbPhoneCall,
   TbCoin,
   TbFiles,
+  TbShieldLock,
 } from 'react-icons/tb';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
@@ -37,6 +38,20 @@ import { useTheme } from '../hooks/useTheme';
 
 const itemClass =
   'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
+
+const navButtonClass =
+  'group relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text md:justify-center md:gap-1 md:px-2.5';
+
+function NavLabel({ text }: { text: string }) {
+  return (
+    <>
+      <span className="md:hidden">{text}</span>
+      <span className="pointer-events-none absolute top-full left-1/2 z-40 mt-1.5 hidden -translate-x-1/2 rounded-md border border-border bg-surface px-2 py-1 text-xs font-medium whitespace-nowrap text-text opacity-0 shadow-lg transition-opacity group-hover:opacity-100 md:block">
+        {text}
+      </span>
+    </>
+  );
+}
 
 type ModalKey =
   | 'contacts'
@@ -129,35 +144,35 @@ export function Layout() {
         type="button"
         data-tour="contacts"
         onClick={() => openModalAndCloseMenu('contacts')}
-        className={`${itemClass} bg-transparent`}
+        className={`${navButtonClass} bg-transparent`}
       >
         <TbAddressBook size={20} />
-        Kontaktlista
+        <NavLabel text="Kontaktlista" />
         <HelpIcon text="Håll koll på familj, vänner, myndigheter och andra kontakter som behöver informeras eller kontaktas." />
       </button>
       <button
         type="button"
         data-tour="inventory"
         onClick={() => openModalAndCloseMenu('inventory')}
-        className={`${itemClass} bg-transparent`}
+        className={`${navButtonClass} bg-transparent`}
       >
         <TbClipboardList size={20} />
-        Inventarielista
+        <NavLabel text="Inventarielista" />
         <HelpIcon text="Kataloger allt som fanns i dödsboet — bankkonton, fastigheter, fordon, skulder. Automatisk sammanfattning av tillgångar och skulder." />
       </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('contactRegistry')} className={`${itemClass} bg-transparent`}>
+      <button type="button" onClick={() => openModalAndCloseMenu('contactRegistry')} className={`${navButtonClass} bg-transparent`}>
         <TbPhoneCall size={20} />
-        Myndigheter & företag
+        <NavLabel text="Myndigheter & företag" />
         <HelpIcon text="Direktlänkar till alla myndigheter som är relevanta för dödsboet — Skatteverket, Pensionsmyndigheten, etc. Sorgestöd-organisationer här också." />
       </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('transactions')} className={`${itemClass} bg-transparent`}>
+      <button type="button" onClick={() => openModalAndCloseMenu('transactions')} className={`${navButtonClass} bg-transparent`}>
         <TbCoin size={20} />
-        Ekonomi
+        <NavLabel text="Ekonomi" />
         <HelpIcon text="Spåra ekonomiska utgifter för dödsboet. Här finns även guides för efterlevandepension och bostadstillägg." />
       </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('documents')} className={`${itemClass} bg-transparent`}>
+      <button type="button" onClick={() => openModalAndCloseMenu('documents')} className={`${navButtonClass} bg-transparent`}>
         <TbFiles size={20} />
-        Dokument
+        <NavLabel text="Dokument" />
         <HelpIcon text="Ladda upp och hantera juridiska dokument — dödsattesten, testamente, bouppteckning, kontrakt." />
       </button>
     </>
@@ -183,69 +198,82 @@ export function Layout() {
     </>
   );
 
-  const rightItems = (
+  const settingsNavItems = (
     <>
       <button
         type="button"
         data-tour="settings"
         onClick={() => openModalAndCloseMenu('settings')}
-        className={`${itemClass} bg-transparent`}
+        className={`${navButtonClass} bg-transparent`}
       >
         <TbSettings size={20} />
-        Inställningar
+        <NavLabel text="Inställningar" />
         <HelpIcon text="Justera projektinställningar, användarroller och uppgifter för dödsboet." />
       </button>
       {user?.role === 'ADMIN' && (
-        <Link to="/admin/dashboard" className={itemClass} onClick={() => setMobileMenuOpen(false)}>
-          Admin
+        <Link
+          to="/admin/dashboard"
+          className={`${navButtonClass} bg-transparent`}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <TbShieldLock size={20} />
+          <NavLabel text="Admin" />
         </Link>
       )}
-      <button
-        onClick={() => {
-          logout();
-          setMobileMenuOpen(false);
-        }}
-        className="flex items-center gap-2 rounded-lg border border-border bg-transparent px-3 py-2 text-sm font-medium text-text transition hover:bg-primary-light"
-      >
-        <TbLogout2 size={18} />
-        Logga ut
-      </button>
     </>
+  );
+
+  const logoutButton = (
+    <button
+      onClick={() => {
+        logout();
+        setMobileMenuOpen(false);
+      }}
+      className="flex items-center gap-2 rounded-lg border border-border bg-transparent px-3 py-2 text-sm font-medium text-text transition hover:bg-primary-light"
+    >
+      <TbLogout2 size={18} />
+      Logga ut
+    </button>
   );
 
   return (
     <div className="flex min-h-screen flex-col bg-bg">
       <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
-          {isInProject ? (
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
-            >
-              <TbHome size={24} className="text-primary-dark" />
-              Översikt
-            </Link>
-          ) : (
-            <Link
-              to="/"
-              className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
-            >
-              <TbBook2 size={24} className="text-primary-dark" />
-              Dödsbo Guide
-            </Link>
-          )}
+        <div className="mx-auto flex max-w-6xl items-center px-6 py-3">
+          <div className="flex flex-1 items-center">
+            {isInProject ? (
+              <Link
+                to="/dashboard"
+                className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
+              >
+                <TbHome size={24} className="text-primary-dark" />
+                Översikt
+              </Link>
+            ) : (
+              <Link
+                to="/"
+                className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
+              >
+                <TbBook2 size={24} className="text-primary-dark" />
+                Dödsbo Guide
+              </Link>
+            )}
+          </div>
 
           {user ? (
             <>
-              <nav className="hidden items-center gap-1 md:flex">
+              <nav className="hidden items-center justify-center gap-1 md:flex">
                 {navItems}
-                <div className="mx-2 h-5 w-px bg-border" />
-                {rightItems}
-                <NotificationsBell />
-                <ThemeToggle />
+                {settingsNavItems}
               </nav>
 
-              <div className="flex items-center gap-2 md:hidden">
+              <div className="hidden flex-1 items-center justify-end gap-2 md:flex">
+                <NotificationsBell />
+                <ThemeToggle />
+                {logoutButton}
+              </div>
+
+              <div className="flex flex-1 items-center justify-end gap-2 md:hidden">
                 <NotificationsBell />
                 <ThemeToggle />
                 <button
@@ -259,7 +287,7 @@ export function Layout() {
               </div>
             </>
           ) : (
-            <nav className="flex items-center gap-3 text-sm">
+            <nav className="flex flex-1 items-center justify-end gap-3 text-sm">
               <ThemeToggle />
               <Link to="/login" className="text-text hover:text-primary-dark">
                 Logga in
@@ -274,8 +302,9 @@ export function Layout() {
         {user && mobileMenuOpen && (
           <nav className="flex flex-col gap-1 border-t border-border p-4 md:hidden">
             {navItems}
+            {settingsNavItems}
             <div className="my-1 h-px w-full bg-border" />
-            {rightItems}
+            {logoutButton}
           </nav>
         )}
       </header>
