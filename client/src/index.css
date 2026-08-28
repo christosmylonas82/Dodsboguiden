@@ -1,44 +1,54 @@
 @import "tailwindcss";
 
+/* Notion Sans is proprietary; Inter is its public open-source basis and Notion's
+   own documented fallback (see DESIGN.md Typography > Font Family). */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
 @theme {
-  --color-bg: #faf7f2;
-  --color-surface: #ffffff;
-  --color-text: #2f2b26;
-  --color-muted: #7a7168;
-  --color-primary: #6b7f6b;
-  --color-primary-dark: #566a56;
-  --color-primary-light: #eef2ea;
-  --color-border: #e6ded3;
-  --color-danger: #b5564a;
-  --color-danger-light: #f7e9e6;
-  --color-success: #4f7a5c;
-  --color-success-light: #e5f0e7;
-  --color-success-dark: #3d6048;
-  --color-warning: #b8863f;
-  --color-warning-light: #faf0dd;
-  --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  /* Notion design system tokens — see DESIGN.md */
+  --color-bg: #f6f5f4; /* colors.surface */
+  --color-surface: #ffffff; /* colors.canvas */
+  --color-text: #37352f; /* colors.charcoal */
+  --color-muted: #787671; /* colors.steel */
+  --color-primary: #5645d4; /* colors.primary */
+  --color-primary-dark: #4534b3; /* colors.primary-pressed */
+  --color-primary-light: #e6e0f5; /* colors.card-tint-lavender */
+  --color-border: #e5e3df; /* colors.hairline */
+  --color-danger: #e03131; /* colors.semantic-error */
+  --color-danger-light: #fde0ec; /* colors.card-tint-rose */
+  --color-success: #1aae39; /* colors.semantic-success */
+  --color-success-light: #d9f3e1; /* colors.card-tint-mint */
+  --color-success-dark: #128a2c;
+  --color-warning: #dd5b00; /* colors.semantic-warning */
+  --color-warning-light: #ffe8d4; /* colors.card-tint-peach */
+  --font-sans: 'Inter', 'Notion Sans', -apple-system, system-ui, 'Segoe UI', Helvetica, sans-serif;
 }
 
 html, body, #root {
   height: 100%;
 }
 
+:root {
+  color-scheme: light;
+}
+
 [data-theme='dark'] {
-  --color-bg: #1c1a17;
-  --color-surface: #262320;
-  --color-text: #ede9e4;
-  --color-muted: #a89f92;
-  --color-primary: #7c9279;
-  --color-primary-dark: #9db299;
-  --color-primary-light: #2a3328;
-  --color-border: #3a352f;
-  --color-danger: #d97b6e;
-  --color-danger-light: #3d2420;
-  --color-success: #6fa87f;
-  --color-success-light: #22332a;
-  --color-success-dark: #8fc49f;
-  --color-warning: #d1a15e;
-  --color-warning-light: #3a2f1c;
+  color-scheme: dark;
+  --color-bg: #191919;
+  --color-surface: #202020;
+  --color-text: #e9e9e7;
+  --color-muted: #9b9a97;
+  --color-primary: #8072e8;
+  --color-primary-dark: #5645d4;
+  --color-primary-light: #2b2540;
+  --color-border: #2f2f2f;
+  --color-danger: #ff6b6b;
+  --color-danger-light: #3a2020;
+  --color-success: #4cc264;
+  --color-success-light: #1f3324;
+  --color-success-dark: #7fd794;
+  --color-warning: #f0985a;
+  --color-warning-light: #3a2818;
 }
 
 body {
@@ -46,12 +56,22 @@ body {
 }
 
 .dodsbo-shepherd.shepherd-element {
+  background: var(--color-surface);
+  color: var(--color-text);
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   max-width: 360px;
 }
 
-.dodsbo-shepherd .shepherd-header {
+.dodsbo-shepherd .shepherd-arrow:before {
+  background: var(--color-surface);
+}
+
+.dodsbo-shepherd.shepherd-has-title[data-popper-placement^='bottom'] > .shepherd-arrow:before {
+  background-color: var(--color-primary);
+}
+
+.dodsbo-shepherd.shepherd-has-title .shepherd-content .shepherd-header {
   background: var(--color-primary);
   padding: 16px;
   border-radius: 12px 12px 0 0;
@@ -62,8 +82,12 @@ body {
   font-weight: 600;
 }
 
-.dodsbo-shepherd .shepherd-cancel-icon {
+.dodsbo-shepherd.shepherd-has-title .shepherd-content .shepherd-cancel-icon {
   color: white;
+}
+
+.dodsbo-shepherd.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover {
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .dodsbo-shepherd .shepherd-text {
@@ -107,6 +131,10 @@ body {
 
 .shepherd-modal-overlay-container {
   opacity: 0.5;
+}
+
+[data-theme='dark'] .shepherd-modal-overlay-container.shepherd-modal-is-visible {
+  opacity: 0.85;
 }
 
 .policy-markdown h1 {
