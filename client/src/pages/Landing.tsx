@@ -148,10 +148,10 @@ export function LandingPage() {
       {/* Hero */}
       <FullBleed className="bg-gradient-to-b from-primary-light to-bg">
         <div className="flex flex-col items-center gap-6 text-center">
-          <h1 className="max-w-3xl text-[36px] font-bold leading-tight text-text sm:text-[48px]">
+          <h1 className="max-w-3xl text-3xl font-semibold text-text sm:text-4xl">
             Samla allt på ett ställe, dela på arbetet tillsammans
           </h1>
-          <p className="max-w-2xl text-[17px] leading-relaxed text-muted sm:text-lg">
+          <p className="max-w-2xl text-base leading-relaxed text-muted sm:text-[18px] sm:leading-[1.5]">
             Dödsbohantering behöver inte vara överväldigande. DödsboGuiden gör det enkelt för familjen att
             koordinera arbetet tillsammans – med struktur, klarhet och lugn.
           </p>
@@ -163,7 +163,7 @@ export function LandingPage() {
       {/* Utmaningen */}
       <FullBleed className="bg-bg">
         <div className="flex flex-col items-center gap-3 text-center">
-          <h2 className="text-[32px] font-bold text-text sm:text-[40px]">
+          <h2 className="text-2xl font-semibold text-text sm:text-3xl">
             Utmaningen är inte juridiken — det är överblicken
           </h2>
           <p className="max-w-2xl text-[15px] leading-relaxed text-muted sm:text-base">
@@ -188,7 +188,7 @@ export function LandingPage() {
       {/* Lösning */}
       <FullBleed className="bg-surface">
         <div className="flex flex-col items-center gap-3 text-center">
-          <h2 className="text-[32px] font-bold text-text sm:text-[40px]">DödsboGuiden löser allt det här</h2>
+          <h2 className="text-2xl font-semibold text-text sm:text-3xl">DödsboGuiden löser allt det här</h2>
           <p className="max-w-2xl text-[15px] leading-relaxed text-muted sm:text-base">
             Se exakt vad som behöver göras, vem som gör vad, och i vilken ordning. Tydliga prioriteringar och
             klara nästa steg betyder att du alltid vet vad som ska hända härnäst – utan stress eller
@@ -218,7 +218,7 @@ export function LandingPage() {
       {/* FAQ */}
       <FullBleed className="bg-primary-light">
         <div className="flex flex-col items-center gap-3 text-center">
-          <h2 className="text-[32px] font-bold text-text sm:text-[40px]">Vanliga frågor</h2>
+          <h2 className="text-2xl font-semibold text-text sm:text-3xl">Vanliga frågor</h2>
           <p className="max-w-2xl text-[15px] leading-relaxed text-muted sm:text-base">
             Tydliga svar på vad DödsboGuiden gör och inte gör.
           </p>
