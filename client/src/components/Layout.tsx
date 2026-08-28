@@ -5,6 +5,7 @@ import {
   TbClipboardList,
   TbBulb,
   TbSettings,
+  TbHome,
   TbMenu2,
   TbX,
   TbLogout2,
@@ -247,14 +248,19 @@ export function Layout() {
     <div className="flex min-h-screen flex-col bg-bg">
       <header className="border-b border-border bg-surface">
         <div className="flex w-full items-center px-6 py-2">
-          <div className="flex flex-1 items-center">
-            <Link
-              to={user ? '/dashboard' : '/'}
-              aria-label="Dödsboguiden"
-              className="flex items-center rounded-md bg-white px-3 py-2 transition hover:opacity-90"
-            >
+          <div className="flex flex-1 items-center gap-4">
+            <span className="flex items-center rounded-md bg-white px-3 py-2">
               <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-16 w-auto" />
-            </Link>
+            </span>
+            {user && (
+              <Link
+                to="/dashboard"
+                className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
+              >
+                <TbHome size={24} className="text-primary-dark" />
+                Översikt
+              </Link>
+            )}
           </div>
 
           {user ? (
