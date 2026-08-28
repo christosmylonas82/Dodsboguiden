@@ -50,7 +50,7 @@ function PostManagementSection({ projectId }: { projectId: string }) {
 
 const STATUS_BORDER_CLASS: Record<TaskStatus, string> = {
   PENDING: 'border-l-border',
-  IN_PROGRESS: 'border-l-warning',
+  IN_PROGRESS: 'border-l-primary',
   DONE: 'border-l-success',
   SKIPPED: 'border-l-muted',
 };

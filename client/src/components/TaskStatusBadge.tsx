@@ -8,7 +8,7 @@ export const TASK_STATUS_BADGE_CLASSES: Record<TaskStatus, string> = {
   // without that contrast, a hover/background change nearby can make the badge
   // read as "faded" via simultaneous-contrast, even though its own color never changes.
   PENDING: 'bg-amber-400 text-gray-900 border-amber-600 shadow-sm',
-  IN_PROGRESS: 'bg-amber-500 text-white border-amber-700 shadow-sm',
+  IN_PROGRESS: 'bg-primary text-white border-primary-dark shadow-sm',
   DONE: 'bg-success text-white border-success-dark shadow-sm',
   SKIPPED: 'bg-muted text-white border-text shadow-sm',
 };
