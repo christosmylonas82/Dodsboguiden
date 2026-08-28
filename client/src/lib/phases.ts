@@ -16,5 +16,5 @@ export function phaseStatus(tasks: Task[]): { label: string; tone: BadgeTone } {
   if (counted.length > 0 && done === counted.length) return { label: 'Klar', tone: 'success' };
   const started = counted.some((t) => t.completed || t.status === 'IN_PROGRESS');
   if (!started) return { label: 'Ej påbörjad', tone: 'neutral' };
-  return { label: 'Pågår', tone: 'warning' };
+  return { label: 'Pågår', tone: 'primary' };
 }

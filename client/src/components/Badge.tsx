@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
 
-export type BadgeTone = 'success' | 'warning' | 'neutral' | 'danger';
+export type BadgeTone = 'success' | 'warning' | 'neutral' | 'danger' | 'primary';
 
 const TONE_CLASSES: Record<BadgeTone, string> = {
   success: 'bg-success-light text-success',
   warning: 'bg-warning-light text-warning',
   neutral: 'bg-primary-light text-muted',
   danger: 'bg-danger-light text-danger',
+  primary: 'bg-primary-light text-primary',
 };
 
 export function Badge({ tone, children }: { tone: BadgeTone; children: ReactNode }) {

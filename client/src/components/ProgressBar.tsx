@@ -5,6 +5,7 @@ const FILL_CLASS: Record<BadgeTone, string> = {
   warning: 'bg-warning',
   neutral: 'bg-muted',
   danger: 'bg-danger',
+  primary: 'bg-primary',
 };
 
 export function ProgressBar({ percent, tone }: { percent: number; tone?: BadgeTone }) {

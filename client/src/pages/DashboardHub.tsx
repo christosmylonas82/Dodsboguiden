@@ -118,7 +118,7 @@ export function DashboardHubPage() {
             </div>
             <p className="mt-1 text-muted">Dödsboets checklista och aktivitet</p>
           </div>
-          <Badge tone={progress === 100 ? 'success' : hasStarted ? 'warning' : 'neutral'}>
+          <Badge tone={progress === 100 ? 'success' : hasStarted ? 'primary' : 'neutral'}>
             {progress === 100 ? 'Klar' : hasStarted ? 'Pågår' : 'Ej påbörjad'}
           </Badge>
         </div>
