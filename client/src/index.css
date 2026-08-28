@@ -10,9 +10,9 @@
   --color-surface: #ffffff; /* colors.canvas */
   --color-text: #37352f; /* colors.charcoal */
   --color-muted: #787671; /* colors.steel */
-  --color-primary: #5645d4; /* colors.primary */
-  --color-primary-dark: #4534b3; /* colors.primary-pressed */
-  --color-primary-light: #e6e0f5; /* colors.card-tint-lavender */
+  --color-primary: #0a4062; /* brand navy — from logo */
+  --color-primary-dark: #072d44; /* pressed state */
+  --color-primary-light: #dfe8ec; /* pale navy tint — hover backgrounds, hero gradient */
   --color-border: #e5e3df; /* colors.hairline */
   --color-danger: #e03131; /* colors.semantic-error */
   --color-danger-light: #fde0ec; /* colors.card-tint-rose */
@@ -21,7 +21,7 @@
   --color-success-dark: #128a2c;
   --color-warning: #dd5b00; /* colors.semantic-warning */
   --color-warning-light: #ffe8d4; /* colors.card-tint-peach */
-  --color-link: #0075de; /* colors.link-blue */
+  --color-link: #65998d; /* brand teal — from logo */
   --font-sans: 'Inter', 'Notion Sans', -apple-system, system-ui, 'Segoe UI', Helvetica, sans-serif;
 
   /* Typography scale — mapped from DESIGN.md typography.* onto the text-* sizes
@@ -61,9 +61,9 @@ html, body, #root {
   --color-surface: #202020;
   --color-text: #e9e9e7;
   --color-muted: #9b9a97;
-  --color-primary: #8072e8;
-  --color-primary-dark: #5645d4;
-  --color-primary-light: #2b2540;
+  --color-primary: #3d8ab8;
+  --color-primary-dark: #0a4062;
+  --color-primary-light: #17303d;
   --color-border: #2f2f2f;
   --color-danger: #ff6b6b;
   --color-danger-light: #3a2020;
@@ -72,7 +72,7 @@ html, body, #root {
   --color-success-dark: #7fd794;
   --color-warning: #f0985a;
   --color-warning-light: #3a2818;
-  --color-link: #5195e0;
+  --color-link: #8fc3b3;
 }
 
 body {
