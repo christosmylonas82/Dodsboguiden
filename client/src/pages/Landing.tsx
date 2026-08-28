@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { TbAlertTriangle, TbQuestionMark, TbUsers, TbClockHour4, TbCheck, TbPlus } from 'react-icons/tb';
+import heroFamily from '../assets/hero-family.jpg';
 
 function FullBleed({ className, children }: { className?: string; children: ReactNode }) {
   return (
@@ -137,19 +138,23 @@ export function LandingPage() {
   return (
     <div>
       {/* Hero */}
-      <FullBleed className="bg-gradient-to-b from-primary-light to-bg">
-        <div className="flex flex-col items-center gap-6 text-center">
-          <h1 className="max-w-3xl text-3xl font-semibold text-text sm:text-4xl">
-            Samla allt på ett ställe, dela på arbetet tillsammans
-          </h1>
-          <p className="max-w-2xl text-base leading-relaxed text-muted sm:text-[18px] sm:leading-[1.5]">
-            Dödsbohantering behöver inte vara överväldigande. DödsboGuiden gör det enkelt för familjen att
-            koordinera arbetet tillsammans – med struktur, klarhet och lugn.
-          </p>
-          <CtaButtons />
-          <FreeBadge />
+      <section className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden">
+        <img src={heroFamily} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary-dark/90 via-primary/80 to-primary/85" />
+        <div className="relative mx-auto max-w-[1200px] px-5 py-20">
+          <div className="flex flex-col items-center gap-6 text-center">
+            <h1 className="max-w-3xl text-3xl font-semibold text-white sm:text-4xl">
+              Samla allt på ett ställe, dela på arbetet tillsammans
+            </h1>
+            <p className="max-w-2xl text-base leading-relaxed text-white/80 sm:text-[18px] sm:leading-[1.5]">
+              Dödsbohantering behöver inte vara överväldigande. DödsboGuiden gör det enkelt för familjen att
+              koordinera arbetet tillsammans – med struktur, klarhet och lugn.
+            </p>
+            <CtaButtons />
+            <FreeBadge />
+          </div>
         </div>
-      </FullBleed>
+      </section>
 
       {/* Utmaningen */}
       <FullBleed className="bg-bg">
