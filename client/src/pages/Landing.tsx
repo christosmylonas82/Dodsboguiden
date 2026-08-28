@@ -1,14 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  TbAlertTriangle,
-  TbQuestionMark,
-  TbUsers,
-  TbClockHour4,
-  TbCheck,
-  TbPlus,
-  TbSparkles,
-} from 'react-icons/tb';
+import { TbAlertTriangle, TbQuestionMark, TbUsers, TbClockHour4, TbCheck, TbPlus } from 'react-icons/tb';
 
 function FullBleed({ className, children }: { className?: string; children: ReactNode }) {
   return (
@@ -20,8 +12,7 @@ function FullBleed({ className, children }: { className?: string; children: Reac
 
 function FreeBadge() {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-1.5 text-sm font-medium text-text">
-      <TbSparkles className="text-primary-dark" size={16} />
+    <span className="inline-flex items-center rounded-full border border-border bg-surface px-5 py-2 text-base font-medium text-text">
       Helt gratis att använda — ingen prenumeration, inga dolda avgifter
     </span>
   );
