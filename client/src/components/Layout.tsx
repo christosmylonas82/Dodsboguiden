@@ -5,8 +5,6 @@ import {
   TbClipboardList,
   TbBulb,
   TbSettings,
-  TbBook2,
-  TbHome,
   TbMenu2,
   TbX,
   TbLogout2,
@@ -16,6 +14,7 @@ import {
   TbFiles,
   TbShieldLock,
 } from 'react-icons/tb';
+import dodsboguidenLogo from '../assets/dodsboguiden-logo.png';
 import { useAuth } from '../context/AuthContext';
 import { apiFetch } from '../lib/api';
 import type { Invitation, ProjectDetail } from '../lib/types';
@@ -249,23 +248,13 @@ export function Layout() {
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex max-w-6xl items-center px-6 py-3">
           <div className="flex flex-1 items-center">
-            {user ? (
-              <Link
-                to="/dashboard"
-                className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
-              >
-                <TbHome size={24} className="text-primary-dark" />
-                Översikt
-              </Link>
-            ) : (
-              <Link
-                to="/"
-                className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
-              >
-                <TbBook2 size={24} className="text-primary-dark" />
-                Dödsbo Guide
-              </Link>
-            )}
+            <Link
+              to={user ? '/dashboard' : '/'}
+              aria-label="Dödsboguiden"
+              className="flex items-center rounded-md bg-white px-2 py-1 transition hover:opacity-90"
+            >
+              <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-7 w-auto" />
+            </Link>
           </div>
 
           {user ? (
