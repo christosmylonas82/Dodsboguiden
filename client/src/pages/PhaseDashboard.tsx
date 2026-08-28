@@ -1,21 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { TbArrowLeft, TbPencil, TbExternalLink, TbChevronDown, TbMailboxOff, TbDeviceDesktopHeart } from 'react-icons/tb';
+import { TbArrowLeft, TbPencil, TbExternalLink, TbChevronDown, TbMailboxOff, TbPlus, TbTrash } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
-import type { ProjectDetail, Task, TaskStatus, PostManagementTask, DigitalHeritageItem } from '../lib/types';
+import type { ProjectDetail, Task, TaskStatus, PostManagementTask } from '../lib/types';
 import { Badge } from '../components/Badge';
 import { Avatar } from '../components/Avatar';
 import { ProgressBar } from '../components/ProgressBar';
 import { TaskManageModal } from '../components/TaskManageModal';
 import { TaskStatusBadge } from '../components/TaskStatusBadge';
 import { PostManagementModal } from '../components/PostManagementModal';
-import { DigitalHeritageModal } from '../components/DigitalHeritageModal';
 import { formatTimestamp } from '../lib/activity';
 import { PHASE_DESCRIPTIONS, TASK_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { phaseStatus } from '../lib/phases';
+import { tasksForProgress } from '../lib/taskStatus';
 import { DUE_DATE_LABEL, DUE_DATE_TEXT_CLASS, daysUntilDue } from '../lib/dueDateUtils';
-
-const DIGITAL_HERITAGE_PLATFORM_COUNT = 7;
 
 function PostManagementSection({ projectId }: { projectId: string }) {
   const [expanded, setExpanded] = useState(false);
@@ -50,43 +48,11 @@ function PostManagementSection({ projectId }: { projectId: string }) {
   );
 }
 
-function DigitalHeritageSection({ projectId }: { projectId: string }) {
-  const [expanded, setExpanded] = useState(false);
-  const [items, setItems] = useState<DigitalHeritageItem[]>([]);
-
-  useEffect(() => {
-    apiFetch<{ items: DigitalHeritageItem[] }>(`/projects/${projectId}/digital-heritage`).then((data) => setItems(data.items));
-  }, [projectId]);
-
-  const handledCount = items.filter((i) => i.status !== 'NOT_STARTED').length;
-
-  return (
-    <div className="mt-6 rounded-2xl border border-border bg-surface shadow-sm">
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center justify-between gap-3 rounded-2xl bg-transparent p-6 text-left"
-      >
-        <span className="flex items-center gap-2">
-          <TbDeviceDesktopHeart size={20} className="text-primary-dark" />
-          <span className="text-base font-semibold text-text">Digitalt arv</span>
-          <span className="text-sm text-muted">({handledCount} av {DIGITAL_HERITAGE_PLATFORM_COUNT} plattformar hanterade)</span>
-        </span>
-        <TbChevronDown size={20} className={`shrink-0 text-muted transition-transform ${expanded ? 'rotate-180' : ''}`} />
-      </button>
-      {expanded && (
-        <div className="border-t border-border px-6 pb-6">
-          <DigitalHeritageModal projectId={projectId} variant="inline" />
-        </div>
-      )}
-    </div>
-  );
-}
-
 const STATUS_BORDER_CLASS: Record<TaskStatus, string> = {
   PENDING: 'border-l-border',
   IN_PROGRESS: 'border-l-warning',
   DONE: 'border-l-success',
+  SKIPPED: 'border-l-muted',
 };
 
 export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
@@ -94,6 +60,8 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [managingTaskId, setManagingTaskId] = useState<string | null>(null);
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [addingTask, setAddingTask] = useState(false);
 
   function toggleExpanded(taskId: string) {
     setExpandedTaskIds((prev) => {
@@ -144,12 +112,36 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
     reload();
   }
 
+  async function addCustomTask(e: FormEvent) {
+    e.preventDefault();
+    const title = newTaskTitle.trim();
+    if (!id || !title) return;
+    setAddingTask(true);
+    try {
+      await apiFetch(`/projects/${id}/tasks`, {
+        method: 'POST',
+        body: JSON.stringify({ title, phase }),
+      });
+      setNewTaskTitle('');
+      await reload();
+    } finally {
+      setAddingTask(false);
+    }
+  }
+
+  async function deleteCustomTask(task: Task) {
+    if (!id) return;
+    await apiFetch(`/projects/${id}/tasks/${task.id}`, { method: 'DELETE' });
+    reload();
+  }
+
   if (!project) return <p className="text-muted">Laddar…</p>;
 
   const tasks = project.tasks.filter((t) => t.phase === phase);
   const status = phaseStatus(tasks);
-  const doneCount = tasks.filter((t) => t.completed).length;
-  const percent = tasks.length ? Math.round((doneCount / tasks.length) * 100) : 0;
+  const countedTasks = tasksForProgress(tasks);
+  const doneCount = countedTasks.filter((t) => t.completed).length;
+  const percent = countedTasks.length ? Math.round((doneCount / countedTasks.length) * 100) : 0;
   const managingTask = tasks.find((t) => t.id === managingTaskId) ?? null;
 
   return (
@@ -164,7 +156,7 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
         <h1 className="text-3xl font-semibold text-text">{phase}</h1>
         <Badge tone={status.tone}>{status.label}</Badge>
         <span className="text-sm text-muted">
-          {doneCount} av {tasks.length} klara
+          {doneCount} av {countedTasks.length} klara
         </span>
       </div>
       <p className="mt-1 text-muted">{PHASE_DESCRIPTIONS[phase]}</p>
@@ -190,26 +182,28 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
           {tasks.map((task) => {
             const completedByName = task.completedBy ? memberNameByUserId.get(task.completedBy) : null;
             const isDone = task.status === 'DONE';
+            const isSkipped = task.status === 'SKIPPED';
+            const isSettled = isDone || isSkipped;
             const description = task.description ?? TASK_DESCRIPTIONS[task.title];
             return (
               <div
                 key={task.id}
-                role={isDone ? undefined : 'button'}
-                tabIndex={isDone ? undefined : 0}
-                onClick={isDone ? undefined : () => setManagingTaskId(task.id)}
+                role={isSettled ? undefined : 'button'}
+                tabIndex={isSettled ? undefined : 0}
+                onClick={isSettled ? undefined : () => setManagingTaskId(task.id)}
                 onKeyDown={
-                  isDone
+                  isSettled
                     ? undefined
                     : (e) => {
                         if (e.key === 'Enter' || e.key === ' ') setManagingTaskId(task.id);
                       }
                 }
                 className={`border-l-4 py-3 pr-2 pl-3 transition-colors duration-150 first:pt-0 ${STATUS_BORDER_CLASS[task.status]} ${
-                  isDone ? '' : 'cursor-pointer hover:bg-black/[0.02]'
+                  isSettled ? '' : 'cursor-pointer hover:bg-black/[0.02]'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`flex min-w-0 flex-1 items-center gap-3 ${isDone ? 'opacity-60' : ''}`}>
+                  <div className={`flex min-w-0 flex-1 items-center gap-3 ${isSettled ? 'opacity-60' : ''}`}>
                     <input
                       type="checkbox"
                       checked={task.completed}
@@ -217,10 +211,12 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
                       onClick={(e) => e.stopPropagation()}
                       className="h-5 w-5 shrink-0 accent-[var(--color-primary)]"
                     />
-                    <span className={isDone ? 'text-muted' : 'text-text'}>{task.title}</span>
+                    <span className={`${isSettled ? 'text-muted' : 'text-text'} ${isSkipped ? 'line-through' : ''}`}>
+                      {task.title}
+                    </span>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <div className={isDone ? 'opacity-60' : ''}>
+                    <div className={isSettled ? 'opacity-60' : ''}>
                       <TaskStatusBadge status={task.status} />
                     </div>
                     <button
@@ -235,9 +231,23 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
                     >
                       <TbPencil size={18} />
                     </button>
+                    {task.isCustom && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteCustomTask(task);
+                        }}
+                        aria-label="Ta bort uppgift"
+                        title="Ta bort"
+                        className="rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-danger-light hover:text-danger"
+                      >
+                        <TbTrash size={18} />
+                      </button>
+                    )}
                   </div>
                 </div>
-                <div className={`pl-8 ${isDone ? 'opacity-60' : ''}`}>
+                <div className={`pl-8 ${isSettled ? 'opacity-60' : ''}`}>
                   {description && <p className="mt-1 text-sm text-muted">{description}</p>}
                   {task.url && (
                     <a
@@ -245,7 +255,7 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="mt-1 inline-block text-sm text-blue-600 hover:underline"
+                      className="mt-1 inline-block text-sm text-link hover:underline"
                     >
                       Läs mer hos Skatteverket
                     </a>
@@ -258,7 +268,7 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
                           e.stopPropagation();
                           toggleExpanded(task.id);
                         }}
-                        className="mt-1 block bg-transparent p-0 text-sm text-blue-600 hover:underline"
+                        className="mt-1 block bg-transparent p-0 text-sm text-link hover:underline"
                       >
                         {expandedTaskIds.has(task.id) ? 'Dölj' : 'Läs mer'}
                       </button>
@@ -285,7 +295,7 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
                       <span className="text-xs text-muted">Tilldelad {task.assignedUser.name}</span>
                     </div>
                   )}
-                  {!isDone && task.dueDate && (
+                  {!isSettled && task.dueDate && (
                     <p className={`mt-1 text-xs font-medium ${DUE_DATE_TEXT_CLASS[task.dueDateStatus ?? 'no_date']}`}>
                       Deadline: {new Date(task.dueDate).toLocaleDateString('sv-SE')}
                       {task.dueDateStatus && task.dueDateStatus !== 'no_date' && task.dueDateStatus !== 'on_time' && (
@@ -304,10 +314,27 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
             );
           })}
         </div>
+
+        <form onSubmit={addCustomTask} className={`flex items-center gap-2 ${tasks.length > 0 ? 'mt-4 border-t border-border pt-4' : ''}`}>
+          <input
+            type="text"
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+            placeholder="Lägg till egen uppgift…"
+            className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+          />
+          <button
+            type="submit"
+            disabled={addingTask || !newTaskTitle.trim()}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+          >
+            <TbPlus size={16} />
+            Lägg till
+          </button>
+        </form>
       </div>
 
       {phase === 'Avslut & arvskifte' && id && <PostManagementSection projectId={id} />}
-      {phase === 'Under bouppteckning' && id && <DigitalHeritageSection projectId={id} />}
 
       {managingTask && (
         <TaskManageModal

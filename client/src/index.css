@@ -21,6 +21,7 @@
   --color-success-dark: #128a2c;
   --color-warning: #dd5b00; /* colors.semantic-warning */
   --color-warning-light: #ffe8d4; /* colors.card-tint-peach */
+  --color-link: #0075de; /* colors.link-blue */
   --font-sans: 'Inter', 'Notion Sans', -apple-system, system-ui, 'Segoe UI', Helvetica, sans-serif;
 }
 
@@ -49,6 +50,7 @@ html, body, #root {
   --color-success-dark: #7fd794;
   --color-warning: #f0985a;
   --color-warning-light: #3a2818;
+  --color-link: #5195e0;
 }
 
 body {
