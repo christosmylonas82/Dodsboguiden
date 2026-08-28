@@ -13,7 +13,7 @@ export function formatActivityAction(action: string): string {
   if (action.startsWith('reopened task ')) return `återöppnade ${action.slice('reopened task '.length)}`;
   if (action.startsWith('added task ')) return `lade till ${action.slice('added task '.length)}`;
 
-  const statusMatch = action.match(/^changed status of (.+) to (PENDING|IN_PROGRESS|DONE)$/);
+  const statusMatch = action.match(/^changed status of (.+) to (PENDING|IN_PROGRESS|DONE|SKIPPED)$/);
   if (statusMatch) {
     const [, quotedTitle, status] = statusMatch;
     return `ändrade status för ${quotedTitle} till "${TASK_STATUS_LABELS[status as TaskStatus]}"`;

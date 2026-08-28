@@ -35,8 +35,8 @@ export function DashboardPage() {
       <div className="mt-8">
         {projects === null && <p className="text-muted">Laddar…</p>}
         {projects?.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-border p-6 text-center text-muted">
-            Du har inga dödsbon ännu.
+          <p className="rounded-xl border border-dashed border-border p-6 text-center text-muted">
+            När du är redo finns vi här. Skapa ditt första dödsbo för att komma igång.
           </p>
         )}
         <div className="grid gap-4 sm:grid-cols-2">
@@ -44,7 +44,7 @@ export function DashboardPage() {
             <Link
               key={p.id}
               to={`/projects/${p.id}/dashboard`}
-              className="block rounded-2xl border border-border bg-surface p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className="block rounded-xl border border-border bg-surface p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-2">
                 <h3 className="text-lg font-semibold text-text">{p.deceasedName}</h3>

@@ -181,7 +181,7 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
           <button
             type="button"
             onClick={() => setEditNameModalOpen(true)}
-            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
+            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
           >
             <TbPencil size={16} />
             Redigera
@@ -192,7 +192,7 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
           <button
             type="button"
             onClick={() => setImageModalOpen(true)}
-            className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
+            className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
           >
             Ladda upp bild
           </button>
@@ -201,7 +201,7 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
               type="button"
               onClick={() => setConfirmingImageRemove(true)}
               disabled={!user.profileImageUrl}
-              className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light disabled:opacity-40"
+              className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light disabled:opacity-40"
             >
               Ta bort bild
             </button>
@@ -299,7 +299,7 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
                 <button
                   type="button"
                   onClick={() => setConfirmingDelete(false)}
-                  className="rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
+                  className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
                 >
                   Avbryt
                 </button>
@@ -332,7 +332,7 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+            className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
           >
             Stäng
           </button>

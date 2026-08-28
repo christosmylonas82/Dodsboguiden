@@ -73,7 +73,7 @@ export function SurvivingPensionModal({ projectId, onClose }: { projectId: strin
 
   return (
     <ModalOverlay onClose={onClose} maxWidthClassName="max-w-2xl">
-      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="max-h-[80vh] overflow-y-auto rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Efterlevandepension</h3>
           <button type="button" onClick={onClose} aria-label="Stäng" className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text">
@@ -123,7 +123,7 @@ export function SurvivingPensionModal({ projectId, onClose }: { projectId: strin
                       max={25}
                       value={childAge}
                       onChange={(e) => setChildAge(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                      className="mt-1 w-full h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
                     />
                   </div>
                   <label className="flex items-center gap-2 text-sm text-text">
@@ -143,7 +143,7 @@ export function SurvivingPensionModal({ projectId, onClose }: { projectId: strin
                       max={67}
                       value={survivorAge}
                       onChange={(e) => setSurvivorAge(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                      className="mt-1 w-full h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
                     />
                   </div>
                   <label className="flex items-center gap-2 text-sm text-text">
@@ -174,7 +174,7 @@ export function SurvivingPensionModal({ projectId, onClose }: { projectId: strin
                   type="button"
                   onClick={handleSave}
                   disabled={submitting || (pensionType === 'BARNPENSION' ? !childAge : !survivorAge)}
-                  className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-60"
+                  className="mt-4 rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-60"
                 >
                   {submitting ? 'Sparar…' : 'Spara i dödsboet'}
                 </button>
@@ -204,7 +204,7 @@ export function SurvivingPensionModal({ projectId, onClose }: { projectId: strin
         )}
 
         <div className="mt-6 flex justify-end border-t border-border pt-5">
-          <button type="button" onClick={onClose} className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light">
+          <button type="button" onClick={onClose} className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light">
             Stäng
           </button>
         </div>

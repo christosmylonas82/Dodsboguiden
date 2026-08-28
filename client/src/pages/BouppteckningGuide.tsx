@@ -222,7 +222,7 @@ export function BouppteckningGuidePage() {
         <button
           type="button"
           onClick={handleExport}
-          className="mt-4 flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
+          className="mt-4 flex items-center gap-1.5 rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white hover:bg-primary-dark"
         >
           <TbDownload size={16} />
           Exportera sammanfattning

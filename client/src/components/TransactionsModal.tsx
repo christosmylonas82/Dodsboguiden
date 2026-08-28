@@ -122,7 +122,7 @@ export function TransactionsModal({
 
   return (
     <ModalOverlay onClose={onClose} maxWidthClassName="max-w-2xl">
-      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="max-h-[80vh] overflow-y-auto rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Ekonomi</h3>
           <div className="flex items-center gap-1">
@@ -239,14 +239,14 @@ export function TransactionsModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+                  className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
                 >
                   Stäng
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAddForm(true)}
-                  className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-dark"
+                  className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
                 >
                   + Lägg till transaktion
                 </button>
@@ -258,7 +258,7 @@ export function TransactionsModal({
                   <select
                     value={type}
                     onChange={(e) => setType(e.target.value as TransactionType)}
-                    className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                    className="h-11 rounded-lg border border-border bg-surface px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
                   >
                     <option value="COST">Kostnad</option>
                     <option value="INCOME">Intäkt</option>
@@ -266,7 +266,7 @@ export function TransactionsModal({
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value as TransactionCategory)}
-                    className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                    className="h-11 rounded-lg border border-border bg-surface px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
                   >
                     {CATEGORY_ORDER.map((c) => (
                       <option key={c} value={c}>
@@ -279,7 +279,7 @@ export function TransactionsModal({
                     placeholder="Beskrivning, t.ex. Begravningsbyrå - ceremoni"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none sm:col-span-2"
+                    className="h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none sm:col-span-2"
                   />
                   <input
                     required
@@ -288,19 +288,19 @@ export function TransactionsModal({
                     placeholder="Belopp (kr)"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                    className="h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
                   />
                   <input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                    className="h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
                   />
                   <input
                     placeholder="Noteringar (valfritt)"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none sm:col-span-2"
+                    className="h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none sm:col-span-2"
                   />
                 </div>
                 {error && <p className="mt-2 text-sm text-danger">{error}</p>}
@@ -308,14 +308,14 @@ export function TransactionsModal({
                   <button
                     type="button"
                     onClick={() => setShowAddForm(false)}
-                    className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+                    className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
                   >
                     Avbryt
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+                    className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
                   >
                     {submitting ? 'Lägger till…' : '+ Lägg till'}
                   </button>

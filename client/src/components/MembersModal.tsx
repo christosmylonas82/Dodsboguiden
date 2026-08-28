@@ -47,7 +47,7 @@ export function MembersModal({
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Familjemedlemmar</h3>
           <button
@@ -148,7 +148,7 @@ export function MembersModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+            className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
           >
             Stäng
           </button>

@@ -7,7 +7,7 @@ import { PolicyModal } from '../components/PolicyModal';
 type Tab = 'login' | 'register';
 
 function fieldClass(hasError: boolean) {
-  return `mt-1.5 w-full rounded-lg border px-3 py-2.5 text-text focus:outline-none ${
+  return `mt-1.5 h-11 w-full rounded-lg border px-4 text-text focus:border-2 focus:outline-none ${
     hasError ? 'border-danger focus:border-danger' : 'border-border focus:border-primary'
   }`;
 }
@@ -23,7 +23,7 @@ export function AuthPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8">
+    <div className="mx-auto max-w-lg rounded-xl border border-border bg-surface p-6 shadow-sm sm:p-8">
       <div className="flex gap-1 rounded-lg bg-bg p-1">
         <button
           type="button"
@@ -119,7 +119,7 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
         </button>
         {showForgotHint && (
           <p className="mt-1 text-xs text-muted">
-            Lösenordsåterställning finns inte än — kontakta support@dodsboguiden.se.
+            Vi kan hjälpa dig — mejla oss på support@dodsboguiden.se så löser vi det tillsammans.
           </p>
         )}
       </div>
@@ -129,7 +129,7 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
       <button
         type="submit"
         disabled={submitting}
-        className="mt-5 w-full rounded-lg bg-primary px-4 py-2.5 font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+        className="mt-5 w-full rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
       >
         {submitting ? 'Loggar in…' : 'Logga in'}
       </button>
@@ -308,7 +308,7 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
       <button
         type="submit"
         disabled={submitting}
-        className="mt-6 w-full rounded-lg bg-primary px-4 py-2.5 font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+        className="mt-6 w-full rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
       >
         {submitting ? 'Skapar konto…' : 'Skapa konto'}
       </button>

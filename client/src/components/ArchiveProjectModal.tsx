@@ -27,7 +27,7 @@ export function ArchiveProjectModal({
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <h3 className="text-lg font-semibold text-text">Arkivera dödsbo</h3>
         <p className="mt-3 text-sm leading-relaxed text-muted">
           Du är på väg att arkivera dödsboet &quot;{deceasedName}&quot;. Arkiverade dödsbon sparas i 30 dagar,
@@ -38,7 +38,7 @@ export function ArchiveProjectModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-border bg-surface px-4 py-2 text-text hover:bg-primary-light"
+            className="rounded-lg border border-border bg-surface px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
           >
             Avbryt
           </button>

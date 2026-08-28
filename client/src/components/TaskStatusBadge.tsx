@@ -1,4 +1,4 @@
-import { TbClock, TbCircleFilled, TbCheck } from 'react-icons/tb';
+import { TbClock, TbCircleFilled, TbCheck, TbBan } from 'react-icons/tb';
 import type { TaskStatus } from '../lib/types';
 import { TASK_STATUS_LABELS } from '../lib/taskStatus';
 
@@ -10,12 +10,14 @@ export const TASK_STATUS_BADGE_CLASSES: Record<TaskStatus, string> = {
   PENDING: 'bg-amber-400 text-gray-900 border-amber-600 shadow-sm',
   IN_PROGRESS: 'bg-amber-500 text-white border-amber-700 shadow-sm',
   DONE: 'bg-success text-white border-success-dark shadow-sm',
+  SKIPPED: 'bg-muted text-white border-text shadow-sm',
 };
 
 export const TASK_STATUS_ICONS: Record<TaskStatus, React.ReactNode> = {
   PENDING: <TbClock size={15} />,
   IN_PROGRESS: <TbCircleFilled size={11} />,
   DONE: <TbCheck size={16} strokeWidth={3} />,
+  SKIPPED: <TbBan size={15} />,
 };
 
 export function TaskStatusBadge({ status }: { status: TaskStatus }) {

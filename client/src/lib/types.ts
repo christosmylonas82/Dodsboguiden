@@ -18,7 +18,7 @@ export interface ProjectSummary {
   progress: number;
 }
 
-export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'DONE';
+export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'DONE' | 'SKIPPED';
 export type TaskPriority = 'NOW' | 'SOON' | 'LATER';
 export type DueDateStatus = 'overdue' | 'due_soon' | 'on_time' | 'no_date';
 
@@ -48,6 +48,7 @@ export interface Task {
   notes: string | null;
   dueDate: string | null;
   dueDateStatus?: DueDateStatus;
+  isCustom: boolean;
 }
 
 export interface ProjectMember {
@@ -146,18 +147,6 @@ export interface PostManagementTask {
   newAddress: string | null;
   notes: string | null;
   completedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type DigitalHeritageStatus = 'NOT_STARTED' | 'MEMORIAL' | 'DELETED' | 'ARCHIVED';
-
-export interface DigitalHeritageItem {
-  id: string;
-  projectId: string;
-  platform: string;
-  status: DigitalHeritageStatus;
-  notes: string | null;
   createdAt: string;
   updatedAt: string;
 }

@@ -26,11 +26,11 @@ function PostManagementSection({ projectId }: { projectId: string }) {
   const doneCount = tasks.filter((t) => t.status === 'DONE').length;
 
   return (
-    <div className="mt-6 rounded-2xl border border-border bg-surface shadow-sm">
+    <div className="mt-6 rounded-xl border border-border bg-surface shadow-sm">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center justify-between gap-3 rounded-2xl bg-transparent p-6 text-left"
+        className="flex w-full items-center justify-between gap-3 rounded-xl bg-transparent p-6 text-left"
       >
         <span className="flex items-center gap-2">
           <TbMailboxOff size={20} className="text-primary-dark" />
@@ -177,7 +177,7 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
         <span className="text-sm font-medium text-text">{percent}%</span>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
+      <div className="mt-6 rounded-xl border border-border bg-surface p-6 shadow-sm">
         <div className="divide-y divide-border">
           {tasks.map((task) => {
             const completedByName = task.completedBy ? memberNameByUserId.get(task.completedBy) : null;
@@ -321,7 +321,7 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
             value={newTaskTitle}
             onChange={(e) => setNewTaskTitle(e.target.value)}
             placeholder="Lägg till egen uppgift…"
-            className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+            className="flex-1 h-11 rounded-lg border border-border bg-surface px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
           />
           <button
             type="submit"

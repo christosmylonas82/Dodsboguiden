@@ -17,6 +17,7 @@ import { formatActivityAction, formatRelativeTime } from '../lib/activity';
 import { PHASE_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { PHASES, phaseStatus } from '../lib/phases';
 import { PHASE_ROUTE_SLUG } from '../lib/phaseRoutes';
+import { tasksForProgress } from '../lib/taskStatus';
 
 export function DashboardHubPage() {
   const { id } = useParams<{ id: string }>();
@@ -77,8 +78,9 @@ export function DashboardHubPage() {
 
   if (!project) return <p className="text-muted">Laddar…</p>;
 
-  const progress = project.tasks.length
-    ? Math.round((project.tasks.filter((t) => t.completed).length / project.tasks.length) * 100)
+  const countedProjectTasks = tasksForProgress(project.tasks);
+  const progress = countedProjectTasks.length
+    ? Math.round((countedProjectTasks.filter((t) => t.completed).length / countedProjectTasks.length) * 100)
     : 0;
   const lastActivity = activity[0];
   const isAdmin = project.members.find((m) => m.userId === user?.id)?.role === 'ADMIN';
@@ -93,6 +95,7 @@ export function DashboardHubPage() {
               {isAdmin && (
                 <button
                   type="button"
+                  data-tour="edit-name"
                   onClick={() => setOpenModal('rename')}
                   aria-label="Redigera namn"
                   title="Redigera namn"
@@ -134,7 +137,7 @@ export function DashboardHubPage() {
             icon={<TbProgress size={20} />}
             label="Framsteg"
             value={`${progress}%`}
-            hint={`${project.tasks.filter((t) => t.completed).length} av ${project.tasks.length} klara`}
+            hint={`${countedProjectTasks.filter((t) => t.completed).length} av ${countedProjectTasks.length} klara`}
             onClick={() => setOpenModal('progress')}
           />
         </div>
@@ -147,13 +150,15 @@ export function DashboardHubPage() {
             onClick={() => setOpenModal('members')}
           />
         </div>
-        <MetricCard
-          icon={<TbBell size={20} />}
-          label="Senaste aktivitet"
-          value={lastActivity ? formatRelativeTime(lastActivity.timestamp) : '—'}
-          hint={lastActivity ? `${lastActivity.user.name} ${formatActivityAction(lastActivity.action)}` : 'Ingen aktivitet än'}
-          onClick={() => setOpenModal('activity')}
-        />
+        <div data-tour="activity">
+          <MetricCard
+            icon={<TbBell size={20} />}
+            label="Senaste aktivitet"
+            value={lastActivity ? formatRelativeTime(lastActivity.timestamp) : '—'}
+            hint={lastActivity ? `${lastActivity.user.name} ${formatActivityAction(lastActivity.action)}` : 'Ingen aktivitet än'}
+            onClick={() => setOpenModal('activity')}
+          />
+        </div>
       </div>
 
       <div data-tour="phases" className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -161,19 +166,20 @@ export function DashboardHubPage() {
           const tasks = project.tasks.filter((t) => t.phase === phase);
           if (tasks.length === 0) return null;
           const status = phaseStatus(tasks);
-          const doneCount = tasks.filter((t) => t.completed).length;
+          const countedTasks = tasksForProgress(tasks);
+          const doneCount = countedTasks.filter((t) => t.completed).length;
           return (
             <Link
               key={phase}
               to={`/projects/${id}/${PHASE_ROUTE_SLUG[phase]}`}
-              className="flex flex-col rounded-2xl border border-border bg-surface p-6 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md"
+              className="flex flex-col rounded-xl border border-border bg-surface p-6 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-lg font-semibold text-text">{phase}</h2>
                 <Badge tone={status.tone}>{status.label}</Badge>
               </div>
               <p className="mt-1 text-sm text-muted">
-                {doneCount} av {tasks.length} klara
+                {doneCount} av {countedTasks.length} klara
               </p>
               <p className="mt-2 flex-1 text-sm text-muted">{PHASE_DESCRIPTIONS[phase]}</p>
               <p className="mt-4 flex items-center gap-1 text-sm font-medium text-primary-dark">
@@ -184,7 +190,7 @@ export function DashboardHubPage() {
         })}
         <Link
           to={`/projects/${id}/bouppteckning`}
-          className="flex flex-col rounded-2xl border border-border bg-surface p-6 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md"
+          className="flex flex-col rounded-xl border border-border bg-surface p-6 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md"
         >
           <h2 className="text-lg font-semibold text-text">Boupptecknings-guide</h2>
           <p className="mt-2 flex-1 text-sm text-muted">

@@ -37,7 +37,7 @@ export function DeleteMemberConfirmModal({
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="rounded-2xl border border-danger bg-surface p-6 shadow-lg">
+      <div className="rounded-xl border border-danger bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-center gap-2">
           <TbAlertTriangle size={22} className="text-danger" />
           <h3 className="text-lg font-semibold text-text">Ta bort medlem?</h3>
@@ -57,7 +57,7 @@ export function DeleteMemberConfirmModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+            className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
           >
             Avbryt
           </button>

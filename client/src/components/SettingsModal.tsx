@@ -4,7 +4,7 @@ import { ModalOverlay } from './ModalOverlay';
 export function SettingsModal({ onClose }: { onClose: () => void }) {
   return (
     <ModalOverlay onClose={onClose} maxWidthClassName="max-w-2xl">
-      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="max-h-[80vh] overflow-y-auto rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Inställningar</h3>
           <button

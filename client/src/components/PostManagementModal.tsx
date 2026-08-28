@@ -48,7 +48,6 @@ export function PostManagementModal({
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [tasks, setTasks] = useState<PostManagementTask[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newAddress, setNewAddress] = useState('');
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -82,15 +81,6 @@ export function PostManagementModal({
     const updated = await apiFetch<PostManagementTask>(`/projects/${projectId}/post-management/${task.id}`, {
       method: 'PATCH',
       body: JSON.stringify({ status: nextStatus }),
-    });
-    setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
-  }
-
-  async function saveAddress() {
-    const task = await ensureTask('ADDRESS_CHANGE');
-    const updated = await apiFetch<PostManagementTask>(`/projects/${projectId}/post-management/${task.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ newAddress }),
     });
     setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
   }
@@ -156,24 +146,6 @@ export function PostManagementModal({
                     </div>
                     <p className="mt-1.5 text-xs text-muted">{meta.description}</p>
 
-                    {type === 'ADDRESS_CHANGE' && (
-                      <div className="mt-3 flex gap-2">
-                        <input
-                          placeholder="Ny adress för dödsboet"
-                          defaultValue={task?.newAddress ?? ''}
-                          onChange={(e) => setNewAddress(e.target.value)}
-                          className="flex-1 rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
-                        />
-                        <button
-                          type="button"
-                          onClick={saveAddress}
-                          className="rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium text-text hover:bg-primary-light"
-                        >
-                          Spara
-                        </button>
-                      </div>
-                    )}
-
                     {type === 'AD_BLOCK' && (
                       <button
                         type="button"
@@ -203,7 +175,7 @@ export function PostManagementModal({
 
         {variant === 'modal' && (
           <div className="mt-6 flex justify-end border-t border-border pt-5">
-            <button type="button" onClick={onClose} className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light">
+            <button type="button" onClick={onClose} className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light">
               Stäng
             </button>
           </div>
@@ -215,7 +187,7 @@ export function PostManagementModal({
 
   return (
     <ModalOverlay onClose={onClose ?? (() => {})} maxWidthClassName="max-w-2xl">
-      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">{body}</div>
+      <div className="max-h-[80vh] overflow-y-auto rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">{body}</div>
     </ModalOverlay>
   );
 }

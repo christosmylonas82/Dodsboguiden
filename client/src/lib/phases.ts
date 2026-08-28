@@ -1,5 +1,6 @@
 import type { Task } from './types';
 import type { BadgeTone } from '../components/Badge';
+import { tasksForProgress } from './taskStatus';
 
 export const PHASES: Task['phase'][] = [
   'Direkt efter dödsfall',
@@ -10,8 +11,9 @@ export const PHASES: Task['phase'][] = [
 ];
 
 export function phaseStatus(tasks: Task[]): { label: string; tone: BadgeTone } {
-  const done = tasks.filter((t) => t.completed).length;
+  const counted = tasksForProgress(tasks);
+  const done = counted.filter((t) => t.completed).length;
+  if (done === counted.length) return { label: 'Klar', tone: 'success' };
   if (done === 0) return { label: 'Ej påbörjad', tone: 'neutral' };
-  if (done === tasks.length) return { label: 'Klar', tone: 'success' };
   return { label: 'Pågår', tone: 'warning' };
 }

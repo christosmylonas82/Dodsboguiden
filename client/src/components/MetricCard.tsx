@@ -29,12 +29,12 @@ export function MetricCard({
       <button
         type="button"
         onClick={onClick}
-        className="h-full w-full rounded-2xl border border-border bg-surface p-5 text-left shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md"
+        className="h-full w-full rounded-xl border border-border bg-surface p-5 text-left shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md"
       >
         {content}
       </button>
     );
   }
 
-  return <div className="h-full w-full rounded-2xl border border-border bg-surface p-5 shadow-sm">{content}</div>;
+  return <div className="h-full w-full rounded-xl border border-border bg-surface p-5 shadow-sm">{content}</div>;
 }

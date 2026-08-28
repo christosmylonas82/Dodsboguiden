@@ -40,7 +40,7 @@ export function ResetPasswordPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8">
+    <div className="mx-auto max-w-md rounded-xl border border-border bg-surface p-6 shadow-sm sm:p-8">
       <h1 className="text-2xl font-semibold text-text">Återställ lösenord</h1>
 
       {done ? (
@@ -49,7 +49,7 @@ export function ResetPasswordPage() {
           <button
             type="button"
             onClick={() => navigate('/login')}
-            className="mt-5 w-full rounded-lg bg-primary px-4 py-2.5 font-medium text-white transition hover:bg-primary-dark"
+            className="mt-5 w-full rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
           >
             Logga in
           </button>
@@ -69,7 +69,7 @@ export function ResetPasswordPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1.5 w-full rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
+            className="mt-1.5 w-full h-11 rounded-lg border border-border px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
           />
 
           <label htmlFor="confirmPassword" className="mt-4 block text-xs font-medium uppercase tracking-wide text-muted">
@@ -81,7 +81,7 @@ export function ResetPasswordPage() {
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="mt-1.5 w-full rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
+            className="mt-1.5 w-full h-11 rounded-lg border border-border px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
           />
 
           {error && <p className="mt-3 text-sm text-danger">{error}</p>}
@@ -89,7 +89,7 @@ export function ResetPasswordPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-5 w-full rounded-lg bg-primary px-4 py-2.5 font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+            className="mt-5 w-full rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
           >
             {submitting ? 'Sparar…' : 'Spara nytt lösenord'}
           </button>

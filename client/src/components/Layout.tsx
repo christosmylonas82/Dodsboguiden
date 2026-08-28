@@ -157,15 +157,30 @@ export function Layout() {
         <TbClipboardList size={24} />
         <NavLabel text="Inventarielista" />
       </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('contactRegistry')} className={`${navButtonClass} bg-transparent`}>
+      <button
+        type="button"
+        data-tour="contactRegistry"
+        onClick={() => openModalAndCloseMenu('contactRegistry')}
+        className={`${navButtonClass} bg-transparent`}
+      >
         <TbPhoneCall size={24} />
         <NavLabel text="Myndigheter & företag" />
       </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('transactions')} className={`${navButtonClass} bg-transparent`}>
+      <button
+        type="button"
+        data-tour="transactions"
+        onClick={() => openModalAndCloseMenu('transactions')}
+        className={`${navButtonClass} bg-transparent`}
+      >
         <TbCoin size={24} />
         <NavLabel text="Ekonomi" />
       </button>
-      <button type="button" onClick={() => openModalAndCloseMenu('documents')} className={`${navButtonClass} bg-transparent`}>
+      <button
+        type="button"
+        data-tour="documents"
+        onClick={() => openModalAndCloseMenu('documents')}
+        className={`${navButtonClass} bg-transparent`}
+      >
         <TbFiles size={24} />
         <NavLabel text="Dokument" />
       </button>
@@ -234,7 +249,7 @@ export function Layout() {
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex max-w-6xl items-center px-6 py-3">
           <div className="flex flex-1 items-center">
-            {isInProject ? (
+            {user ? (
               <Link
                 to="/dashboard"
                 className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
@@ -261,8 +276,12 @@ export function Layout() {
               </nav>
 
               <div className="hidden flex-1 items-center justify-end gap-2 md:flex">
-                <NotificationsBell />
-                <ThemeToggle />
+                <div data-tour="notifications">
+                  <NotificationsBell />
+                </div>
+                <div data-tour="theme">
+                  <ThemeToggle />
+                </div>
                 {logoutButton}
               </div>
 

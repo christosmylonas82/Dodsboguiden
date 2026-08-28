@@ -81,7 +81,7 @@ export function ContactsModal({
 
   return (
     <ModalOverlay onClose={onClose} maxWidthClassName="max-w-2xl">
-      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="max-h-[80vh] overflow-y-auto rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Kontaktlista</h3>
           <div className="flex items-center gap-1">
@@ -152,14 +152,14 @@ export function ContactsModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+              className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
             >
               Stäng
             </button>
             <button
               type="button"
               onClick={() => setShowAddForm(true)}
-              className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-dark"
+              className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
             >
               + Lägg till ny kontakt
             </button>
@@ -173,33 +173,33 @@ export function ContactsModal({
                 placeholder="Namn"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                className="h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
               />
               <input
                 required
                 placeholder="Relation (t.ex. Barn, Advokat)"
                 value={relation}
                 onChange={(e) => setRelation(e.target.value)}
-                className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                className="h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
               />
               <input
                 placeholder="Telefon"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                className="h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
               />
               <input
                 type="email"
                 placeholder="E-post"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                className="h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
               />
               <input
                 placeholder="Anteckningar"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none sm:col-span-2"
+                className="h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none sm:col-span-2"
               />
             </div>
             {error && <p className="mt-2 text-sm text-danger">{error}</p>}
@@ -207,14 +207,14 @@ export function ContactsModal({
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+                className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
               >
                 Avbryt
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+                className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
               >
                 {submitting ? 'Lägger till…' : '+ Lägg till'}
               </button>

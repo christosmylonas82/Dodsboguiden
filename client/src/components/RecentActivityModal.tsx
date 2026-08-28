@@ -17,7 +17,7 @@ export function RecentActivityModal({
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Senaste aktivitet</h3>
           <button

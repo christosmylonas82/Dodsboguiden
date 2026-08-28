@@ -83,7 +83,7 @@ export function InventoryModal({
 
   return (
     <ModalOverlay onClose={onClose} maxWidthClassName="max-w-2xl">
-      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="max-h-[80vh] overflow-y-auto rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Inventarielista</h3>
           <div className="flex items-center gap-1">
@@ -189,7 +189,7 @@ export function InventoryModal({
                               updateLocal(item.id, { status });
                               saveField(item.id, { status });
                             }}
-                            className="rounded-lg border border-border px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                            className="rounded-lg border border-border bg-surface px-2 py-1.5 text-text focus:border-primary focus:outline-none"
                           >
                             {INVENTORY_STATUS_ORDER.map((s) => (
                               <option key={s} value={s}>
@@ -245,14 +245,14 @@ export function InventoryModal({
               <button
                 type="button"
                 onClick={handleAddRow}
-                className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+                className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
               >
                 + Lägg till rad
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-dark"
+                className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
               >
                 Stäng
               </button>

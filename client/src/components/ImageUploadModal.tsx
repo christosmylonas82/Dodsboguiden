@@ -96,7 +96,7 @@ export function ImageUploadModal({
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <h3 className="text-lg font-semibold text-text">Ladda upp profilbild</h3>
         <p className="mt-1 text-sm text-muted">Välj en bild (JPG, PNG eller WebP, upp till 5 MB).</p>
 
@@ -114,7 +114,7 @@ export function ImageUploadModal({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="mt-4 w-full rounded-lg border border-border bg-transparent px-4 py-2 text-sm text-text hover:bg-primary-light"
+          className="mt-4 w-full rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
         >
           Välj fil från datorn
         </button>
@@ -148,7 +148,7 @@ export function ImageUploadModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+            className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
           >
             Avbryt
           </button>
@@ -156,7 +156,7 @@ export function ImageUploadModal({
             type="button"
             onClick={handleUpload}
             disabled={!preview || uploading}
-            className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+            className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
           >
             {uploading ? 'Laddar upp…' : 'Ladda upp'}
           </button>

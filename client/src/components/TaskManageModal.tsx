@@ -53,7 +53,7 @@ export function TaskManageModal({
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <h3 className="text-lg font-semibold text-text">{task.title}</h3>
 
         <div className="mt-5">
@@ -84,7 +84,7 @@ export function TaskManageModal({
             id="assignee"
             value={assignedTo}
             onChange={(e) => handleAssigneeChange(e.target.value)}
-            className="mt-2 w-full rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
+            className="mt-2 w-full h-11 rounded-lg border border-border bg-surface px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
           >
             <option value="">Ingen</option>
             {assignableMembers.map((m) => (
@@ -105,7 +105,7 @@ export function TaskManageModal({
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="flex-1 rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
+              className="flex-1 h-11 rounded-lg border border-border px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
             />
             {dueDate && (
               <span className={`text-xs font-semibold whitespace-nowrap ${DUE_DATE_TEXT_CLASS[getDueDateStatus(dueDate)]}`}>
@@ -124,7 +124,7 @@ export function TaskManageModal({
             rows={3}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="mt-2 w-full rounded-lg border border-border px-3 py-2.5 text-text focus:border-primary focus:outline-none"
+            className="mt-2 w-full h-11 rounded-lg border border-border px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
           />
         </div>
 
@@ -132,7 +132,7 @@ export function TaskManageModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+            className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
           >
             Avbryt
           </button>
@@ -140,7 +140,7 @@ export function TaskManageModal({
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+            className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
           >
             {saving ? 'Sparar…' : 'Spara'}
           </button>

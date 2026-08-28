@@ -134,7 +134,7 @@ export function DocumentsModal({
 
   return (
     <ModalOverlay onClose={onClose} maxWidthClassName="max-w-2xl">
-      <div className="max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg">
+      <div className="max-h-[80vh] overflow-y-auto rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Dokument</h3>
           <button
@@ -217,14 +217,14 @@ export function DocumentsModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+              className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
             >
               Stäng
             </button>
             <button
               type="button"
               onClick={() => setShowAddForm(true)}
-              className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-dark"
+              className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
             >
               + Ladda upp dokument
             </button>
@@ -238,12 +238,12 @@ export function DocumentsModal({
                 placeholder="Titel, t.ex. Dödsfallsintyg"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                className="h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
               />
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as DocumentType)}
-                className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                className="h-11 rounded-lg border border-border bg-surface px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
               >
                 {TYPE_ORDER.map((t) => (
                   <option key={t} value={t}>
@@ -255,7 +255,7 @@ export function DocumentsModal({
                 placeholder="Beskrivning (valfritt)"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                className="h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
               />
               <div>
                 <input
@@ -263,7 +263,7 @@ export function DocumentsModal({
                   type="file"
                   accept=".pdf,.doc,.docx"
                   onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm text-text focus:border-primary focus:outline-none"
+                  className="w-full h-11 rounded-lg border border-border px-4 text-sm text-text focus:border-2 focus:border-primary focus:outline-none"
                 />
                 <p className="mt-1 text-xs text-muted">Max 8 MB. PDF eller Word-dokument.</p>
                 {fileError && <p className="mt-1 text-xs text-danger">{fileError}</p>}
@@ -274,14 +274,14 @@ export function DocumentsModal({
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="rounded-lg border border-border bg-transparent px-4 py-2 text-text hover:bg-primary-light"
+                className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
               >
                 Avbryt
               </button>
               <button
                 type="submit"
                 disabled={submitting || !file}
-                className="rounded-lg bg-primary px-4 py-2 font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+                className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
               >
                 {submitting ? 'Laddar upp…' : 'Ladda upp'}
               </button>
@@ -292,7 +292,7 @@ export function DocumentsModal({
 
       {previewUrl && (
         <ModalOverlay onClose={() => setPreviewUrl(null)} maxWidthClassName="max-w-4xl">
-          <div className="flex h-[85vh] flex-col rounded-2xl border border-border bg-surface p-4 shadow-lg">
+          <div className="flex h-[85vh] flex-col rounded-xl border border-border bg-surface p-4 shadow-lg">
             <div className="mb-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-sm font-semibold text-text">
                 <TbFileTypePdf size={18} />

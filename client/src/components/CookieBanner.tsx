@@ -1,6 +1,6 @@
 export function CookieBanner({ onClose, onViewCookies }: { onClose: () => void; onViewCookies: () => void }) {
   return (
-    <div className="fixed bottom-6 left-6 z-[70] max-w-sm rounded-2xl border border-border bg-surface p-5 shadow-lg">
+    <div className="fixed bottom-6 left-6 z-[70] max-w-sm rounded-xl border border-border bg-surface p-5 shadow-lg">
       <h3 className="text-sm font-semibold text-text">🍪 Vi använder cookies</h3>
       <p className="mt-2 text-sm leading-relaxed text-muted">
         Vi använder nödvändiga cookies för att tjänsten ska fungera (inloggning, säkerhet). Läs mer i vår
