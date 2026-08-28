@@ -246,14 +246,14 @@ export function Layout() {
   return (
     <div className="flex min-h-screen flex-col bg-bg">
       <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex max-w-6xl items-center px-6 py-3">
+        <div className="flex w-full items-center px-6 py-2">
           <div className="flex flex-1 items-center">
             <Link
               to={user ? '/dashboard' : '/'}
               aria-label="Dödsboguiden"
-              className="flex items-center rounded-md bg-white px-2 py-1 transition hover:opacity-90"
+              className="flex items-center rounded-md bg-white px-3 py-2 transition hover:opacity-90"
             >
-              <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-7 w-auto" />
+              <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-16 w-auto" />
             </Link>
           </div>
 
