@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { TbAlertTriangle, TbQuestionMark, TbUsers, TbClockHour4, TbCheck, TbPlus } from 'react-icons/tb';
 import heroFamily from '../assets/hero-family.jpg';
+import heroFamily2 from '../assets/hero-family-2.jpg';
 
 function FullBleed({ className, children }: { className?: string; children: ReactNode }) {
   return (
@@ -182,34 +183,38 @@ export function LandingPage() {
       </FullBleed>
 
       {/* Lösning */}
-      <FullBleed className="bg-surface">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <h2 className="text-2xl font-semibold text-text sm:text-3xl">DödsboGuiden löser allt det här</h2>
-          <p className="max-w-2xl text-[15px] leading-relaxed text-muted sm:text-base">
-            Se exakt vad som behöver göras, vem som gör vad, och i vilken ordning. Tydliga prioriteringar och
-            klara nästa steg betyder att du alltid vet vad som ska hända härnäst – utan stress eller
-            förvirring.
-          </p>
+      <section className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden">
+        <img src={heroFamily2} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary-dark/90 via-primary/80 to-primary/85" />
+        <div className="relative mx-auto max-w-[1200px] px-5 py-20">
+          <div className="flex flex-col items-center gap-3 text-center">
+            <h2 className="text-2xl font-semibold text-white sm:text-3xl">DödsboGuiden löser allt det här</h2>
+            <p className="max-w-2xl text-[15px] leading-relaxed text-white/80 sm:text-base">
+              Se exakt vad som behöver göras, vem som gör vad, och i vilken ordning. Tydliga prioriteringar och
+              klara nästa steg betyder att du alltid vet vad som ska hända härnäst – utan stress eller
+              förvirring.
+            </p>
+          </div>
+          <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {benefits.map(({ title, text }) => (
+              <div
+                key={title}
+                className="rounded-xl border border-border bg-bg p-6 transition duration-200 ease-out hover:-translate-y-1 hover:shadow-md"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-success-light text-success">
+                  <TbCheck size={18} />
+                </span>
+                <h3 className="mt-3 font-semibold text-text">{title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted">{text}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-12 flex flex-col items-center gap-6">
+            <CtaButtons />
+            <FreeBadge />
+          </div>
         </div>
-        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {benefits.map(({ title, text }) => (
-            <div
-              key={title}
-              className="rounded-xl border border-border bg-bg p-6 transition duration-200 ease-out hover:-translate-y-1 hover:shadow-md"
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-success-light text-success">
-                <TbCheck size={18} />
-              </span>
-              <h3 className="mt-3 font-semibold text-text">{title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">{text}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-12 flex flex-col items-center gap-6">
-          <CtaButtons />
-          <FreeBadge />
-        </div>
-      </FullBleed>
+      </section>
 
       {/* FAQ */}
       <FullBleed className="bg-primary-light">
