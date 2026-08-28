@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, Outlet, useParams } from 'react-router-dom';
+import { Link, Outlet, useLocation, useParams } from 'react-router-dom';
 import {
   TbAddressBook,
   TbClipboardList,
@@ -64,6 +64,8 @@ type ModalKey =
 
 export function Layout() {
   const { user, logout, markTipsSeen } = useAuth();
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
   const { id: projectId } = useParams<{ id?: string }>();
   const isInProject = Boolean(projectId);
   const [openModal, setOpenModal] = useState<ModalKey | null>(null);
@@ -249,9 +251,19 @@ export function Layout() {
       <header className="border-b border-border bg-surface">
         <div className="flex w-full items-center px-6 py-2">
           <div className="flex flex-1 items-center gap-4">
-            <span className="flex items-center rounded-md bg-white px-3 py-2">
-              <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-16 w-auto" />
-            </span>
+            {isAuthPage ? (
+              <Link
+                to="/"
+                aria-label="Dödsboguiden"
+                className="flex items-center rounded-md bg-white px-3 py-2 transition hover:opacity-90"
+              >
+                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-16 w-auto" />
+              </Link>
+            ) : (
+              <span className="flex items-center rounded-md bg-white px-3 py-2">
+                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-16 w-auto" />
+              </span>
+            )}
             {user && (
               <Link
                 to="/dashboard"
