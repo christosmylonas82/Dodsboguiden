@@ -16,6 +16,7 @@ export interface ProjectSummary {
   deletedAt?: string | null;
   memberCount: number;
   progress: number;
+  hasStarted: boolean;
 }
 
 export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'DONE' | 'SKIPPED';

@@ -82,6 +82,7 @@ export function DashboardHubPage() {
   const progress = countedProjectTasks.length
     ? Math.round((countedProjectTasks.filter((t) => t.completed).length / countedProjectTasks.length) * 100)
     : 0;
+  const hasStarted = countedProjectTasks.some((t) => t.completed || t.status === 'IN_PROGRESS');
   const lastActivity = activity[0];
   const isAdmin = project.members.find((m) => m.userId === user?.id)?.role === 'ADMIN';
 
@@ -117,8 +118,8 @@ export function DashboardHubPage() {
             </div>
             <p className="mt-1 text-muted">Dödsboets checklista och aktivitet</p>
           </div>
-          <Badge tone={progress === 100 ? 'success' : progress === 0 ? 'neutral' : 'warning'}>
-            {progress === 100 ? 'Klar' : progress === 0 ? 'Ej påbörjad' : 'Pågår'}
+          <Badge tone={progress === 100 ? 'success' : hasStarted ? 'warning' : 'neutral'}>
+            {progress === 100 ? 'Klar' : hasStarted ? 'Pågår' : 'Ej påbörjad'}
           </Badge>
         </div>
         <button

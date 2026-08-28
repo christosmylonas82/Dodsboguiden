@@ -66,24 +66,28 @@ export async function listProjects(req: Request, res: Response) {
       ? { members: { some: { userId, role: 'ADMIN' } } }
       : { deletedAt: null, members: { some: { userId } } },
     include: {
-      tasks: { select: { completed: true } },
+      tasks: { select: { completed: true, status: true } },
       _count: { select: { members: true } },
     },
     orderBy: { createdAt: 'desc' },
   });
 
   res.json(
-    projects.map((p) => ({
-      id: p.id,
-      deceasedName: p.deceasedName,
-      status: p.status,
-      createdAt: p.createdAt,
-      deletedAt: p.deletedAt,
-      memberCount: p._count.members,
-      progress: p.tasks.length
-        ? Math.round((p.tasks.filter((t) => t.completed).length / p.tasks.length) * 100)
-        : 0,
-    })),
+    projects.map((p) => {
+      const countedTasks = p.tasks.filter((t) => t.status !== 'SKIPPED');
+      return {
+        id: p.id,
+        deceasedName: p.deceasedName,
+        status: p.status,
+        createdAt: p.createdAt,
+        deletedAt: p.deletedAt,
+        memberCount: p._count.members,
+        progress: countedTasks.length
+          ? Math.round((countedTasks.filter((t) => t.completed).length / countedTasks.length) * 100)
+          : 0,
+        hasStarted: countedTasks.some((t) => t.completed || t.status === 'IN_PROGRESS'),
+      };
+    }),
   );
 }
 

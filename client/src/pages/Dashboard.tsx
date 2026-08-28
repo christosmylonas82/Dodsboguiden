@@ -48,8 +48,8 @@ export function DashboardPage() {
             >
               <div className="flex items-start justify-between gap-2">
                 <h3 className="text-lg font-semibold text-text">{p.deceasedName}</h3>
-                <Badge tone={p.progress === 100 ? 'success' : p.progress === 0 ? 'neutral' : 'warning'}>
-                  {p.progress === 100 ? 'Klar' : p.progress === 0 ? 'Ej påbörjad' : 'Pågår'}
+                <Badge tone={p.progress === 100 ? 'success' : p.hasStarted ? 'warning' : 'neutral'}>
+                  {p.progress === 100 ? 'Klar' : p.hasStarted ? 'Pågår' : 'Ej påbörjad'}
                 </Badge>
               </div>
               <p className="mt-1 text-sm text-muted">
