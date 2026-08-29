@@ -16,7 +16,8 @@
     "prisma:backfill-urls": "tsx prisma/backfill-task-urls.ts",
     "prisma:sync-urls": "tsx prisma/sync-task-urls.ts",
     "prisma:sync-more-info": "tsx prisma/sync-task-more-info.ts",
-    "prisma:backfill-fullmakt-task": "tsx prisma/backfill-fullmakt-task.ts"
+    "prisma:backfill-fullmakt-task": "tsx prisma/backfill-fullmakt-task.ts",
+    "prisma:backfill-post-management-tasks": "tsx prisma/backfill-post-management-tasks.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",

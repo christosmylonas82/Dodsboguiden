@@ -13,7 +13,7 @@ import {
   restoreProject,
   updateProject,
 } from '../controllers/projects.controller.js';
-import { createTask, listActivity, updateTask } from '../controllers/tasks.controller.js';
+import { createTask, deleteTask, listActivity, updateTask } from '../controllers/tasks.controller.js';
 import {
   createContact,
   deleteContact,
@@ -38,18 +38,6 @@ import {
   getDocumentFile,
   listDocuments,
 } from '../controllers/documents.controller.js';
-import {
-  createPostManagementTask,
-  deletePostManagementTask,
-  listPostManagementTasks,
-  updatePostManagementTask,
-} from '../controllers/postManagement.controller.js';
-import {
-  createDigitalHeritageItem,
-  getDigitalHeritage,
-  updateDigitalHeritageItem,
-  updateSelectedArchive,
-} from '../controllers/digitalHeritage.controller.js';
 import {
   createSurvivingPensionNote,
   deleteSurvivingPensionNote,
@@ -77,6 +65,7 @@ router.delete('/:id/members/:memberId', requireProjectAdmin, asyncHandler(remove
 
 router.post('/:id/tasks', requireProjectMember, asyncHandler(createTask));
 router.put('/:id/tasks/:taskId', requireProjectMember, asyncHandler(updateTask));
+router.delete('/:id/tasks/:taskId', requireProjectMember, asyncHandler(deleteTask));
 
 router.get('/:id/activity', requireProjectMember, asyncHandler(listActivity));
 
@@ -99,16 +88,6 @@ router.get('/:id/documents', requireProjectMember, asyncHandler(listDocuments));
 router.post('/:id/documents', requireProjectMember, asyncHandler(createDocument));
 router.get('/:id/documents/:documentId/file', requireProjectMember, asyncHandler(getDocumentFile));
 router.delete('/:id/documents/:documentId', requireProjectMember, asyncHandler(deleteDocument));
-
-router.get('/:id/post-management', requireProjectMember, asyncHandler(listPostManagementTasks));
-router.post('/:id/post-management', requireProjectMember, asyncHandler(createPostManagementTask));
-router.patch('/:id/post-management/:taskId', requireProjectMember, asyncHandler(updatePostManagementTask));
-router.delete('/:id/post-management/:taskId', requireProjectMember, asyncHandler(deletePostManagementTask));
-
-router.get('/:id/digital-heritage', requireProjectMember, asyncHandler(getDigitalHeritage));
-router.post('/:id/digital-heritage', requireProjectMember, asyncHandler(createDigitalHeritageItem));
-router.patch('/:id/digital-heritage/archive', requireProjectMember, asyncHandler(updateSelectedArchive));
-router.patch('/:id/digital-heritage/:itemId', requireProjectMember, asyncHandler(updateDigitalHeritageItem));
 
 router.get('/:id/surviving-pension', requireProjectMember, asyncHandler(listSurvivingPensionNotes));
 router.post('/:id/surviving-pension', requireProjectMember, asyncHandler(createSurvivingPensionNote));

@@ -43,7 +43,7 @@ export function TaskCard({
             }
       }
       className={`rounded-2xl border border-border bg-surface p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-all duration-200 ${
-        isSettled ? 'opacity-60' : 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)]'
+        isSettled ? 'opacity-60' : 'cursor-pointer hover:-translate-y-0.5 hover:bg-primary-light hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)]'
       }`}
     >
       <div className="flex items-start gap-3">

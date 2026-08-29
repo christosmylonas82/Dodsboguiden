@@ -578,6 +578,40 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
     responsibleRole: 'Dödsbodelägare',
   },
   {
+    title: 'Adressändring för dödsboet (SKV 8403)',
+    description:
+      'Om dödsboet har en annan adress än vid dödsfallet är det viktigt att göra en adressändring, annars eftersänds inte post från Skatteverket.',
+    moreInfo:
+      'Om dödsboet har en annan adress än vid dödsfallet är det viktigt att göra en adressändring — annars eftersänds inte deklarationsblanketten, utan Posten skickar tillbaka den till Skatteverket. Detta bör vara klart innan april månad, då deklarationsblanketten för dödsboet normalt skickas ut.',
+    url: 'https://www.skatteverket.se/privat/folkbokforing/narenanhorigdor/anmalnyadressfordodsbo.4.3528414214b3f8758056b6.html',
+    phase: 'Avslut & arvskifte',
+    priority: 'SOON',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Beställ eftersändning av post (12 månader)',
+    description: 'Den som har hand om dödsboet kan beställa eftersändning av post i 12 månader.',
+    moreInfo:
+      'Den som har hand om dödsboet kan beställa eftersändning av post i 12 månader via adressandring.se, så att post som skickas till den avlidnes gamla adress hittar rätt.',
+    url: 'https://www.adressandring.se',
+    phase: 'Avslut & arvskifte',
+    priority: 'SOON',
+    timeEstimate: '15 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Spärra reklam till den avlidne (SPAR)',
+    description: 'Spärra direktadresserad reklam till den avlidne i SPAR (Statens personadressregister).',
+    moreInfo:
+      'För att spärra direktadresserad reklam till den avlidne i SPAR, mejla spar@skatteverket.se med den avlidnes namn och personnummer samt en begäran om att spärra reklamutskick.',
+    url: 'https://www.spar.se',
+    phase: 'Avslut & arvskifte',
+    priority: 'LATER',
+    timeEstimate: '15 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
     title: 'Genomför avslutande familjesamtal',
     description: 'Ett avslutande möte med familjen kan hjälpa att stänga processen och kontrollera att allt är gjort.',
     moreInfo:

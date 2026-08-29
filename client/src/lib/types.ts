@@ -137,21 +137,6 @@ export interface ProjectDocument {
   uploadedByUser: { id: string; name: string };
 }
 
-export type PostTaskType = 'ADDRESS_CHANGE' | 'MAIL_FORWARDING' | 'AD_BLOCK';
-export type PostTaskStatus = 'PENDING' | 'DONE';
-
-export interface PostManagementTask {
-  id: string;
-  projectId: string;
-  taskType: PostTaskType;
-  status: PostTaskStatus;
-  newAddress: string | null;
-  notes: string | null;
-  completedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export type PensionType = 'BARNPENSION' | 'OMSTALLNINGSPENSION';
 
 export interface SurvivingPensionNote {

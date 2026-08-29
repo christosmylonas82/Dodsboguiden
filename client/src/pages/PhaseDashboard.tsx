@@ -1,49 +1,15 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { TbArrowLeft, TbExternalLink, TbChevronDown, TbMailboxOff, TbPlus } from 'react-icons/tb';
+import { TbArrowLeft, TbExternalLink, TbPlus } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
-import type { ProjectDetail, Task, TaskStatus, PostManagementTask } from '../lib/types';
+import type { ProjectDetail, Task, TaskStatus } from '../lib/types';
 import { Badge } from '../components/Badge';
 import { ProgressBar } from '../components/ProgressBar';
 import { TaskManageModal } from '../components/TaskManageModal';
 import { TaskCard } from '../components/TaskCard';
-import { PostManagementModal } from '../components/PostManagementModal';
 import { PHASE_DESCRIPTIONS, TASK_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { phaseStatus } from '../lib/phases';
 import { tasksForProgress } from '../lib/taskStatus';
-
-function PostManagementSection({ projectId }: { projectId: string }) {
-  const [expanded, setExpanded] = useState(false);
-  const [tasks, setTasks] = useState<PostManagementTask[]>([]);
-
-  useEffect(() => {
-    apiFetch<PostManagementTask[]>(`/projects/${projectId}/post-management`).then(setTasks);
-  }, [projectId]);
-
-  const doneCount = tasks.filter((t) => t.status === 'DONE').length;
-
-  return (
-    <div className="mt-6 rounded-xl border border-border bg-surface shadow-sm">
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center justify-between gap-3 rounded-xl bg-transparent p-6 text-left"
-      >
-        <span className="flex items-center gap-2">
-          <TbMailboxOff size={20} className="text-primary-dark" />
-          <span className="text-base font-semibold text-text">Post- & adresshantering</span>
-          <span className="text-sm text-muted">({doneCount} av {tasks.length || 3} steg klara)</span>
-        </span>
-        <TbChevronDown size={20} className={`shrink-0 text-muted transition-transform ${expanded ? 'rotate-180' : ''}`} />
-      </button>
-      {expanded && (
-        <div className="border-t border-border px-6 pb-6">
-          <PostManagementModal projectId={projectId} variant="inline" />
-        </div>
-      )}
-    </div>
-  );
-}
 
 export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
   const { id } = useParams<{ id: string }>();
@@ -207,8 +173,6 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
           Lägg till
         </button>
       </form>
-
-      {phase === 'Avslut & arvskifte' && id && <PostManagementSection projectId={id} />}
 
       {managingTask && (
         <TaskManageModal

@@ -163,7 +163,7 @@ export function BouppteckningGuidePage() {
             <button
               type="button"
               onClick={() => setExpandedStep(expandedStep === idx ? -1 : idx)}
-              className="grid w-full grid-cols-[40px_1fr_auto] items-center gap-3 p-4 text-left hover:bg-primary-light"
+              className="grid w-full grid-cols-[40px_1fr_auto] items-center gap-3 p-4 text-left bg-surface hover:bg-primary-light"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
                 {idx + 1}
