@@ -8,6 +8,7 @@ const NOTIFICATION_TITLES: [string, string][] = [
   ['uploaded document', 'Nytt dokument'],
   ['added inventory item', 'Ny egendom registrerad'],
   ['added transaction', 'Ny transaktion registrerad'],
+  ['added contact', 'Ny kontakt tillagd'],
 ];
 
 function notificationTitle(action: string): string {

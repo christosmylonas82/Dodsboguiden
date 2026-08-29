@@ -12,6 +12,7 @@ export function formatActivityAction(action: string): string {
   if (action.startsWith('completed task ')) return `avklarade ${action.slice('completed task '.length)}`;
   if (action.startsWith('reopened task ')) return `återöppnade ${action.slice('reopened task '.length)}`;
   if (action.startsWith('added task ')) return `lade till ${action.slice('added task '.length)}`;
+  if (action.startsWith('added contact ')) return `lade till kontakten ${action.slice('added contact '.length)}`;
 
   const statusMatch = action.match(/^changed status of (.+) to (PENDING|IN_PROGRESS|DONE|SKIPPED)$/);
   if (statusMatch) {

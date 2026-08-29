@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
+import { logActivity } from '../lib/activity.js';
 
 const createContactSchema = z.object({
   name: z.string().min(1),
@@ -32,6 +33,14 @@ export async function createContact(req: Request, res: Response) {
   const contact = await prisma.contact.create({
     data: { ...body, projectId: req.params.id },
   });
+
+  await logActivity({
+    projectId: req.params.id,
+    userId: req.user!.userId,
+    action: `added contact "${contact.name}"`,
+    notify: true,
+  });
+
   res.status(201).json(contact);
 }
 
