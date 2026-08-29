@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { TbAlertTriangle, TbQuestionMark, TbUsers, TbClockHour4, TbCheck, TbPlus } from 'react-icons/tb';
 import heroFamily from '../assets/hero-family.jpg';
 import heroFamily2 from '../assets/hero-family-2.jpg';
+import { SuitabilityQuiz } from '../components/SuitabilityQuiz';
 
 function FullBleed({ className, children }: { className?: string; children: ReactNode }) {
   return (
@@ -156,6 +157,11 @@ export function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Lämplighetstest */}
+      <FullBleed className="bg-surface">
+        <SuitabilityQuiz />
+      </FullBleed>
 
       {/* Utmaningen */}
       <FullBleed className="bg-bg">
