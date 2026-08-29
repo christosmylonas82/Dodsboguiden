@@ -161,12 +161,12 @@ export function Layout() {
       </button>
       <button
         type="button"
-        data-tour="contactRegistry"
-        onClick={() => openModalAndCloseMenu('contactRegistry')}
+        data-tour="documents"
+        onClick={() => openModalAndCloseMenu('documents')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbPhoneCall size={24} />
-        <NavLabel text="Myndigheter & företag" />
+        <TbFiles size={24} />
+        <NavLabel text="Dokument" />
       </button>
       <button
         type="button"
@@ -179,12 +179,12 @@ export function Layout() {
       </button>
       <button
         type="button"
-        data-tour="documents"
-        onClick={() => openModalAndCloseMenu('documents')}
+        data-tour="contactRegistry"
+        onClick={() => openModalAndCloseMenu('contactRegistry')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbFiles size={24} />
-        <NavLabel text="Dokument" />
+        <TbPhoneCall size={24} />
+        <NavLabel text="Myndigheter & företag" />
       </button>
     </>
   ) : (
