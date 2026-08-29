@@ -19,7 +19,7 @@ export function ExportMenu({
         onClick={() => setOpen((o) => !o)}
         aria-label="Exportera"
         title="Exportera"
-        className="rounded-lg bg-transparent p-1 text-muted hover:bg-primary-light hover:text-text"
+        className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent text-muted hover:bg-primary-light hover:text-text"
       >
         <TbDownload size={18} />
       </button>

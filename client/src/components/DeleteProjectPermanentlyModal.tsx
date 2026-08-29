@@ -39,7 +39,7 @@ export function DeleteProjectPermanentlyModal({
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="rounded-xl border border-danger bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
+      <div className="rounded-xl border border-danger bg-surface p-4 sm:p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-center gap-2">
           <TbAlertTriangle size={22} className="text-danger" />
           <h3 className="text-lg font-semibold text-text">Radera permanent?</h3>

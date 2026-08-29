@@ -53,7 +53,7 @@ export function TaskManageModal({
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="rounded-xl border border-border bg-surface p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
+      <div className="rounded-xl border border-border bg-surface p-4 sm:p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <h3 className="text-lg font-semibold text-text">{task.title}</h3>
 
         <div className="mt-5">

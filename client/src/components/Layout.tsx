@@ -45,7 +45,7 @@ function NavLabel({ text }: { text: string }) {
   return (
     <>
       <span className="md:hidden">{text}</span>
-      <span className="pointer-events-none absolute top-full left-1/2 z-40 mt-1.5 hidden -translate-x-1/2 rounded-md border border-border bg-surface px-2 py-1 text-xs font-medium whitespace-nowrap text-text opacity-0 shadow-lg transition-opacity group-hover:opacity-100 md:block">
+      <span className="pointer-events-none absolute top-full left-1/2 z-40 mt-1.5 hidden -translate-x-1/2 rounded-md border border-border bg-surface px-2 py-1 text-xs font-medium whitespace-nowrap text-text opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-active:opacity-100 md:block">
         {text}
       </span>
     </>
