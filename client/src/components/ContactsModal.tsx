@@ -60,6 +60,17 @@ export function ContactsModal({
     }
   }
 
+  function updateLocal(contactId: string, patch: Partial<Contact>) {
+    setContacts((prev) => prev.map((c) => (c.id === contactId ? { ...c, ...patch } : c)));
+  }
+
+  async function saveField(contactId: string, patch: Partial<Contact>) {
+    await apiFetch<Contact>(`/projects/${projectId}/contacts/${contactId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    });
+  }
+
   async function handleDelete(contactId: string) {
     setContacts((prev) => prev.filter((c) => c.id !== contactId));
     try {
@@ -125,11 +136,47 @@ export function ContactsModal({
               <tbody>
                 {contacts.map((c) => (
                   <tr key={c.id} className="border-b border-border last:border-0">
-                    <td className="py-2 pr-3 text-text">{c.name}</td>
-                    <td className="py-2 pr-3 text-text">{c.relation}</td>
-                    <td className="py-2 pr-3 text-text">{c.phone ?? '—'}</td>
-                    <td className="py-2 pr-3 text-text">{c.email ?? '—'}</td>
-                    <td className="py-2 pr-3 text-text">{c.notes ?? '—'}</td>
+                    <td className="py-2 pr-3">
+                      <input
+                        value={c.name}
+                        onChange={(e) => updateLocal(c.id, { name: e.target.value })}
+                        onBlur={(e) => saveField(c.id, { name: e.target.value })}
+                        className="w-full rounded-lg border border-border px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                      />
+                    </td>
+                    <td className="py-2 pr-3">
+                      <input
+                        value={c.relation}
+                        onChange={(e) => updateLocal(c.id, { relation: e.target.value })}
+                        onBlur={(e) => saveField(c.id, { relation: e.target.value })}
+                        className="w-full rounded-lg border border-border px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                      />
+                    </td>
+                    <td className="py-2 pr-3">
+                      <input
+                        value={c.phone ?? ''}
+                        onChange={(e) => updateLocal(c.id, { phone: e.target.value })}
+                        onBlur={(e) => saveField(c.id, { phone: e.target.value || null })}
+                        className="w-full rounded-lg border border-border px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                      />
+                    </td>
+                    <td className="py-2 pr-3">
+                      <input
+                        type="email"
+                        value={c.email ?? ''}
+                        onChange={(e) => updateLocal(c.id, { email: e.target.value })}
+                        onBlur={(e) => saveField(c.id, { email: e.target.value || null })}
+                        className="w-full rounded-lg border border-border px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                      />
+                    </td>
+                    <td className="py-2 pr-3">
+                      <input
+                        value={c.notes ?? ''}
+                        onChange={(e) => updateLocal(c.id, { notes: e.target.value })}
+                        onBlur={(e) => saveField(c.id, { notes: e.target.value || null })}
+                        className="w-full rounded-lg border border-border px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                      />
+                    </td>
                     <td className="py-2 text-right">
                       <button
                         type="button"

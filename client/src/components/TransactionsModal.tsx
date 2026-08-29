@@ -34,6 +34,7 @@ export function TransactionsModal({
   const [submitting, setSubmitting] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [filter, setFilter] = useState<Filter>('ALL');
+  const [amountDrafts, setAmountDrafts] = useState<Record<string, string>>({});
 
   const [type, setType] = useState<TransactionType>('COST');
   const [category, setCategory] = useState<TransactionCategory>('OVRIGT');
@@ -78,6 +79,17 @@ export function TransactionsModal({
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function updateLocal(id: string, patch: Partial<Transaction>) {
+    setTransactions((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
+  }
+
+  async function saveField(id: string, patch: Partial<Transaction>) {
+    await apiFetch<Transaction>(`/projects/${projectId}/transactions/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    });
   }
 
   async function handleDelete(id: string) {
@@ -198,8 +210,10 @@ export function TransactionsModal({
                   <thead>
                     <tr className="border-b border-border text-muted">
                       <th className="py-2 pr-3 font-medium">Datum</th>
+                      <th className="py-2 pr-3 font-medium">Typ</th>
                       <th className="py-2 pr-3 font-medium">Kategori</th>
                       <th className="py-2 pr-3 font-medium">Beskrivning</th>
+                      <th className="py-2 pr-3 font-medium">Noteringar</th>
                       <th className="py-2 pr-3 text-right font-medium">Belopp</th>
                       <th className="py-2 font-medium"></th>
                     </tr>
@@ -207,15 +221,90 @@ export function TransactionsModal({
                   <tbody>
                     {displayed.map((t) => (
                       <tr key={t.id} className="border-b border-border last:border-0">
-                        <td className="py-2 pr-3 whitespace-nowrap text-muted">{new Date(t.date).toLocaleDateString('sv-SE')}</td>
-                        <td className="py-2 pr-3 text-text">{CATEGORY_LABELS[t.category]}</td>
-                        <td className="py-2 pr-3 text-text">
-                          {t.description}
-                          {t.notes && <div className="text-xs text-muted">{t.notes}</div>}
+                        <td className="py-2 pr-3">
+                          <input
+                            type="date"
+                            value={t.date.slice(0, 10)}
+                            onChange={(e) => {
+                              const iso = new Date(`${e.target.value}T00:00:00`).toISOString();
+                              updateLocal(t.id, { date: iso });
+                              saveField(t.id, { date: iso });
+                            }}
+                            className="rounded-lg border border-border px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                          />
                         </td>
-                        <td className={`py-2 pr-3 text-right font-medium whitespace-nowrap ${t.type === 'COST' ? 'text-danger' : 'text-success'}`}>
-                          {t.type === 'COST' ? '-' : '+'}
-                          {formatCurrency(t.amount)}
+                        <td className="py-2 pr-3">
+                          <select
+                            value={t.type}
+                            onChange={(e) => {
+                              const type = e.target.value as TransactionType;
+                              updateLocal(t.id, { type });
+                              saveField(t.id, { type });
+                            }}
+                            className="rounded-lg border border-border bg-surface px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                          >
+                            {(['COST', 'INCOME'] as const).map((ty) => (
+                              <option key={ty} value={ty}>
+                                {TYPE_LABELS[ty]}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="py-2 pr-3">
+                          <select
+                            value={t.category}
+                            onChange={(e) => {
+                              const category = e.target.value as TransactionCategory;
+                              updateLocal(t.id, { category });
+                              saveField(t.id, { category });
+                            }}
+                            className="rounded-lg border border-border bg-surface px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                          >
+                            {CATEGORY_ORDER.map((c) => (
+                              <option key={c} value={c}>
+                                {CATEGORY_LABELS[c]}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="py-2 pr-3">
+                          <input
+                            value={t.description}
+                            onChange={(e) => updateLocal(t.id, { description: e.target.value })}
+                            onBlur={(e) => saveField(t.id, { description: e.target.value })}
+                            className="w-full rounded-lg border border-border px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                          />
+                        </td>
+                        <td className="py-2 pr-3">
+                          <input
+                            value={t.notes ?? ''}
+                            onChange={(e) => updateLocal(t.id, { notes: e.target.value })}
+                            onBlur={(e) => saveField(t.id, { notes: e.target.value || null })}
+                            className="w-full rounded-lg border border-border px-2 py-1.5 text-text focus:border-primary focus:outline-none"
+                          />
+                        </td>
+                        <td className="py-2 pr-3">
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={amountDrafts[t.id] ?? String(t.amount)}
+                            onChange={(e) => {
+                              const input = e.target.value;
+                              if (input === '' || /^\d*$/.test(input)) {
+                                setAmountDrafts((prev) => ({ ...prev, [t.id]: input }));
+                              }
+                            }}
+                            onBlur={() => {
+                              const amount = parseInt(amountDrafts[t.id] ?? '', 10) || 0;
+                              setAmountDrafts((prev) => {
+                                const { [t.id]: _removed, ...rest } = prev;
+                                return rest;
+                              });
+                              updateLocal(t.id, { amount });
+                              saveField(t.id, { amount });
+                            }}
+                            className={`w-24 rounded-lg border border-border px-2 py-1.5 text-right focus:border-primary focus:outline-none ${t.type === 'COST' ? 'text-danger' : 'text-success'}`}
+                          />
                         </td>
                         <td className="py-2 text-right">
                           <button
