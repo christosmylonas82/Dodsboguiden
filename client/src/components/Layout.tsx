@@ -267,7 +267,7 @@ export function Layout() {
             {user && (
               <Link
                 to="/dashboard"
-                className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
+                className="hidden items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark md:flex"
               >
                 <TbHome size={24} className="text-primary-dark" />
                 Översikt dödsbon
@@ -320,6 +320,10 @@ export function Layout() {
 
         {user && mobileMenuOpen && (
           <nav className="flex flex-col gap-1 border-t border-border p-4 md:hidden">
+            <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className={itemClass}>
+              <TbHome size={20} />
+              Översikt dödsbon
+            </Link>
             {navItems}
             {settingsNavItems}
             <div className="my-1 h-px w-full bg-border" />
