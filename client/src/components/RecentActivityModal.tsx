@@ -17,7 +17,7 @@ export function RecentActivityModal({
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="rounded-xl border border-border bg-surface p-4 sm:p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
+      <div className="max-h-[80vh] overflow-y-auto rounded-xl border border-border bg-surface p-4 sm:p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Senaste aktivitet</h3>
           <button
@@ -60,6 +60,16 @@ export function RecentActivityModal({
             Aktivitetsloggen
           </Link>
         </p>
+
+        <div className="mt-6 flex justify-end border-t border-border pt-5">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
+          >
+            Stäng
+          </button>
+        </div>
       </div>
     </ModalOverlay>
   );
