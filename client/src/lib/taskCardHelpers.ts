@@ -17,7 +17,7 @@ const KEYWORD_ICON_RULES: { keywords: string[]; icon: IconType }[] = [
     icon: TbCoin,
   },
   {
-    keywords: ['dokument', 'intyg', 'bevis', 'testamente', 'bouppteckning', 'arkivera', 'blankett', 'skifte'],
+    keywords: ['dokument', 'intyg', 'bevis', 'testamente', 'bouppteckning', 'arkivera', 'blankett', 'skifte', 'fullmakt'],
     icon: TbFileText,
   },
   {

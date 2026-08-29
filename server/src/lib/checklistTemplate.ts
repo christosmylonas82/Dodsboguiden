@@ -365,6 +365,18 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
     timeEstimate: '1-2 timmar',
     responsibleRole: 'Närmaste anhörig eller juridisk vägledning',
   },
+  {
+    title: 'Skriv fullmakt för dödsbo och praktiska ärenden',
+    description:
+      'Om ni är flera dödsbodelägare är det praktiskt att utse en person som företrädare. Ni behöver då skriva en fullmakt. Dokumentera även betalningar av räkningar och uppsägning av abonnemang.',
+    moreInfo:
+      'Som nära anhörig är du ofta dödsbodelägare tillsammans med andra. Om ni är flera i dödsboet är det praktiskt att utse en av er som företrädare för att hantera administrativa ärenden — samla alla dödsbodelägare, avgör vem som ska vara ombud, och skriv en fullmakt med namn och personnummer som undertecknas av alla. Spara den tillsammans med övriga dödsbodokument. Samtidigt måste löpande räkningar betalas — hyra, el, telefon, vatten med mera, helst inom 1-2 veckor efter dödsfallet. Ta med räkningarna till den avlidnes bank eller använd bankens betaltjänst för dödsbo, och spara alla kvitton. Säg också upp autogiro och stående betalningar samt avsluta abonnemang och medlemskap: telefon och internet, el/gas/vatten, hem- och möbelförsäkringar, TV/streaming och gymkort. Spara skriftlig bekräftelse på varje uppsägning.',
+    url: 'https://www.skatteverket.se/',
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+  },
 
   // Under bouppteckning
   {
