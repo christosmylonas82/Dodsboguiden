@@ -270,7 +270,7 @@ export function Layout() {
                 className="flex items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark"
               >
                 <TbHome size={24} className="text-primary-dark" />
-                Översikt
+                Översikt dödsbon
               </Link>
             )}
           </div>

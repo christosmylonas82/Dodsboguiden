@@ -37,7 +37,7 @@ export function ProjectActivityPage() {
         className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-primary-dark"
       >
         <TbArrowLeft size={16} />
-        Tillbaka till översikt
+        Tillbaka till dashboard
       </Link>
       <p className="mt-3 text-xs text-muted">Dashboard &gt; Aktivitetslogg</p>
 

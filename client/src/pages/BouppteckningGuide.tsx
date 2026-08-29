@@ -133,7 +133,7 @@ export function BouppteckningGuidePage() {
     <div>
       <Link to={`/projects/${id}/dashboard`} className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-primary-dark">
         <TbArrowLeft size={16} />
-        Tillbaka till översikt
+        Tillbaka till dashboard
       </Link>
 
       <h1 className="mt-2 text-3xl font-semibold text-text">Boupptecknings-guide</h1>
