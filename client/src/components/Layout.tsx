@@ -255,13 +255,13 @@ export function Layout() {
               <Link
                 to="/"
                 aria-label="Dödsboguiden"
-                className="flex items-center rounded-md bg-white px-3 py-2 transition hover:opacity-90"
+                className="flex shrink-0 items-center rounded-md bg-white px-3 py-2 transition hover:opacity-90"
               >
-                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-16 w-auto" />
+                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-16 w-auto shrink-0" />
               </Link>
             ) : (
-              <span className="flex items-center rounded-md bg-white px-3 py-2">
-                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-16 w-auto" />
+              <span className="flex shrink-0 items-center rounded-md bg-white px-3 py-2">
+                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-16 w-auto shrink-0" />
               </span>
             )}
             {user && (
