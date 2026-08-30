@@ -163,17 +163,17 @@ export function DashboardHubPage() {
             label="Framsteg"
             value={
               <span className="flex flex-col items-start justify-between gap-3 sm:flex-row">
-                <span className="block min-w-0 text-left">
-                  <span className="text-xl font-semibold text-text">{progress}%</span>
+                <span className="block min-w-0 flex-1 basis-0 text-left">
+                  <span className="text-lg font-semibold text-text">{progress}%</span>
                   <span className="mt-1 block text-xs font-normal text-muted">
                     {countedProjectTasks.filter((t) => t.completed).length} av {countedProjectTasks.length} klara
                   </span>
                 </span>
                 {deadlineDays !== null && (
-                  <span className="block min-w-0 text-left sm:text-right">
+                  <span className="block min-w-0 flex-1 basis-0 text-left sm:text-right">
                     <span className="flex items-center gap-1 sm:justify-end">
-                      <TbClock size={16} className="shrink-0 text-text" />
-                      <span className="text-xl font-semibold whitespace-nowrap text-text">{deadlineDays} dagar kvar</span>
+                      <TbClock size={14} className="shrink-0 text-text" />
+                      <span className="text-lg font-semibold text-text">{deadlineDays} dagar kvar</span>
                     </span>
                     <span className="mt-1 block text-xs font-normal text-muted">
                       Deadline: {formatDeadlineDate(project.deceasedDate!)}
