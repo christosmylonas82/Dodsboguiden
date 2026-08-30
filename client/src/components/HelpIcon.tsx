@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { TbHelpCircle } from 'react-icons/tb';
+import { TbHelpCircleFilled } from 'react-icons/tb';
 
 export function HelpIcon({ text, title }: { text: string; title?: string }) {
   const [open, setOpen] = useState(false);
@@ -51,9 +51,9 @@ export function HelpIcon({ text, title }: { text: string; title?: string }) {
         onClick={() => setOpen((o) => !o)}
         aria-label="Hjälp"
         title="Hjälp"
-        className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent text-muted hover:bg-primary-light hover:text-text"
+        className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent text-primary hover:bg-primary-light hover:text-primary-dark"
       >
-        <TbHelpCircle size={24} />
+        <TbHelpCircleFilled size={28} style={{ width: 28, height: 28, flexShrink: 0 }} />
       </button>
       {open &&
         position &&
