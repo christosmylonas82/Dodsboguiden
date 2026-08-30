@@ -5,11 +5,22 @@ import { HELP_TEXT } from '../lib/helpText';
 import { HelpIcon } from './HelpIcon';
 import { ModalOverlay } from './ModalOverlay';
 import { ProgressBar } from './ProgressBar';
+import { daysUntilDeadline, formatDeadlineDate } from '../lib/deadline';
+import { TbClock } from 'react-icons/tb';
 
-export function ProgressOverviewModal({ tasks, onClose }: { tasks: Task[]; onClose: () => void }) {
+export function ProgressOverviewModal({
+  tasks,
+  deceasedDate,
+  onClose,
+}: {
+  tasks: Task[];
+  deceasedDate?: string | null;
+  onClose: () => void;
+}) {
   const countedTasks = tasksForProgress(tasks);
   const doneCount = countedTasks.filter((t) => t.completed).length;
   const totalPercent = countedTasks.length ? Math.round((doneCount / countedTasks.length) * 100) : 0;
+  const deadlineDays = deceasedDate ? daysUntilDeadline(deceasedDate) : null;
 
   return (
     <ModalOverlay onClose={onClose}>
@@ -30,9 +41,18 @@ export function ProgressOverviewModal({ tasks, onClose }: { tasks: Task[]; onClo
         </div>
 
         <div className="mt-5">
-          <p className="text-sm font-medium text-text">
-            Totalt: {totalPercent}% klart ({doneCount} av {countedTasks.length})
-          </p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <p className="text-sm font-medium text-text">
+              Totalt: {totalPercent}% klart ({doneCount} av {countedTasks.length})
+            </p>
+            {deadlineDays !== null && (
+              <p className="flex items-center gap-1.5 text-sm font-medium text-text">
+                <TbClock size={14} className="shrink-0 text-muted" />
+                {deadlineDays} dagar kvar
+                <span className="text-muted">· Deadline: {formatDeadlineDate(deceasedDate!)}</span>
+              </p>
+            )}
+          </div>
           <div className="mt-2">
             <ProgressBar percent={totalPercent} />
           </div>

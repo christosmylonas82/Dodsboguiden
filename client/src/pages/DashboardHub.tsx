@@ -251,7 +251,7 @@ export function DashboardHubPage() {
       )}
 
       {openModal === 'progress' && (
-        <ProgressOverviewModal tasks={project.tasks} onClose={() => setOpenModal(null)} />
+        <ProgressOverviewModal tasks={project.tasks} deceasedDate={project.deceasedDate} onClose={() => setOpenModal(null)} />
       )}
       {openModal === 'activity' && (
         <RecentActivityModal projectId={id!} activity={activity} onClose={() => setOpenModal(null)} />
