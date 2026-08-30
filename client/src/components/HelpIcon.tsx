@@ -53,7 +53,7 @@ export function HelpIcon({ text, title }: { text: string; title?: string }) {
         title="Hjälp"
         className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent text-muted hover:bg-primary-light hover:text-text"
       >
-        <TbHelpCircle size={18} />
+        <TbHelpCircle size={24} />
       </button>
       {open &&
         position &&
