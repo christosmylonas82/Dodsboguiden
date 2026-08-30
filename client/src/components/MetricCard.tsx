@@ -6,21 +6,28 @@ export function MetricCard({
   hint,
   icon,
   onClick,
+  headerRight,
+  centered,
 }: {
   label: string;
   value: ReactNode;
   hint?: string;
   icon?: ReactNode;
   onClick?: () => void;
+  headerRight?: ReactNode;
+  centered?: boolean;
 }) {
   const content = (
     <>
-      <div className="flex items-center gap-2">
-        {icon && <span className="shrink-0 text-muted">{icon}</span>}
-        <span className="text-sm font-medium text-muted">{label}</span>
+      <div className={`flex items-center gap-2 ${headerRight ? 'justify-between' : centered ? 'justify-center' : ''}`}>
+        <div className="flex items-center gap-2">
+          {icon && <span className="shrink-0 text-muted">{icon}</span>}
+          <span className="text-sm font-medium text-muted">{label}</span>
+        </div>
+        {headerRight}
       </div>
-      <p className="mt-2 text-3xl font-semibold text-text">{value}</p>
-      {hint && <p className="mt-1 text-sm text-muted">{hint}</p>}
+      <p className={`mt-2 text-3xl font-semibold text-text ${centered ? 'text-center' : ''}`}>{value}</p>
+      {hint && <p className={`mt-1 text-sm text-muted ${centered ? 'text-center' : ''}`}>{hint}</p>}
     </>
   );
 

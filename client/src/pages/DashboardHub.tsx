@@ -161,6 +161,7 @@ export function DashboardHubPage() {
           <MetricCard
             icon={<TbProgress size={20} />}
             label="Framsteg"
+            headerRight={deadlineDays !== null && <TbClock size={24} className="shrink-0 text-muted" />}
             value={
               <span className="flex flex-col items-start justify-between gap-3 sm:flex-row">
                 <span className="block min-w-0 flex-1 basis-0 text-left">
@@ -171,10 +172,7 @@ export function DashboardHubPage() {
                 </span>
                 {deadlineDays !== null && (
                   <span className="block min-w-0 flex-1 basis-0 text-left sm:text-right">
-                    <span className="flex items-center gap-1 sm:justify-end">
-                      <TbClock size={14} className="shrink-0 text-text" />
-                      <span className="text-lg font-semibold text-text">{deadlineDays} dagar kvar</span>
-                    </span>
+                    <span className="text-lg font-semibold text-text">{deadlineDays} dagar kvar</span>
                     <span className="mt-1 block text-xs font-normal text-muted">
                       Deadline: {formatDeadlineDate(project.deceasedDate!)}
                     </span>
@@ -192,6 +190,7 @@ export function DashboardHubPage() {
             value={project.members.length}
             hint={project.members.length === 1 ? '1 medlem' : `${project.members.length} medlemmar`}
             onClick={() => setOpenModal('members')}
+            centered
           />
         </div>
         <div data-tour="activity">
@@ -201,6 +200,7 @@ export function DashboardHubPage() {
             value={lastActivity ? formatRelativeTime(lastActivity.timestamp) : '—'}
             hint={lastActivity ? `${lastActivity.user.name} ${formatActivityAction(lastActivity.action)}` : 'Ingen aktivitet än'}
             onClick={() => setOpenModal('activity')}
+            centered
           />
         </div>
       </div>

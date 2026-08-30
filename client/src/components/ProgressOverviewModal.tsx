@@ -42,9 +42,6 @@ export function ProgressOverviewModal({
 
         <div className="mt-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <p className="text-sm font-medium text-text">
-              Totalt: {totalPercent}% klart ({doneCount} av {countedTasks.length})
-            </p>
             {deadlineDays !== null && (
               <p className="flex items-center gap-1.5 text-sm font-medium text-text">
                 <TbClock size={14} className="shrink-0 text-muted" />
@@ -52,6 +49,9 @@ export function ProgressOverviewModal({
                 <span className="text-muted">· Deadline: {formatDeadlineDate(deceasedDate!)}</span>
               </p>
             )}
+            <p className="text-sm font-medium text-text">
+              Totalt: {totalPercent}% klart ({doneCount} av {countedTasks.length})
+            </p>
           </div>
           <div className="mt-2">
             <ProgressBar percent={totalPercent} />
