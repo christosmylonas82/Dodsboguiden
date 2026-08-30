@@ -44,7 +44,7 @@ export function DashboardPage() {
             <Link
               key={p.id}
               to={`/projects/${p.id}/dashboard`}
-              className="block rounded-xl border border-border bg-surface p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className="block rounded-xl border border-border bg-surface p-5 shadow-sm transition hover:-translate-y-0.5 hover:bg-primary-light hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-2">
                 <h3 className="text-lg font-semibold text-text">{p.deceasedName}</h3>

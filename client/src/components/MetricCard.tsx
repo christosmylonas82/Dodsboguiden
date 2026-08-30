@@ -36,7 +36,7 @@ export function MetricCard({
       <button
         type="button"
         onClick={onClick}
-        className="h-full w-full rounded-xl border border-border bg-surface p-5 text-left shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md"
+        className="h-full w-full rounded-xl border border-border bg-surface p-5 text-left shadow-sm transition duration-150 hover:-translate-y-0.5 hover:bg-primary-light hover:shadow-md"
       >
         {content}
       </button>
