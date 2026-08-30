@@ -124,6 +124,136 @@ export async function exportTableToPdf(opts: ExportTableOptions): Promise<void> 
     .save();
 }
 
+interface GdprExportPayload {
+  user: {
+    name: string;
+    email: string;
+    createdAt: string;
+    gdprConsent: boolean;
+    consentDate: string | null;
+  };
+  projects: {
+    id: string;
+    deceasedName: string;
+    role: string;
+    status: string;
+    tasks: { completed: boolean }[];
+  }[];
+  loginHistory: {
+    action: string;
+    timestamp: string;
+    ipAddress: string | null;
+    location: string;
+    device: string | null;
+  }[];
+  passwordResetHistory: {
+    requestedAt: string;
+    expiresAt: string;
+    used: boolean;
+  }[];
+}
+
+function sectionTable(headers: string[], rows: string[][], emptyLabel: string): string {
+  if (rows.length === 0) {
+    return `<p style="font-size:12px;color:#666;margin:0 0 16px;">${emptyLabel}</p>`;
+  }
+  const headerHtml = headers
+    .map((h) => `<th style="text-align:left;border-bottom:2px solid #333;padding:5px 8px;font-size:11px;">${h}</th>`)
+    .join('');
+  const rowsHtml = rows
+    .map(
+      (row) =>
+        `<tr>${row.map((cell) => `<td style="border-bottom:1px solid #ddd;padding:5px 8px;font-size:11px;">${cell}</td>`).join('')}</tr>`,
+    )
+    .join('');
+  return `
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+      <thead><tr>${headerHtml}</tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+  `;
+}
+
+export async function exportGdprDataToPdf(payload: GdprExportPayload): Promise<void> {
+  const container = document.createElement('div');
+  container.style.padding = '24px';
+  container.style.fontFamily = 'Arial, sans-serif';
+  container.style.color = '#1a1a1a';
+
+  const sectionHeading = (title: string) =>
+    `<h2 style="font-size:15px;margin:20px 0 8px;">${title}</h2>`;
+
+  container.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+      <img src="${dodsboguidenLogo}" style="height:28px;width:auto;flex-shrink:0;" />
+      <div>
+        <h1 style="font-size:20px;margin:0 0 4px;">Mina personuppgifter</h1>
+        <p style="font-size:12px;color:#666;margin:0;">Exporterat: ${new Date().toLocaleDateString('sv-SE')}</p>
+      </div>
+    </div>
+
+    ${sectionHeading('Profil')}
+    ${sectionTable(
+      ['Fält', 'Värde'],
+      [
+        ['Namn', payload.user.name],
+        ['E-post', payload.user.email],
+        ['Registrerad', new Date(payload.user.createdAt).toLocaleDateString('sv-SE')],
+        ['Samtycke lämnat', payload.user.gdprConsent ? 'Ja' : 'Nej'],
+        ['Samtyckesdatum', payload.user.consentDate ? new Date(payload.user.consentDate).toLocaleDateString('sv-SE') : '-'],
+      ],
+      'Ingen profildata.',
+    )}
+
+    ${sectionHeading('Dödsbon')}
+    ${sectionTable(
+      ['Namn', 'Roll', 'Status', 'Klara uppgifter'],
+      payload.projects.map((p) => [
+        p.deceasedName,
+        p.role,
+        p.status,
+        `${p.tasks.filter((t) => t.completed).length} av ${p.tasks.length}`,
+      ]),
+      'Inga dödsbon.',
+    )}
+
+    ${sectionHeading('Inloggningshistorik')}
+    ${sectionTable(
+      ['Datum', 'Åtgärd', 'Plats', 'Enhet'],
+      payload.loginHistory.map((e) => [
+        new Date(e.timestamp).toLocaleString('sv-SE'),
+        e.action,
+        e.location,
+        e.device ?? '-',
+      ]),
+      'Ingen inloggningshistorik.',
+    )}
+
+    ${sectionHeading('Lösenordsåterställningar')}
+    ${sectionTable(
+      ['Begärd', 'Förfaller', 'Använd'],
+      payload.passwordResetHistory.map((r) => [
+        new Date(r.requestedAt).toLocaleString('sv-SE'),
+        new Date(r.expiresAt).toLocaleString('sv-SE'),
+        r.used ? 'Ja' : 'Nej',
+      ]),
+      'Inga lösenordsåterställningar.',
+    )}
+  `;
+
+  const dateStamp = new Date().toISOString().split('T')[0];
+  await html2pdf()
+    .set({
+      margin: 10,
+      filename: `dodsboguiden-data-export-${dateStamp}.pdf`,
+      image: { type: 'png', quality: 1 },
+      html2canvas: { scale: 3, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    })
+    .from(container)
+    .save();
+}
+
 export async function exportTableToDocx(opts: ExportTableOptions): Promise<void> {
   const logoBytes = await getLogoBytes();
 

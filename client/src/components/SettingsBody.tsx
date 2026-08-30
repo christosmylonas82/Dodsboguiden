@@ -1,9 +1,10 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TbPencil, TbDownload, TbTrash, TbLogout2 } from 'react-icons/tb';
+import { TbPencil, TbDownload, TbFileText, TbTrash, TbLogout2 } from 'react-icons/tb';
 import { apiFetch, ApiError, BASE_URL, getToken } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import type { ProjectSummary, User } from '../lib/types';
+import { exportGdprDataToPdf } from '../lib/export';
 import { ChangeEmailModal } from './ChangeEmailModal';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import { DeleteProjectPermanentlyModal } from './DeleteProjectPermanentlyModal';
@@ -89,11 +90,18 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
     }
   }
 
-  async function handleExport() {
+  async function handleExport(format: 'json' | 'pdf') {
     const token = getToken();
     const res = await fetch(`${BASE_URL}/auth/export-data`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+
+    if (format === 'pdf') {
+      const payload = await res.json();
+      await exportGdprDataToPdf(payload);
+      return;
+    }
+
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -269,11 +277,19 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={handleExport}
+            onClick={() => handleExport('json')}
             className="flex items-center gap-1.5 rounded-lg border border-border bg-transparent px-5 py-3 text-sm text-text hover:bg-primary-light"
           >
             <TbDownload size={16} />
-            Ladda ner min data
+            Ladda ner som JSON
+          </button>
+          <button
+            type="button"
+            onClick={() => handleExport('pdf')}
+            className="flex items-center gap-1.5 rounded-lg border border-border bg-transparent px-5 py-3 text-sm text-text hover:bg-primary-light"
+          >
+            <TbFileText size={16} />
+            Ladda ner som PDF
           </button>
           {!confirmingDelete ? (
             <button
