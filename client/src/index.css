@@ -22,8 +22,6 @@
   --color-warning: #dd5b00; /* colors.semantic-warning */
   --color-warning-light: #ffe8d4; /* colors.card-tint-peach */
   --color-link: #65998d; /* brand teal — from logo */
-  --color-card-accent: #81aaa3; /* topbar / dashboard card / phase card background */
-  --color-card-accent-border: #6d9992; /* deeper tint for card border consistency */
   --font-sans: 'Inter', 'Notion Sans', -apple-system, system-ui, 'Segoe UI', Helvetica, sans-serif;
 
   /* Typography scale — mapped from DESIGN.md typography.* onto the text-* sizes
@@ -75,8 +73,6 @@ html, body, #root {
   --color-warning: #f0985a;
   --color-warning-light: #3a2818;
   --color-link: #8fc3b3;
-  --color-card-accent: var(--color-surface);
-  --color-card-accent-border: var(--color-border);
 }
 
 body {
