@@ -113,7 +113,13 @@ export async function exportTableToPdf(opts: ExportTableOptions): Promise<void> 
   `;
 
   await html2pdf()
-    .set({ margin: 10, filename: `${opts.filenamePrefix}-${slugify(opts.deceasedName)}.pdf` })
+    .set({
+      margin: 10,
+      filename: `${opts.filenamePrefix}-${slugify(opts.deceasedName)}.pdf`,
+      image: { type: 'png', quality: 1 },
+      html2canvas: { scale: 3, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    })
     .from(container)
     .save();
 }

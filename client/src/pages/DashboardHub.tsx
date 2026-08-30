@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { TbProgress, TbUsers, TbBell, TbUserPlus, TbArrowRight, TbPencil } from 'react-icons/tb';
+import { TbProgress, TbUsers, TbBell, TbUserPlus, TbArrowRight, TbPencil, TbClock } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { ActivityEntry, ProjectDetail } from '../lib/types';
 import { Badge } from '../components/Badge';
@@ -19,7 +19,7 @@ import { PHASE_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { PHASES, phaseStatus } from '../lib/phases';
 import { PHASE_ROUTE_SLUG } from '../lib/phaseRoutes';
 import { tasksForProgress } from '../lib/taskStatus';
-import { DEADLINE_REMINDER_MILESTONES, daysUntilDeadline } from '../lib/deadline';
+import { DEADLINE_REMINDER_MILESTONES, daysUntilDeadline, formatDeadlineDate } from '../lib/deadline';
 
 export function DashboardHubPage() {
   const { id } = useParams<{ id: string }>();
@@ -51,6 +51,14 @@ export function DashboardHubPage() {
   useEffect(() => {
     reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    const interval = setInterval(() => {
+      apiFetch<ActivityEntry[]>(`/projects/${id}/activity`).then(setActivity);
+    }, 15000);
+    return () => clearInterval(interval);
   }, [id]);
 
   useEffect(() => {
@@ -154,16 +162,26 @@ export function DashboardHubPage() {
             icon={<TbProgress size={20} />}
             label="Framsteg"
             value={
-              <span className="flex items-baseline justify-between gap-2">
-                <span>{progress}%</span>
+              <span className="flex flex-col items-start justify-between gap-3 sm:flex-row">
+                <span className="block text-left">
+                  <span className="text-3xl font-semibold text-text">{progress}%</span>
+                  <span className="mt-1 block text-sm font-normal text-muted">
+                    {countedProjectTasks.filter((t) => t.completed).length} av {countedProjectTasks.length} klara
+                  </span>
+                </span>
                 {deadlineDays !== null && (
-                  <span className="text-sm font-medium text-muted">
-                    <strong className="text-text">{deadlineDays}</strong> dagar kvar till bouppteckning
+                  <span className="block text-left sm:text-right">
+                    <span className="flex items-center gap-1 text-sm font-medium text-muted sm:justify-end">
+                      <TbClock size={14} />
+                      <strong className="text-text">{deadlineDays}</strong> dagar kvar
+                    </span>
+                    <span className="mt-1 block text-sm font-normal text-muted">
+                      Deadline: {formatDeadlineDate(project.deceasedDate!)}
+                    </span>
                   </span>
                 )}
               </span>
             }
-            hint={`${countedProjectTasks.filter((t) => t.completed).length} av ${countedProjectTasks.length} klara`}
             onClick={() => setOpenModal('progress')}
           />
         </div>

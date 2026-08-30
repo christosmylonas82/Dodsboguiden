@@ -20,6 +20,14 @@ export function ProjectActivityPage() {
     apiFetch<ProjectDetail>(`/projects/${id}`).then((p) => setDeceasedName(p.deceasedName));
   }, [id]);
 
+  useEffect(() => {
+    if (!id) return;
+    const interval = setInterval(() => {
+      apiFetch<ActivityEntry[]>(`/projects/${id}/activity`).then(setActivity);
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [id]);
+
   if (!activity) return <p className="text-muted">Laddar…</p>;
 
   function exportOptions() {
