@@ -25,6 +25,7 @@ export function BouppteckningGuidePage() {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [expandedStep, setExpandedStep] = useState(0);
+  const [newLawExpanded, setNewLawExpanded] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -153,12 +154,53 @@ export function BouppteckningGuidePage() {
 
       <div className="mt-4 flex items-start gap-3 rounded-xl border border-warning bg-warning-light p-4 text-sm">
         <TbAlertCircle size={20} className="mt-0.5 shrink-0 text-warning" />
-        <div>
-          <p className="font-semibold text-text">Ny lag från 1 juli 2026</p>
+        <div className="flex-1">
+          <p className="font-semibold text-text">Ny lag från 1 juli om digital bouppteckning</p>
           <p className="mt-1 text-text">
-            Digital bouppteckning är nu möjlig. Kopia på bouppteckningen ska inte längre skickas in. Personnummer
-            måste anges på alla kallade.
+            Från den 1 juli 2026 träder en ny lagändring i kraft. Blanketten för bouppteckning är ännu inte
+            uppdaterad enligt de nya kraven och begreppen, men går utmärkt att använda ändå.
           </p>
+
+          <button
+            type="button"
+            onClick={() => setNewLawExpanded((e) => !e)}
+            className="mt-2 inline-flex items-center gap-1 bg-transparent text-sm font-medium text-warning hover:underline"
+          >
+            {newLawExpanded ? 'Läs mindre' : 'Läs mer'}
+            <TbChevronDown size={14} className={`transition-transform ${newLawExpanded ? 'rotate-180' : ''}`} />
+          </button>
+
+          {newLawExpanded && (
+            <div className="mt-3 space-y-3 border-t border-warning/40 pt-3 text-text">
+              <div>
+                <p className="font-semibold">Tänk på:</p>
+                <ul className="mt-1 list-disc space-y-1 pl-5">
+                  <li>Personnummer eller samordningsnummer måste anges på alla som är kallade till förrättningen.</li>
+                  <li>Kopia på bouppteckningen ska inte längre skickas med.</li>
+                </ul>
+              </div>
+
+              <div>
+                <p className="font-semibold">
+                  Följande begrepp är ändrade i lagstiftningen men ännu inte uppdaterade i blanketten:
+                </p>
+                <ul className="mt-1 list-disc space-y-1 pl-5">
+                  <li>Förrättningsmän – Förrättningsperson</li>
+                  <li>Bouppgivarens försäkran – Bouppgivarens bekräftelse</li>
+                </ul>
+              </div>
+
+              <a
+                href="https://www.skatteverket.se/privat/etjansterochblanketter/blanketterbroschyrer/blanketter/info/4600.4.39f16f103821c58f680006692.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-dark hover:underline"
+              >
+                Källa: Skatteverket
+                <TbExternalLink size={14} />
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
