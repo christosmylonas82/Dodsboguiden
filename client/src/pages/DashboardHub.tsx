@@ -171,9 +171,9 @@ export function DashboardHubPage() {
                 </span>
                 {deadlineDays !== null && (
                   <span className="block text-left sm:text-right">
-                    <span className="flex items-center gap-1 text-sm font-medium text-muted sm:justify-end">
-                      <TbClock size={14} />
-                      <strong className="text-text">{deadlineDays}</strong> dagar kvar
+                    <span className="flex items-center gap-1.5 sm:justify-end">
+                      <TbClock size={22} className="shrink-0 text-text" />
+                      <span className="text-3xl font-semibold text-text">{deadlineDays} dagar kvar</span>
                     </span>
                     <span className="mt-1 block text-sm font-normal text-muted">
                       Deadline: {formatDeadlineDate(project.deceasedDate!)}
