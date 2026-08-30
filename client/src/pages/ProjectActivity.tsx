@@ -4,8 +4,10 @@ import { TbArrowLeft } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
 import type { ActivityEntry, ProjectDetail } from '../lib/types';
 import { formatActivityAction, formatTimestamp } from '../lib/activity';
+import { HELP_TEXT } from '../lib/helpText';
 import { Avatar } from '../components/Avatar';
 import { ExportMenu } from '../components/ExportMenu';
+import { HelpIcon } from '../components/HelpIcon';
 
 export function ProjectActivityPage() {
   const { id } = useParams<{ id: string }>();
@@ -42,7 +44,10 @@ export function ProjectActivityPage() {
       <p className="mt-3 text-xs text-muted">Dashboard &gt; Aktivitetslogg</p>
 
       <div className="mt-2 flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-semibold text-text">Aktivitetslogg</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-semibold text-text">Aktivitetslogg</h1>
+          <HelpIcon text={HELP_TEXT.projectActivity} />
+        </div>
         <ExportMenu
           onExportPdf={async () => (await import('../lib/export')).exportTableToPdf(exportOptions())}
           onExportDocx={async () => (await import('../lib/export')).exportTableToDocx(exportOptions())}

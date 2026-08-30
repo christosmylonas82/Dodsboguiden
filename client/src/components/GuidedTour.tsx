@@ -30,7 +30,7 @@ export function GuidedTour({ isOpen, onFinish }: { isOpen: boolean; onFinish: ()
     tour.addStep({
       id: 'phases',
       title: 'De 5 faserna',
-      text: 'Din dödsbohantering är indelad i 5 faser: Direkt efter dödsfall, Begravning, Inför bouppteckning, Under bouppteckning, och Avslut & arvskifte. Varje fas har en egen checklista med uppgifter.',
+      text: 'Din dödsbohantering är indelad i 5 faser: Direkt efter dödsfall, Begravning, Inför bouppteckning, Under bouppteckning, och Avslut & arvskifte. Varje fas har en egen checklista med uppgifter. Under "Under bouppteckning" hittar ni även en Boupptecknings-guide med bland annat ett steg för att hålla bouppteckningsförrättningen (mötet).',
       attachTo: { element: '[data-tour="phases"]', on: 'top' },
       buttons: [
         { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
@@ -85,19 +85,8 @@ export function GuidedTour({ isOpen, onFinish }: { isOpen: boolean; onFinish: ()
     tour.addStep({
       id: 'contacts',
       title: 'Kontaktlista',
-      text: 'Spara alla viktiga kontakter här – begravningsbyrå, advokat, banker, försäkringsbolag och andra.',
+      text: 'Spara alla viktiga kontakter här – begravningsbyrå, advokat, banker, försäkringsbolag och andra. Ni kan nu redigera en kontakt direkt i listan, utan att öppna ett separat formulär. Använd knappen "Exportera" längst upp för att spara listan som PDF eller Word.',
       attachTo: { element: '[data-tour="contacts"]', on: 'bottom' },
-      buttons: [
-        { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
-        { text: 'Nästa', action: () => tour.next() },
-      ],
-    });
-
-    tour.addStep({
-      id: 'contactRegistry',
-      title: 'Myndigheter & företag',
-      text: 'Här hittar ni färdiga kontaktuppgifter till myndigheter, banker och andra företag som ofta behöver kontaktas vid ett dödsfall.',
-      attachTo: { element: '[data-tour="contactRegistry"]', on: 'bottom' },
       buttons: [
         { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
         { text: 'Nästa', action: () => tour.next() },
@@ -107,19 +96,8 @@ export function GuidedTour({ isOpen, onFinish }: { isOpen: boolean; onFinish: ()
     tour.addStep({
       id: 'inventory',
       title: 'Inventarielista',
-      text: 'Dokumentera alla tillgångar och skulder här. Det behövs för bouppteckningen.',
+      text: 'Dokumentera alla tillgångar och skulder här. Det behövs för bouppteckningen. Precis som i kontaktlistan går raderna att redigera direkt.',
       attachTo: { element: '[data-tour="inventory"]', on: 'bottom' },
-      buttons: [
-        { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
-        { text: 'Nästa', action: () => tour.next() },
-      ],
-    });
-
-    tour.addStep({
-      id: 'transactions',
-      title: 'Ekonomi',
-      text: 'Håll koll på dödsboets kostnader och intäkter, t.ex. begravningskostnader och räkningar.',
-      attachTo: { element: '[data-tour="transactions"]', on: 'bottom' },
       buttons: [
         { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
         { text: 'Nästa', action: () => tour.next() },
@@ -131,6 +109,28 @@ export function GuidedTour({ isOpen, onFinish }: { isOpen: boolean; onFinish: ()
       title: 'Dokument',
       text: 'Ladda upp och samla viktiga dokument som dödsfallsintyg, bouppteckning och avtal på ett ställe.',
       attachTo: { element: '[data-tour="documents"]', on: 'bottom' },
+      buttons: [
+        { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
+        { text: 'Nästa', action: () => tour.next() },
+      ],
+    });
+
+    tour.addStep({
+      id: 'transactions',
+      title: 'Ekonomi',
+      text: 'Håll koll på dödsboets kostnader och intäkter, t.ex. begravningskostnader och räkningar. Även här kan ni redigera poster direkt i listan.',
+      attachTo: { element: '[data-tour="transactions"]', on: 'bottom' },
+      buttons: [
+        { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
+        { text: 'Nästa', action: () => tour.next() },
+      ],
+    });
+
+    tour.addStep({
+      id: 'contactRegistry',
+      title: 'Myndigheter & företag',
+      text: 'Här hittar ni färdiga kontaktuppgifter till myndigheter, banker och andra företag som ofta behöver kontaktas vid ett dödsfall.',
+      attachTo: { element: '[data-tour="contactRegistry"]', on: 'bottom' },
       buttons: [
         { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
         { text: 'Nästa', action: () => tour.next() },

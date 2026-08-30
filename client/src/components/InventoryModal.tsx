@@ -4,7 +4,9 @@ import { apiFetch } from '../lib/api';
 import type { InventoryItem, InventoryStatus } from '../lib/types';
 import { INVENTORY_STATUS_LABELS, INVENTORY_STATUS_ORDER } from '../lib/inventoryStatus';
 import { ExportMenu } from './ExportMenu';
+import { HelpIcon } from './HelpIcon';
 import { ModalOverlay } from './ModalOverlay';
+import { HELP_TEXT } from '../lib/helpText';
 
 export function InventoryModal({
   projectId,
@@ -87,6 +89,7 @@ export function InventoryModal({
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Inventarielista</h3>
           <div className="flex items-center gap-1">
+            <HelpIcon text={HELP_TEXT.inventoryModal} />
             <ExportMenu
               onExportPdf={async () => (await import('../lib/export')).exportTableToPdf(exportOptions())}
               onExportDocx={async () => (await import('../lib/export')).exportTableToDocx(exportOptions())}

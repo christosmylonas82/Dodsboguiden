@@ -3,7 +3,9 @@ import { TbTrash } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { Transaction, TransactionCategory, TransactionType } from '../lib/types';
 import { ExportMenu } from './ExportMenu';
+import { HelpIcon } from './HelpIcon';
 import { ModalOverlay } from './ModalOverlay';
+import { HELP_TEXT } from '../lib/helpText';
 
 const TYPE_LABELS: Record<TransactionType, string> = { COST: 'Kostnad', INCOME: 'Intäkt' };
 
@@ -138,6 +140,7 @@ export function TransactionsModal({
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Ekonomi</h3>
           <div className="flex items-center gap-1">
+            <HelpIcon text={HELP_TEXT.transactionsModal} />
             <ExportMenu
               onExportPdf={async () => (await import('../lib/export')).exportTableToPdf(exportOptions())}
               onExportDocx={async () => (await import('../lib/export')).exportTableToDocx(exportOptions())}

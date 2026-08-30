@@ -100,6 +100,7 @@ model User {
   gdprConsent  Boolean  @default(false) @map("gdpr_consent")
   consentDate  DateTime? @map("consent_date")
   hasSeenTipsOnboarding Boolean @default(false) @map("has_seen_tips_onboarding")
+  onboardingVersionSeen Int @default(0) @map("onboarding_version_seen")
   profileImageUrl String? @db.Text @map("profile_image_url")
   createdAt    DateTime @default(now()) @map("created_at")
   deletedAt    DateTime? @map("deleted_at")

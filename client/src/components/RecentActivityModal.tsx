@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import type { ActivityEntry } from '../lib/types';
 import { formatActivityAction, formatTimestamp } from '../lib/activity';
+import { HELP_TEXT } from '../lib/helpText';
 import { Avatar } from './Avatar';
+import { HelpIcon } from './HelpIcon';
 import { ModalOverlay } from './ModalOverlay';
 
 export function RecentActivityModal({
@@ -20,14 +22,17 @@ export function RecentActivityModal({
       <div className="max-h-[80vh] overflow-y-auto rounded-xl border border-border bg-surface p-4 sm:p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Senaste aktivitet</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Stäng"
-            className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent text-muted hover:bg-primary-light hover:text-text"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-1">
+            <HelpIcon text={HELP_TEXT.recentActivityModal} />
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Stäng"
+              className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent text-muted hover:bg-primary-light hover:text-text"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {recent.length === 0 ? (

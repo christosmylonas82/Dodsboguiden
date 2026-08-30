@@ -7,6 +7,7 @@ import { signToken } from '../lib/jwt.js';
 import { HttpError } from '../middleware/errorHandler.js';
 import { usePasswordResetToken } from '../lib/passwordReset.js';
 import { logAuthEvent } from '../lib/authEvent.js';
+import { CURRENT_ONBOARDING_VERSION } from '../lib/onboarding.js';
 
 function toUserResponse(user: User) {
   return {
@@ -15,6 +16,8 @@ function toUserResponse(user: User) {
     name: user.name,
     role: user.role,
     hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
+    onboardingVersionSeen: user.onboardingVersionSeen,
+    currentOnboardingVersion: CURRENT_ONBOARDING_VERSION,
     profileImageUrl: user.profileImageUrl,
     createdAt: user.createdAt,
   };
@@ -112,6 +115,14 @@ export async function markTipsSeen(req: Request, res: Response) {
   const user = await prisma.user.update({
     where: { id: req.user!.userId },
     data: { hasSeenTipsOnboarding: true },
+  });
+  res.json(toUserResponse(user));
+}
+
+export async function markOnboardingSeen(req: Request, res: Response) {
+  const user = await prisma.user.update({
+    where: { id: req.user!.userId },
+    data: { onboardingVersionSeen: CURRENT_ONBOARDING_VERSION },
   });
   res.json(toUserResponse(user));
 }

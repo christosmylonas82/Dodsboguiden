@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { apiFetch } from '../lib/api';
 import type { ActivityEntry } from '../lib/types';
 import { formatActivityAction, formatTimestamp } from '../lib/activity';
+import { HELP_TEXT } from '../lib/helpText';
 import { Avatar } from './Avatar';
 import { ExportMenu } from './ExportMenu';
+import { HelpIcon } from './HelpIcon';
 import { ModalOverlay } from './ModalOverlay';
 
 export function ActivityLogModal({
@@ -41,6 +43,7 @@ export function ActivityLogModal({
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Aktivitetslogg</h3>
           <div className="flex items-center gap-1">
+            <HelpIcon text={HELP_TEXT.activityLogModal} />
             <ExportMenu
               onExportPdf={async () => (await import('../lib/export')).exportTableToPdf(exportOptions())}
               onExportDocx={async () => (await import('../lib/export')).exportTableToDocx(exportOptions())}

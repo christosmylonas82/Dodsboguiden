@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { TbTrash, TbClock } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { PendingInvitation, ProjectMember } from '../lib/types';
+import { HELP_TEXT } from '../lib/helpText';
 import { Badge } from './Badge';
 import { Avatar } from './Avatar';
+import { HelpIcon } from './HelpIcon';
 import { ModalOverlay } from './ModalOverlay';
 import { DeleteMemberConfirmModal } from './DeleteMemberConfirmModal';
 
@@ -50,14 +52,17 @@ export function MembersModal({
       <div className="rounded-xl border border-border bg-surface p-4 sm:p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Familjemedlemmar</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Stäng"
-            className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent text-muted hover:bg-primary-light hover:text-text"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-1">
+            <HelpIcon text={HELP_TEXT.membersModal} />
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Stäng"
+              className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent text-muted hover:bg-primary-light hover:text-text"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         <p className="mt-5 text-xs font-medium uppercase tracking-wide text-muted">Medlemmar ({members.length})</p>

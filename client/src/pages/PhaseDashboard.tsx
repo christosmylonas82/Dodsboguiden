@@ -4,6 +4,7 @@ import { TbArrowLeft, TbExternalLink, TbPlus } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
 import type { ProjectDetail, Task, TaskStatus } from '../lib/types';
 import { Badge } from '../components/Badge';
+import { HelpIcon } from '../components/HelpIcon';
 import { ProgressBar } from '../components/ProgressBar';
 import { TaskManageModal } from '../components/TaskManageModal';
 import { TaskCard } from '../components/TaskCard';
@@ -114,6 +115,7 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
         <span className="text-sm text-muted">
           {doneCount} av {countedTasks.length} klara
         </span>
+        <HelpIcon text={PHASE_DESCRIPTIONS[phase]} />
       </div>
       <p className="mt-1 text-muted">{PHASE_DESCRIPTIONS[phase]}</p>
       <a

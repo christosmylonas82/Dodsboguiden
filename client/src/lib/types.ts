@@ -4,6 +4,8 @@ export interface User {
   name: string;
   role?: 'USER' | 'ADMIN';
   hasSeenTipsOnboarding: boolean;
+  onboardingVersionSeen: number;
+  currentOnboardingVersion: number;
   profileImageUrl: string | null;
   createdAt: string;
 }

@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { TbArrowLeft, TbChevronDown, TbExternalLink, TbDownload, TbAlertTriangle, TbAlertCircle, TbCircleCheck } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
 import type { InventoryItem, ProjectDetail, Transaction } from '../lib/types';
+import { HELP_TEXT } from '../lib/helpText';
+import { HelpIcon } from '../components/HelpIcon';
 
 function isDebt(item: InventoryItem): boolean {
   return item.type.toLowerCase().includes('skuld') || item.value < 0;
@@ -143,7 +145,10 @@ export function BouppteckningGuidePage() {
         Tillbaka till dashboard
       </Link>
 
-      <h1 className="mt-2 text-3xl font-semibold text-text">Boupptecknings-guide</h1>
+      <div className="mt-2 flex items-center gap-2">
+        <h1 className="text-3xl font-semibold text-text">Boupptecknings-guide</h1>
+        <HelpIcon text={HELP_TEXT.bouppteckningGuide} />
+      </div>
       <p className="mt-1 text-muted">En steg-för-steg-guide genom Skatteverkets bouppteckningsprocess.</p>
 
       <div className="mt-4 flex items-start gap-3 rounded-xl border border-warning bg-warning-light p-4 text-sm">

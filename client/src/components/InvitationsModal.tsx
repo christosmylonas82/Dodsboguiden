@@ -3,7 +3,9 @@ import { TbCircleCheck, TbCircleX, TbMailbox } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { Invitation, InvitationStatus } from '../lib/types';
 import { formatTimestamp } from '../lib/activity';
+import { HELP_TEXT } from '../lib/helpText';
 import { Badge } from './Badge';
+import { HelpIcon } from './HelpIcon';
 import { ModalOverlay } from './ModalOverlay';
 
 const STATUS_BADGE: Record<InvitationStatus, { tone: 'warning' | 'success' | 'danger'; label: string }> = {
@@ -64,14 +66,17 @@ export function InvitationsModal({
       <div className="max-h-[80vh] overflow-y-auto rounded-xl border border-border bg-surface p-4 sm:p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-semibold text-text">Inbjudningar</h3>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Stäng"
-            className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent text-muted hover:bg-primary-light hover:text-text"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-1">
+            <HelpIcon text={HELP_TEXT.invitationsModal} />
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Stäng"
+              className="flex h-11 w-11 items-center justify-center rounded-lg bg-transparent text-muted hover:bg-primary-light hover:text-text"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {loading ? (

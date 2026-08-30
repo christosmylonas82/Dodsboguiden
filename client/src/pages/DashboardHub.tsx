@@ -22,7 +22,7 @@ import { tasksForProgress } from '../lib/taskStatus';
 export function DashboardHubPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, markTipsSeen } = useAuth();
+  const { user, markOnboardingSeen } = useAuth();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
@@ -51,15 +51,15 @@ export function DashboardHubPage() {
   }, [id]);
 
   useEffect(() => {
-    if (project && user && !user.hasSeenTipsOnboarding) {
+    if (project && user && user.onboardingVersionSeen < user.currentOnboardingVersion) {
       setShowTour(true);
     }
   }, [project, user]);
 
   function finishTour() {
     setShowTour(false);
-    if (user && !user.hasSeenTipsOnboarding) {
-      markTipsSeen();
+    if (user && user.onboardingVersionSeen < user.currentOnboardingVersion) {
+      markOnboardingSeen();
     }
   }
 

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   login,
+  markOnboardingSeen,
   markTipsSeen,
   me,
   register,
@@ -23,6 +24,7 @@ router.post('/reset-password', asyncHandler(resetPassword));
 router.get('/me', requireAuth, asyncHandler(me));
 router.put('/me', requireAuth, asyncHandler(updateName));
 router.put('/me/seen-tips', requireAuth, asyncHandler(markTipsSeen));
+router.put('/me/seen-onboarding', requireAuth, asyncHandler(markOnboardingSeen));
 router.put('/email', requireAuth, asyncHandler(updateEmail));
 router.put('/password', requireAuth, asyncHandler(updatePassword));
 router.put('/profile-image', requireAuth, asyncHandler(updateProfileImage));
