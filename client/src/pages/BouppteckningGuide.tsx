@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { TbArrowLeft, TbChevronDown, TbExternalLink, TbDownload, TbAlertTriangle, TbAlertCircle, TbCircleCheck } from 'react-icons/tb';
+import { TbArrowLeft, TbChevronDown, TbExternalLink, TbDownload, TbAlertTriangle, TbAlertCircle, TbCircleCheck, TbCalendar } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
 import type { InventoryItem, ProjectDetail, Transaction } from '../lib/types';
 import { HELP_TEXT } from '../lib/helpText';
 import { HelpIcon } from '../components/HelpIcon';
-import { daysUntilDeadline } from '../lib/deadline';
+import { daysUntilDeadline, formatDeadlineDate } from '../lib/deadline';
 
 function isDebt(item: InventoryItem): boolean {
   return item.type.toLowerCase().includes('skuld') || item.value < 0;
@@ -204,13 +204,23 @@ export function BouppteckningGuidePage() {
         <div>
           <p className="font-semibold text-text">Deadline: 4 månader efter dödsfallet</p>
           {deadlineDays !== null ? (
-            <p className="mt-1 text-text">
-              {deadlineDays >= 0 ? (
-                <>Baserat på det angivna dödsdatumet har du ungefär <strong>{deadlineDays}</strong> dagar kvar.</>
-              ) : (
-                <>Baserat på det angivna dödsdatumet har deadline passerat för <strong>{Math.abs(deadlineDays)}</strong> dagar sedan — kontakta Skatteverket snarast.</>
-              )}
-            </p>
+            <>
+              <p className="mt-1 text-text">
+                {deadlineDays >= 0 ? (
+                  <>Baserat på det angivna dödsdatumet har du ungefär <strong>{deadlineDays}</strong> dagar kvar.</>
+                ) : (
+                  <>Baserat på det angivna dödsdatumet har deadline passerat för <strong>{Math.abs(deadlineDays)}</strong> dagar sedan — kontakta Skatteverket snarast.</>
+                )}
+              </p>
+              <p
+                className={`mt-2 flex items-center gap-1.5 text-sm font-medium ${
+                  deadlineDays < 7 ? 'text-danger' : deadlineDays <= 14 ? 'text-warning' : 'text-primary'
+                }`}
+              >
+                <TbCalendar size={14} />
+                Sista inlämningsdatum: {formatDeadlineDate(project.deceasedDate!)}
+              </p>
+            </>
           ) : (
             <p className="mt-1 text-text">
               Inget dödsdatum är angivet för dödsboet, så vi kan inte räkna ut din exakta deadline. Ange det via "Redigera namn" om du vill se en uppskattning.
