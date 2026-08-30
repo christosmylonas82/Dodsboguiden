@@ -1,5 +1,27 @@
 import html2pdf from 'html2pdf.js';
-import { Document, HeadingLevel, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
+import {
+  Document,
+  HeadingLevel,
+  ImageRun,
+  Packer,
+  Paragraph,
+  Table,
+  TableBorders,
+  TableCell,
+  TableRow,
+  TextRun,
+  WidthType,
+} from 'docx';
+import dodsboguidenLogo from '../assets/dodsboguiden-logo.png';
+
+let logoBytesPromise: Promise<Uint8Array> | null = null;
+
+function getLogoBytes(): Promise<Uint8Array> {
+  logoBytesPromise ??= fetch(dodsboguidenLogo)
+    .then((res) => res.arrayBuffer())
+    .then((buf) => new Uint8Array(buf));
+  return logoBytesPromise;
+}
 
 interface ExportTableOptions {
   title: string;
@@ -65,8 +87,13 @@ export async function exportTableToPdf(opts: ExportTableOptions): Promise<void> 
     .join('');
 
   container.innerHTML = `
-    <h1 style="font-size:20px;margin:0 0 4px;">${opts.title} - ${opts.deceasedName}</h1>
-    <p style="font-size:12px;color:#666;margin:0 0 16px;">Exporterat: ${new Date().toLocaleDateString('sv-SE')}</p>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+      <img src="${dodsboguidenLogo}" style="height:28px;width:auto;flex-shrink:0;" />
+      <div>
+        <h1 style="font-size:20px;margin:0 0 4px;">${opts.title} - ${opts.deceasedName}</h1>
+        <p style="font-size:12px;color:#666;margin:0;">Exporterat: ${new Date().toLocaleDateString('sv-SE')}</p>
+      </div>
+    </div>
     <table style="width:100%;border-collapse:collapse;">
       <thead><tr>${headerHtml}</tr></thead>
       <tbody>${rowsHtml}</tbody>
@@ -92,6 +119,36 @@ export async function exportTableToPdf(opts: ExportTableOptions): Promise<void> 
 }
 
 export async function exportTableToDocx(opts: ExportTableOptions): Promise<void> {
+  const logoBytes = await getLogoBytes();
+
+  const titleHeaderTable = new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: TableBorders.NONE,
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: 25, type: WidthType.PERCENTAGE },
+            children: [
+              new Paragraph({
+                children: [
+                  new ImageRun({ type: 'png', data: logoBytes, transformation: { width: 120, height: 26 } }),
+                ],
+              }),
+            ],
+          }),
+          new TableCell({
+            width: { size: 75, type: WidthType.PERCENTAGE },
+            children: [
+              new Paragraph({ text: `${opts.title} - ${opts.deceasedName}`, heading: HeadingLevel.HEADING_1 }),
+              new Paragraph({ text: `Exporterat: ${new Date().toLocaleDateString('sv-SE')}` }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+
   const headerRow = new TableRow({
     children: opts.headers.map(
       (h) => new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: h, bold: true })] })] }),
@@ -105,8 +162,8 @@ export async function exportTableToDocx(opts: ExportTableOptions): Promise<void>
     sections: [
       {
         children: [
-          new Paragraph({ text: `${opts.title} - ${opts.deceasedName}`, heading: HeadingLevel.HEADING_1 }),
-          new Paragraph({ text: `Exporterat: ${new Date().toLocaleDateString('sv-SE')}`, spacing: { after: 200 } }),
+          titleHeaderTable,
+          new Paragraph({ text: '', spacing: { after: 200 } }),
           new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [headerRow, ...dataRows] }),
           ...(opts.footerLines ?? []).map(
             (line, i, arr) =>
