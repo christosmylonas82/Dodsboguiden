@@ -248,7 +248,7 @@ export function Layout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-bg">
-      <header className="border-b border-border bg-surface">
+      <header className="border-b border-card-accent-border bg-card-accent">
         <div className="flex w-full items-center px-3 py-2 md:px-6">
           <div className="flex flex-1 items-center gap-4">
             {isAuthPage ? (
