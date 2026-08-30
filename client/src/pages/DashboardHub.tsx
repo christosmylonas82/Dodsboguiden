@@ -234,7 +234,7 @@ export function DashboardHubPage() {
         })}
         <Link
           to={`/projects/${id}/bouppteckning`}
-          className="flex flex-col rounded-xl border border-border bg-surface p-6 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md"
+          className="flex flex-col rounded-xl border border-border bg-surface p-6 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:bg-primary-light hover:shadow-md"
         >
           <h2 className="text-lg font-semibold text-text">Boupptecknings-guide</h2>
           <p className="mt-2 flex-1 text-sm text-muted">
