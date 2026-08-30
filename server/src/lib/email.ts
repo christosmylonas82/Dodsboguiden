@@ -5,3 +5,14 @@ export async function sendPasswordResetEmail(email: string, resetLink: string): 
   console.log(`[email stub] Password reset for ${email}: ${resetLink}`);
   return true;
 }
+
+export async function sendDeadlineReminderEmail(
+  email: string,
+  deceasedName: string,
+  daysRemaining: number,
+): Promise<boolean> {
+  console.log(
+    `[email stub] Deadline reminder for ${email}: dödsboet "${deceasedName}" har ${daysRemaining} dagar kvar innan bouppteckningen ska ha kommit in till Skatteverket.`,
+  );
+  return true;
+}

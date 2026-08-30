@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { TbDotsVertical, TbArchive, TbSettings } from 'react-icons/tb';
+import { TbDotsVertical, TbArchive } from 'react-icons/tb';
 import { ArchiveProjectModal } from './ArchiveProjectModal';
-import { SettingsModal } from './SettingsModal';
 
 export function DodsboDropdown({
   projectId,
@@ -14,7 +13,6 @@ export function DodsboDropdown({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
-  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,21 +45,10 @@ export function DodsboDropdown({
               setIsOpen(false);
               setArchiveModalOpen(true);
             }}
-            className="flex w-full items-center gap-2 border-b border-border bg-transparent px-4 py-2.5 text-left text-sm text-text hover:bg-primary-light"
+            className="flex w-full items-center gap-2 bg-transparent px-4 py-2.5 text-left text-sm text-text hover:bg-primary-light"
           >
             <TbArchive size={16} />
             Arkivera dödsbo
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setIsOpen(false);
-              setSettingsModalOpen(true);
-            }}
-            className="flex w-full items-center gap-2 bg-transparent px-4 py-2.5 text-left text-sm text-text hover:bg-primary-light"
-          >
-            <TbSettings size={16} />
-            Inställningar
           </button>
         </div>
       )}
@@ -77,7 +64,6 @@ export function DodsboDropdown({
           }}
         />
       )}
-      {settingsModalOpen && <SettingsModal onClose={() => setSettingsModalOpen(false)} />}
     </div>
   );
 }

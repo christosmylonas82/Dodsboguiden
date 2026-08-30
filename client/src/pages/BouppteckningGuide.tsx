@@ -5,18 +5,10 @@ import { apiFetch } from '../lib/api';
 import type { InventoryItem, ProjectDetail, Transaction } from '../lib/types';
 import { HELP_TEXT } from '../lib/helpText';
 import { HelpIcon } from '../components/HelpIcon';
+import { daysUntilDeadline } from '../lib/deadline';
 
 function isDebt(item: InventoryItem): boolean {
   return item.type.toLowerCase().includes('skuld') || item.value < 0;
-}
-
-function daysUntilDeadline(deceasedDate: string): number {
-  const deadline = new Date(deceasedDate);
-  deadline.setMonth(deadline.getMonth() + 4);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  deadline.setHours(0, 0, 0, 0);
-  return Math.round((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 export function BouppteckningGuidePage() {
@@ -141,7 +133,10 @@ export function BouppteckningGuidePage() {
 
   return (
     <div>
-      <Link to={`/projects/${id}/dashboard`} className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-primary-dark">
+      <Link
+        to={`/projects/${id}/dashboard`}
+        className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
+      >
         <TbArrowLeft size={16} />
         Tillbaka till dashboard
       </Link>
@@ -210,9 +205,11 @@ export function BouppteckningGuidePage() {
           <p className="font-semibold text-text">Deadline: 4 månader efter dödsfallet</p>
           {deadlineDays !== null ? (
             <p className="mt-1 text-text">
-              {deadlineDays >= 0
-                ? `Baserat på det angivna dödsdatumet har du ungefär ${deadlineDays} dagar kvar.`
-                : `Baserat på det angivna dödsdatumet har deadline passerat för ${Math.abs(deadlineDays)} dagar sedan — kontakta Skatteverket snarast.`}
+              {deadlineDays >= 0 ? (
+                <>Baserat på det angivna dödsdatumet har du ungefär <strong>{deadlineDays}</strong> dagar kvar.</>
+              ) : (
+                <>Baserat på det angivna dödsdatumet har deadline passerat för <strong>{Math.abs(deadlineDays)}</strong> dagar sedan — kontakta Skatteverket snarast.</>
+              )}
             </p>
           ) : (
             <p className="mt-1 text-text">

@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { TbArrowLeft, TbExternalLink, TbPlus } from 'react-icons/tb';
+import { TbArrowLeft, TbPlus } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
 import type { ProjectDetail, Task, TaskStatus } from '../lib/types';
 import { Badge } from '../components/Badge';
 import { HelpIcon } from '../components/HelpIcon';
+import { ExportMenu } from '../components/ExportMenu';
 import { ProgressBar } from '../components/ProgressBar';
 import { TaskManageModal } from '../components/TaskManageModal';
 import { TaskCard } from '../components/TaskCard';
+import { TASK_STATUS_LABELS } from '../lib/taskStatus';
 import { PHASE_DESCRIPTIONS, TASK_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { phaseStatus } from '../lib/phases';
 import { tasksForProgress } from '../lib/taskStatus';
@@ -100,13 +102,62 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
   const doneCount = countedTasks.filter((t) => t.completed).length;
   const percent = countedTasks.length ? Math.round((doneCount / countedTasks.length) * 100) : 0;
   const managingTask = tasks.find((t) => t.id === managingTaskId) ?? null;
+  const phaseSlug = phase.replace(/\s+/g, '-').toLowerCase();
+
+  function blankTemplateOptions() {
+    return {
+      title: `Checklista (tom mall) — ${phase}`,
+      deceasedName: project!.deceasedName,
+      headers: ['Uppgift', 'Klar (datum)', 'Ansvarig', 'Kommentar'],
+      rows: tasks.map((t) => [t.title, '', '', '']),
+      filenamePrefix: `checklista-mall-${phaseSlug}`,
+    };
+  }
+
+  function filledExportOptions() {
+    return {
+      title: `Checklista — ${phase}`,
+      deceasedName: project!.deceasedName,
+      headers: ['Uppgift', 'Status', 'Ansvarig', 'Förfallodatum', 'Kommentar'],
+      rows: tasks.map((t) => [
+        t.title,
+        TASK_STATUS_LABELS[t.status],
+        t.assignedUser?.name ?? t.responsibleRole ?? '—',
+        t.dueDate ? new Date(t.dueDate).toLocaleDateString('sv-SE') : '—',
+        t.notes ?? '—',
+      ]),
+      filenamePrefix: `checklista-${phaseSlug}`,
+    };
+  }
 
   return (
     <div>
-      <Link to={`/projects/${id}/dashboard`} className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-primary-dark">
-        <TbArrowLeft size={16} />
-        Tillbaka till dashboard
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link
+          to={`/projects/${id}/dashboard`}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
+        >
+          <TbArrowLeft size={16} />
+          Tillbaka till dashboard
+        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-muted">Tom mall:</span>
+            <ExportMenu
+              onExportPdf={async () => (await import('../lib/export')).exportTableToPdf(blankTemplateOptions())}
+              onExportDocx={async () => (await import('../lib/export')).exportTableToDocx(blankTemplateOptions())}
+            />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-muted">Fullständig:</span>
+            <ExportMenu
+              onExportPdf={async () => (await import('../lib/export')).exportTableToPdf(filledExportOptions())}
+              onExportDocx={async () => (await import('../lib/export')).exportTableToDocx(filledExportOptions())}
+              onExportCsv={async () => (await import('../lib/export')).exportTableToCsv(filledExportOptions())}
+            />
+          </div>
+        </div>
+      </div>
       <p className="mt-3 text-xs text-muted">Dashboard &gt; {phase}</p>
 
       <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -118,15 +169,6 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
         <HelpIcon text={PHASE_DESCRIPTIONS[phase]} />
       </div>
       <p className="mt-1 text-muted">{PHASE_DESCRIPTIONS[phase]}</p>
-      <a
-        href="https://www.efterlevandeguiden.se/checklista-efter-ett-dodsfall.html"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-1 inline-flex items-center gap-1 text-xs text-muted hover:text-primary-dark hover:underline"
-      >
-        📖 Checklista baserad på Efterlevandeguiden
-        <TbExternalLink size={12} />
-      </a>
 
       <div className="mt-4 flex items-center gap-3">
         <div className="flex-1">

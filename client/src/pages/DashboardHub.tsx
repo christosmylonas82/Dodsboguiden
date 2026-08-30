@@ -12,12 +12,14 @@ import { MembersModal } from '../components/MembersModal';
 import { RenameProjectModal } from '../components/RenameProjectModal';
 import { DodsboDropdown } from '../components/DodsboDropdown';
 import { GuidedTour } from '../components/GuidedTour';
+import { DeadlineWarningModal } from '../components/DeadlineWarningModal';
 import { useAuth } from '../context/AuthContext';
 import { formatActivityAction, formatRelativeTime } from '../lib/activity';
 import { PHASE_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { PHASES, phaseStatus } from '../lib/phases';
 import { PHASE_ROUTE_SLUG } from '../lib/phaseRoutes';
 import { tasksForProgress } from '../lib/taskStatus';
+import { DEADLINE_REMINDER_MILESTONES, daysUntilDeadline } from '../lib/deadline';
 
 export function DashboardHubPage() {
   const { id } = useParams<{ id: string }>();
@@ -29,6 +31,7 @@ export function DashboardHubPage() {
   const [openModal, setOpenModal] = useState<'progress' | 'activity' | 'members' | 'rename' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [showTour, setShowTour] = useState(false);
+  const [deadlineWarningDays, setDeadlineWarningDays] = useState<number | null>(null);
 
   function showToast(message: string) {
     setToast(message);
@@ -55,6 +58,18 @@ export function DashboardHubPage() {
       setShowTour(true);
     }
   }, [project, user]);
+
+  useEffect(() => {
+    if (!project?.deceasedDate || !id) return;
+    const days = daysUntilDeadline(project.deceasedDate);
+    const milestone = DEADLINE_REMINDER_MILESTONES.find((m) => m === days);
+    if (milestone === undefined) return;
+    const todayKey = new Date().toISOString().split('T')[0];
+    const storageKey = `deadline-warning-${id}-${milestone}-${todayKey}`;
+    if (localStorage.getItem(storageKey)) return;
+    setDeadlineWarningDays(days);
+    localStorage.setItem(storageKey, 'shown');
+  }, [project, id]);
 
   function finishTour() {
     setShowTour(false);
@@ -85,6 +100,7 @@ export function DashboardHubPage() {
   const hasStarted = countedProjectTasks.some((t) => t.completed || t.status === 'IN_PROGRESS');
   const lastActivity = activity[0];
   const isAdmin = project.members.find((m) => m.userId === user?.id)?.role === 'ADMIN';
+  const deadlineDays = project.deceasedDate ? daysUntilDeadline(project.deceasedDate) : null;
 
   return (
     <div>
@@ -137,7 +153,16 @@ export function DashboardHubPage() {
           <MetricCard
             icon={<TbProgress size={20} />}
             label="Framsteg"
-            value={`${progress}%`}
+            value={
+              <span className="flex items-baseline justify-between gap-2">
+                <span>{progress}%</span>
+                {deadlineDays !== null && (
+                  <span className="text-sm font-medium text-muted">
+                    <strong className="text-text">{deadlineDays}</strong> dagar kvar till bouppteckning
+                  </span>
+                )}
+              </span>
+            }
             hint={`${countedProjectTasks.filter((t) => t.completed).length} av ${countedProjectTasks.length} klara`}
             onClick={() => setOpenModal('progress')}
           />
@@ -256,6 +281,10 @@ export function DashboardHubPage() {
       )}
 
       <GuidedTour isOpen={showTour} onFinish={finishTour} />
+
+      {deadlineWarningDays !== null && (
+        <DeadlineWarningModal daysRemaining={deadlineWarningDays} onClose={() => setDeadlineWarningDays(null)} />
+      )}
     </div>
   );
 }

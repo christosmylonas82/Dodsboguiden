@@ -175,19 +175,37 @@ const updateProjectSchema = z.object({
 export async function updateProject(req: Request, res: Response) {
   const body = updateProjectSchema.parse(req.body);
 
+  const existing = await prisma.project.findUnique({ where: { id: req.params.id } });
+  if (!existing) {
+    throw new HttpError(404, 'Project not found');
+  }
+
+  const nameChanged = body.deceasedName !== existing.deceasedName;
+  const newDeceasedDate = body.deceasedDate !== undefined ? (body.deceasedDate ? new Date(body.deceasedDate) : null) : undefined;
+  const dateChanged = newDeceasedDate !== undefined && newDeceasedDate?.getTime() !== existing.deceasedDate?.getTime();
+
   const project = await prisma.project.update({
     where: { id: req.params.id },
     data: {
       deceasedName: body.deceasedName,
-      ...(body.deceasedDate !== undefined ? { deceasedDate: body.deceasedDate ? new Date(body.deceasedDate) : null } : {}),
+      ...(newDeceasedDate !== undefined ? { deceasedDate: newDeceasedDate } : {}),
     },
   });
 
-  await logActivity({
-    projectId: project.id,
-    userId: req.user!.userId,
-    action: `renamed the dödsbo to "${body.deceasedName}"`,
-  });
+  if (nameChanged) {
+    await logActivity({
+      projectId: project.id,
+      userId: req.user!.userId,
+      action: `renamed the dödsbo to "${body.deceasedName}"`,
+    });
+  }
+  if (dateChanged) {
+    await logActivity({
+      projectId: project.id,
+      userId: req.user!.userId,
+      action: `changed the dödsfallsdatum to "${newDeceasedDate ? newDeceasedDate.toISOString().split('T')[0] : 'inget datum'}"`,
+    });
+  }
 
   res.json(project);
 }

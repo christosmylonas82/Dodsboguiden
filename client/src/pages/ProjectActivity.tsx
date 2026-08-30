@@ -36,7 +36,7 @@ export function ProjectActivityPage() {
     <div>
       <Link
         to={`/projects/${id}/dashboard`}
-        className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-primary-dark"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
       >
         <TbArrowLeft size={16} />
         Tillbaka till dashboard
