@@ -21,6 +21,7 @@ const RESULT_CONTENT: Record<
     body: [
       'Bra nyheter! DödsboGuiden är utformat för din situation.',
       'Du kan med fördel använda appen för att hålla koll på alla uppgifter i en checklista, spåra ekonomin för dödsboet, organisera dokument och kontakter, och få vägledning steg för steg.',
+      'Att hantera ett dödsbo kräver stort ansvar att det går rätt till. Om du känner dig osäker rekommenderar vi alltid att du konsulterar en advokat eller boutredningsman.',
     ],
   },
   warning: {
