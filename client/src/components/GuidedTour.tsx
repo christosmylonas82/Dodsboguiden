@@ -30,7 +30,7 @@ export function GuidedTour({ isOpen, onFinish }: { isOpen: boolean; onFinish: ()
     tour.addStep({
       id: 'phases',
       title: 'De 5 faserna',
-      text: 'Din dödsbohantering är indelad i 5 faser: Direkt efter dödsfall, Begravning, Inför bouppteckning, Under bouppteckning, och Avslut & arvskifte. Varje fas har en egen checklista med uppgifter. Under "Under bouppteckning" hittar ni även en Boupptecknings-guide med bland annat ett steg för att hålla bouppteckningsförrättningen (mötet).',
+      text: 'Din dödsbohantering är indelad i 5 faser: Direkt efter dödsfall, Begravning, Inför bouppteckning, Under bouppteckning, och Avslut & arvskifte. Varje fas har en egen checklista med uppgifter. Under "Under bouppteckning" hittar ni även en Boupptecknings-guide med bland annat ett steg för att hålla bouppteckningsförrättningen (mötet). I "Inför bouppteckning" kan ni även kryssa i om dödsboet är mer komplext (t.ex. företag, samägande, utlandstillgångar) för att få fler relevanta uppgifter i checklistan.',
       attachTo: { element: '[data-tour="phases"]', on: 'top' },
       buttons: [
         { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
