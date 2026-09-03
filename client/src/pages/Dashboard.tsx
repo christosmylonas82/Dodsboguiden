@@ -5,15 +5,32 @@ import { apiFetch } from '../lib/api';
 import type { ProjectSummary } from '../lib/types';
 import { Badge } from '../components/Badge';
 import { CreateProjectModal } from '../components/CreateProjectModal';
+import { TipsModal } from '../components/TipsModal';
+import { useAuth } from '../context/AuthContext';
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const { user, markTipsSeen } = useAuth();
   const [projects, setProjects] = useState<ProjectSummary[] | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [tipsModalOpen, setTipsModalOpen] = useState(false);
 
   useEffect(() => {
     apiFetch<ProjectSummary[]>('/projects').then(setProjects).catch(() => setProjects([]));
   }, []);
+
+  useEffect(() => {
+    if (user && !user.hasSeenTipsOnboarding) {
+      setTipsModalOpen(true);
+    }
+  }, [user]);
+
+  function closeTipsModal() {
+    setTipsModalOpen(false);
+    if (user && !user.hasSeenTipsOnboarding) {
+      markTipsSeen();
+    }
+  }
 
   return (
     <div>
@@ -69,6 +86,8 @@ export function DashboardPage() {
           onCreated={(projectId) => navigate(`/projects/${projectId}/dashboard`)}
         />
       )}
+
+      {tipsModalOpen && <TipsModal onClose={closeTipsModal} />}
     </div>
   );
 }
