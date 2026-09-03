@@ -269,6 +269,13 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
           <li>Änka eller änkling med barn från tidigare äktenskap</li>
           <li>Ogift eller frånskild person — med eller utan barn</li>
         </ul>
+        <p className="mt-3 font-medium">Komplexa dödsbon</p>
+        <p className="mt-1">
+          Om dödsboet är komplext (t.ex. innehåller företag, internationella tillgångar, samägda fastigheter eller
+          tvister mellan arvingar) kan du använda Dödsbo Guide som en guide för att strukturera arbetet.
+          Rekommendationen är dock att ta hjälp av en jurist eller boutredningsman för att säkerställa att allt
+          hanteras korrekt enligt lag.
+        </p>
         <p className="mt-2">Behöver du juridisk rådgivning? Kontakta en advokat eller boutredningsman.</p>
       </div>
 
