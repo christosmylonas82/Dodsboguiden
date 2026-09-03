@@ -2,7 +2,7 @@
 // content already states get an auto-calculated due date. Inventing precise
 // day-counts for the rest would assert deadlines nobody has verified.
 export const TASK_DAY_OFFSETS: Record<string, number> = {
-  'Lämna in boupptecning till Skatteverket': 120, // GDPR: Bouppteckning ska lämnas in senast 4 månader efter dödsfallet
+  'Lämna in bouppteckning till Skatteverket': 120, // GDPR: Bouppteckning ska lämnas in senast 4 månader efter dödsfallet
 };
 
 export function calculateDueDate(deceasedDate: Date, daysAfter: number): Date {

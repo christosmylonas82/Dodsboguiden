@@ -415,7 +415,7 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
     responsibleRole: 'Dödsbodelägare',
   },
   {
-    title: 'Lämna in boupptecning till Skatteverket',
+    title: 'Lämna in bouppteckning till Skatteverket',
     description:
       'Boupptecningen måste lämnas in till Skatteverket senast 4 månader efter dödsfallet. Det är juridisk deadline.',
     moreInfo:
