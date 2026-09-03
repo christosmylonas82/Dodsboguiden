@@ -4,9 +4,12 @@ import { ResultCard } from './ResultCard';
 import {
   calculateQuizResult,
   INITIAL_QUIZ_ANSWERS,
+  type Company,
+  type CoOwnership,
   type Complexity,
   type Domicile,
   type FamilySituation,
+  type ForeignAssets,
   type QuizAnswers,
   type Will,
 } from '../lib/quiz';
@@ -69,6 +72,44 @@ const QUESTIONS: {
       { value: 'unknown' satisfies Complexity, label: 'Vet inte' },
     ],
   },
+  {
+    key: 'company',
+    title: 'Ägde den avlidne ett företag eller var delägare i något företag?',
+    subtitle:
+      'Om den avlidne ägde eller var delägare i ett företag kan det kräva speciell hantering och värdering. DödsboGuiden kan ge vägledning men juristkonsultation rekommenderas för företag.',
+    options: [
+      { value: 'stock-company' satisfies Company, label: 'Ja, ett aktiebolag' },
+      { value: 'sole-trader-or-partnership' satisfies Company, label: 'Ja, en enskild firma eller handelsbolag' },
+      { value: 'no' satisfies Company, label: 'Nej' },
+      { value: 'unknown' satisfies Company, label: 'Vet inte' },
+    ],
+  },
+  {
+    key: 'coOwnership',
+    title: 'Är något (fastighet, bostadsrätt, konto) samägt med annan person?',
+    subtitle:
+      'Samägt innebär att flera personer tillsammans äger något. Det kan komplicera arvfördelningen och kan kräva speciell hantering.',
+    options: [
+      { value: 'yes' satisfies CoOwnership, label: 'Ja, tillsammans med sambo eller annan' },
+      { value: 'no' satisfies CoOwnership, label: 'Nej, den avlidne ägde allt själv' },
+      { value: 'unknown' satisfies CoOwnership, label: 'Vet inte' },
+    ],
+  },
+  {
+    key: 'foreignAssets',
+    title: 'Hade den avlidne tillgångar eller fastigheter utomlands?',
+    subtitle:
+      'Utlandstillgångar följer ofta andra länders regler och kan kräva internationell juridisk hjälp och dubbelbeskattningsavtal.',
+    options: [
+      { value: 'real-estate' satisfies ForeignAssets, label: 'Ja, fastigheter i andra länder' },
+      {
+        value: 'accounts-or-securities' satisfies ForeignAssets,
+        label: 'Ja, bankkonton eller värdepapper i andra länder',
+      },
+      { value: 'no' satisfies ForeignAssets, label: 'Nej, inga utlandstillgångar' },
+      { value: 'unknown' satisfies ForeignAssets, label: 'Vet inte' },
+    ],
+  },
 ];
 
 export function SuitabilityQuiz() {
@@ -107,7 +148,7 @@ export function SuitabilityQuiz() {
         <h2 className="text-2xl font-semibold text-text sm:text-3xl">
           Gör det korta testet för att se om DödsboGuiden kan vara till hjälp eller inte
         </h2>
-        <p className="mt-2 text-muted">Svara på 4 korta frågor för att ta reda på det.</p>
+        <p className="mt-2 text-muted">Svara på {QUESTIONS.length} korta frågor för att ta reda på det.</p>
       </div>
 
       <div className="mt-8">
