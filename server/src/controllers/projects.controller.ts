@@ -3,13 +3,30 @@ import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { HttpError } from '../middleware/errorHandler.js';
-import { DEFAULT_CHECKLIST } from '../lib/checklistTemplate.js';
+import { getChecklistItems, SCENARIO_LABELS, type ChecklistScenario } from '../lib/checklistTemplate.js';
 import { logActivity } from '../lib/activity.js';
 import { calculateDueDate, getDueDateStatus, TASK_DAY_OFFSETS } from '../lib/dueDate.js';
+
+const scenarioFields = {
+  hasCompany: z.boolean().optional(),
+  hasCoOwnership: z.boolean().optional(),
+  hasForeignAssets: z.boolean().optional(),
+  hasRentalProperty: z.boolean().optional(),
+  hasDigitalAssets: z.boolean().optional(),
+};
+
+const SCENARIO_KEYS: { key: ChecklistScenario; field: keyof typeof scenarioFields }[] = [
+  { key: 'company', field: 'hasCompany' },
+  { key: 'coOwnership', field: 'hasCoOwnership' },
+  { key: 'foreignAssets', field: 'hasForeignAssets' },
+  { key: 'rentalProperty', field: 'hasRentalProperty' },
+  { key: 'digitalAssets', field: 'hasDigitalAssets' },
+];
 
 const createProjectSchema = z.object({
   deceasedName: z.string().min(1),
   deceasedDate: z.string().datetime().optional(),
+  ...scenarioFields,
 });
 
 export async function createProject(req: Request, res: Response) {
@@ -22,17 +39,24 @@ export async function createProject(req: Request, res: Response) {
   }
 
   const deceasedDate = body.deceasedDate ? new Date(body.deceasedDate) : undefined;
+  const activeScenarios = SCENARIO_KEYS.filter(({ field }) => body[field]).map(({ key }) => key);
+  const checklist = getChecklistItems(activeScenarios);
 
   const project = await prisma.project.create({
     data: {
       ownerId: userId,
       deceasedName: body.deceasedName,
       deceasedDate,
+      hasCompany: body.hasCompany ?? false,
+      hasCoOwnership: body.hasCoOwnership ?? false,
+      hasForeignAssets: body.hasForeignAssets ?? false,
+      hasRentalProperty: body.hasRentalProperty ?? false,
+      hasDigitalAssets: body.hasDigitalAssets ?? false,
       members: {
         create: { userId, email: user.email, role: 'ADMIN' },
       },
       tasks: {
-        create: DEFAULT_CHECKLIST.map((item, index) => ({
+        create: checklist.map((item, index) => ({
           title: item.title,
           description: item.description,
           moreInfo: item.moreInfo,
@@ -55,6 +79,66 @@ export async function createProject(req: Request, res: Response) {
   await logActivity({ projectId: project.id, userId, action: 'project_created' });
 
   res.status(201).json(project);
+}
+
+const updateScenariosSchema = z.object(scenarioFields);
+
+export async function updateProjectScenarios(req: Request, res: Response) {
+  const body = updateScenariosSchema.parse(req.body);
+  const projectId = req.params.id;
+  const userId = req.user!.userId;
+
+  const existing = await prisma.project.findUnique({ where: { id: projectId }, include: { tasks: true } });
+  if (!existing || existing.deletedAt) {
+    throw new HttpError(404, 'Project not found');
+  }
+
+  const newlyEnabled = SCENARIO_KEYS.filter(
+    ({ field, key }) => body[field] === true && !existing[field],
+  ).map(({ key }) => key);
+
+  const existingTitles = new Set(existing.tasks.map((t) => t.title));
+  const nextOrderIndex = existing.tasks.length ? Math.max(...existing.tasks.map((t) => t.orderIndex)) + 1 : 0;
+  const tasksToAdd = getChecklistItems(newlyEnabled).filter(
+    (item) => newlyEnabled.includes(item.scenario!) && !existingTitles.has(item.title),
+  );
+
+  const project = await prisma.project.update({
+    where: { id: projectId },
+    data: {
+      ...body,
+      tasks: tasksToAdd.length
+        ? {
+            create: tasksToAdd.map((item, index) => ({
+              title: item.title,
+              description: item.description,
+              moreInfo: item.moreInfo,
+              url: item.url,
+              phase: item.phase,
+              priority: item.priority,
+              timeEstimate: item.timeEstimate,
+              responsibleRole: item.responsibleRole,
+              orderIndex: nextOrderIndex + index,
+              dueDate:
+                existing.deceasedDate && TASK_DAY_OFFSETS[item.title] !== undefined
+                  ? calculateDueDate(existing.deceasedDate, TASK_DAY_OFFSETS[item.title])
+                  : undefined,
+            })),
+          }
+        : undefined,
+    },
+    include: { tasks: { orderBy: { orderIndex: 'asc' } } },
+  });
+
+  if (newlyEnabled.length) {
+    await logActivity({
+      projectId,
+      userId,
+      action: `aktiverade checklista för: ${newlyEnabled.map((s) => SCENARIO_LABELS[s]).join(', ')}`,
+    });
+  }
+
+  res.json(project);
 }
 
 export async function listProjects(req: Request, res: Response) {

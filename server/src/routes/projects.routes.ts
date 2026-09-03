@@ -12,6 +12,7 @@ import {
   removeMember,
   restoreProject,
   updateProject,
+  updateProjectScenarios,
 } from '../controllers/projects.controller.js';
 import { createTask, deleteTask, listActivity, updateTask } from '../controllers/tasks.controller.js';
 import {
@@ -57,6 +58,7 @@ router.post('/', asyncHandler(createProject));
 router.get('/', asyncHandler(listProjects));
 router.get('/:id', requireProjectMember, asyncHandler(getProject));
 router.patch('/:id', requireProjectAdmin, asyncHandler(updateProject));
+router.patch('/:id/scenarios', requireProjectMember, asyncHandler(updateProjectScenarios));
 router.post('/:id/invite', requireProjectAdmin, asyncHandler(inviteMember));
 router.patch('/:id/archive', requireProjectAdmin, asyncHandler(archiveProject));
 router.patch('/:id/restore', requireProjectAdmin, asyncHandler(restoreProject));

@@ -31,6 +31,7 @@ export async function createTask(req: Request, res: Response) {
       title: body.title,
       phase: body.phase,
       orderIndex: (lastTask?.orderIndex ?? -1) + 1,
+      isCustom: true,
     },
   });
 
@@ -44,7 +45,7 @@ export async function createTask(req: Request, res: Response) {
   res.status(201).json(task);
 }
 
-const TASK_STATUSES = ['PENDING', 'IN_PROGRESS', 'DONE'] as const;
+const TASK_STATUSES = ['PENDING', 'IN_PROGRESS', 'DONE', 'SKIPPED'] as const;
 
 const updateTaskSchema = z.object({
   title: z.string().min(1).optional(),
@@ -122,6 +123,28 @@ export async function updateTask(req: Request, res: Response) {
   }
 
   res.json({ ...task, dueDateStatus: getDueDateStatus(task.dueDate) });
+}
+
+export async function deleteTask(req: Request, res: Response) {
+  const { id: projectId, taskId } = req.params;
+
+  const existingTask = await prisma.task.findUnique({ where: { id: taskId } });
+  if (!existingTask || existingTask.projectId !== projectId) {
+    throw new HttpError(404, 'Task not found');
+  }
+  if (!existingTask.isCustom) {
+    throw new HttpError(400, 'Only custom tasks can be deleted');
+  }
+
+  await prisma.task.delete({ where: { id: taskId } });
+
+  await logActivity({
+    projectId,
+    userId: req.user!.userId,
+    action: `removed task "${existingTask.title}"`,
+  });
+
+  res.status(204).send();
 }
 
 export async function listActivity(req: Request, res: Response) {

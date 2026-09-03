@@ -8,6 +8,7 @@ export function MetricCard({
   onClick,
   headerRight,
   centered,
+  valueClassName,
 }: {
   label: string;
   value: ReactNode;
@@ -16,6 +17,7 @@ export function MetricCard({
   onClick?: () => void;
   headerRight?: ReactNode;
   centered?: boolean;
+  valueClassName?: string;
 }) {
   const content = (
     <>
@@ -26,7 +28,7 @@ export function MetricCard({
         </div>
         {headerRight}
       </div>
-      <p className={`mt-2 text-3xl font-semibold text-text ${centered ? 'text-center' : ''}`}>{value}</p>
+      <p className={`mt-2 ${valueClassName ?? 'text-3xl'} font-semibold text-text ${centered ? 'text-center' : ''}`}>{value}</p>
       {hint && <p className={`mt-1 text-sm text-muted ${centered ? 'text-center' : ''}`}>{hint}</p>}
     </>
   );

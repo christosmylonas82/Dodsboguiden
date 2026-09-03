@@ -13,6 +13,7 @@ import { TASK_STATUS_LABELS } from '../lib/taskStatus';
 import { PHASE_DESCRIPTIONS, TASK_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { phaseStatus } from '../lib/phases';
 import { tasksForProgress } from '../lib/taskStatus';
+import { SCENARIO_OPTIONS, type ScenarioKey } from '../lib/scenarios';
 
 export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
   const { id } = useParams<{ id: string }>();
@@ -91,6 +92,15 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
   async function deleteCustomTask(task: Task) {
     if (!id) return;
     await apiFetch(`/projects/${id}/tasks/${task.id}`, { method: 'DELETE' });
+    reload();
+  }
+
+  async function toggleScenario(key: ScenarioKey, value: boolean) {
+    if (!id) return;
+    await apiFetch(`/projects/${id}/scenarios`, {
+      method: 'PATCH',
+      body: JSON.stringify({ [key]: value }),
+    });
     reload();
   }
 
@@ -176,6 +186,28 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
         </div>
         <span className="text-sm font-medium text-text">{percent}%</span>
       </div>
+
+      {phase === 'Inför bouppteckning' && (
+        <div className="mt-6 rounded-xl border border-border bg-bg p-4">
+          <p className="text-sm font-medium text-text">Är dödsboet mer komplext?</p>
+          <p className="mt-1 text-xs text-muted">
+            Kryssa i det som stämmer så lägger vi till relevanta extra punkter i checklistan nedan.
+          </p>
+          <div className="mt-3 flex flex-col gap-2">
+            {SCENARIO_OPTIONS.map((option) => (
+              <label key={option.key} className="flex items-start gap-2.5 text-sm text-text">
+                <input
+                  type="checkbox"
+                  checked={project[option.key]}
+                  onChange={(e) => toggleScenario(option.key, e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--color-primary)]"
+                />
+                {option.label}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-6 flex flex-col gap-6">
         {tasks.map((task) => {

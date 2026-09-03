@@ -72,6 +72,11 @@ export interface ProjectDetail {
   tasks: Task[];
   members: ProjectMember[];
   invitations: PendingInvitation[];
+  hasCompany: boolean;
+  hasCoOwnership: boolean;
+  hasForeignAssets: boolean;
+  hasRentalProperty: boolean;
+  hasDigitalAssets: boolean;
 }
 
 export interface PendingInvitation {

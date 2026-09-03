@@ -26,6 +26,7 @@ enum TaskStatus {
   PENDING
   IN_PROGRESS
   DONE
+  SKIPPED
 }
 
 enum InventoryStatus {
@@ -166,6 +167,11 @@ model Project {
   deadlineReminder30SentAt DateTime? @map("deadline_reminder_30_sent_at")
   status        ProjectStatus @default(ACTIVE)
   selectedArchive String?     @map("selected_archive")
+  hasCompany        Boolean @default(false) @map("has_company")
+  hasCoOwnership    Boolean @default(false) @map("has_co_ownership")
+  hasForeignAssets  Boolean @default(false) @map("has_foreign_assets")
+  hasRentalProperty Boolean @default(false) @map("has_rental_property")
+  hasDigitalAssets  Boolean @default(false) @map("has_digital_assets")
   createdAt     DateTime      @default(now()) @map("created_at")
   deletedAt     DateTime?     @map("deleted_at")
 
@@ -221,6 +227,7 @@ model Task {
   responsibleRole String?       @map("responsible_role")
   notes           String?
   dueDate         DateTime?     @map("due_date")
+  isCustom        Boolean       @default(false) @map("is_custom")
 
   project         Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   completedByUser User?   @relation("TaskCompletedBy", fields: [completedBy], references: [id])

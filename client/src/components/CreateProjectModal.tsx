@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { apiFetch, ApiError } from '../lib/api';
 import { ModalOverlay } from './ModalOverlay';
+import { SCENARIO_OPTIONS, type ScenarioKey } from '../lib/scenarios';
 
 export function CreateProjectModal({
   onClose,
@@ -11,6 +12,13 @@ export function CreateProjectModal({
 }) {
   const [deceasedName, setDeceasedName] = useState('');
   const [deceasedDate, setDeceasedDate] = useState('');
+  const [scenarios, setScenarios] = useState<Record<ScenarioKey, boolean>>({
+    hasCompany: false,
+    hasCoOwnership: false,
+    hasForeignAssets: false,
+    hasRentalProperty: false,
+    hasDigitalAssets: false,
+  });
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,6 +32,7 @@ export function CreateProjectModal({
         body: JSON.stringify({
           deceasedName,
           ...(deceasedDate ? { deceasedDate: new Date(`${deceasedDate}T00:00:00Z`).toISOString() } : {}),
+          ...scenarios,
         }),
       });
       onCreated(project.id);
@@ -71,6 +80,25 @@ export function CreateProjectModal({
             <p className="text-xs text-muted">
               Om du anger ett datum räknar vi ut deadlinen för bouppteckning (4 månader) automatiskt.
             </p>
+          </div>
+          <div className="mt-5 rounded-lg border border-border bg-bg p-3.5">
+            <p className="text-sm font-medium text-text">Är dödsboet mer komplext? (valfritt)</p>
+            <p className="mt-1 text-xs text-muted">
+              Kryssa i det som stämmer så lägger vi till relevanta extra punkter i checklistan. Du kan ändra detta senare.
+            </p>
+            <div className="mt-3 flex flex-col gap-2">
+              {SCENARIO_OPTIONS.map((option) => (
+                <label key={option.key} className="flex items-start gap-2.5 text-sm text-text">
+                  <input
+                    type="checkbox"
+                    checked={scenarios[option.key]}
+                    onChange={(e) => setScenarios((s) => ({ ...s, [option.key]: e.target.checked }))}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--color-primary)]"
+                  />
+                  {option.label}
+                </label>
+              ))}
+            </div>
           </div>
           {error && <p className="mt-2 text-sm text-danger">{error}</p>}
           <div className="mt-6 flex justify-end gap-3">

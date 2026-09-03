@@ -7,6 +7,8 @@ export type ChecklistPhase =
 
 export type ChecklistPriority = 'NOW' | 'SOON' | 'LATER';
 
+export type ChecklistScenario = 'company' | 'coOwnership' | 'foreignAssets' | 'rentalProperty' | 'digitalAssets';
+
 export interface ChecklistTemplateItem {
   title: string;
   description: string;
@@ -16,6 +18,21 @@ export interface ChecklistTemplateItem {
   priority: ChecklistPriority;
   timeEstimate: string;
   responsibleRole: string;
+  /** Only included when the matching Project scenario flag is true. Omitted = shown to everyone. */
+  scenario?: ChecklistScenario;
+}
+
+export const SCENARIO_LABELS: Record<ChecklistScenario, string> = {
+  company: 'Företag eller näringsverksamhet',
+  coOwnership: 'Samägande med annan person',
+  foreignAssets: 'Tillgångar utomlands',
+  rentalProperty: 'Hyresrätt',
+  digitalAssets: 'Digitala tillgångar och abonnemang',
+};
+
+/** Core items, plus any scenario items whose scenario is in `activeScenarios`. */
+export function getChecklistItems(activeScenarios: ChecklistScenario[]): ChecklistTemplateItem[] {
+  return DEFAULT_CHECKLIST.filter((item) => !item.scenario || activeScenarios.includes(item.scenario));
 }
 
 export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
@@ -102,6 +119,73 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
     phase: 'Direkt efter dödsfall',
     priority: 'SOON',
     timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Kontrollera om den avlidne ägde ett företag',
+    description:
+      'Ett företag kan behöva omedelbar tillsyn - vänta inte med att ta reda på om den avlidne var företagare.',
+    moreInfo:
+      'Kontrollera omedelbart om den avlidne ägde eller var delägare i ett företag (aktiebolag, enskild firma, handelsbolag). Det är viktigt att veta detta direkt eftersom företaget kan behöva operativ omsorg - anställda, kunder och avtal väntar inte. Fråga familj och bekanta, eller sök upp den avlidnes namn på bolagsverket.se.',
+    url: 'https://www.bolagsverket.se',
+    phase: 'Direkt efter dödsfall',
+    priority: 'NOW',
+    timeEstimate: '30 min - 1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Säkra e-postkonton',
+    description: 'Ett öppet e-postkonto kan missbrukas för att återställa lösenord på andra konton.',
+    moreInfo:
+      'Hitta och säkra den avlidnes e-postadress(er) omedelbart. Det är enkelt för obehöriga att missbruka ett öppet e-postkonto för lösenordsåterställning på andra konton. Kontakta e-postleverantören (Gmail, Outlook, etc.) och informera att kontot tillhör en avliden person - du behöver troligen ett dödsbevis.',
+    url: null,
+    phase: 'Direkt efter dödsfall',
+    priority: 'NOW',
+    timeEstimate: '30 min - 1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Säkra sociala medier-konton',
+    description: 'Sociala medier-konton bör säkras direkt för att förhindra missbruk.',
+    moreInfo:
+      'Hitta alla sociala medier-konton (Facebook, Instagram, LinkedIn, X/Twitter). Säkra dem omedelbart för att förhindra att obehöriga loggar in. Beslut om kontona ska stängas eller omvandlas till minnessidor kan fattas senare - de flesta plattformar har särskilda processer för dödsfall.',
+    url: null,
+    phase: 'Direkt efter dödsfall',
+    priority: 'SOON',
+    timeEstimate: '30 min - 1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Hitta och säkra lösenordshanterare',
+    description: 'En lösenordshanterare kan ge tillgång till alla den avlidnes digitala konton på en gång.',
+    moreInfo:
+      'Kontrollera om den avlidne använde en lösenordshanterare (1Password, Bitwarden, LastPass, etc.). Om lösenorden finns där men hanteraren är låst kan de gå förlorade helt. Kontakta leverantören med dödsbevis för åtkomst, eller sök efter ett huvudlösenord som kan ha antecknats någonstans.',
+    url: null,
+    phase: 'Direkt efter dödsfall',
+    priority: 'NOW',
+    timeEstimate: '30 min - 1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Kontrollera kryptovalutor och digitala plånböcker',
+    description: 'Kryptovalutor kan vara värdefulla men försvinner för alltid om nycklarna går förlorade.',
+    moreInfo:
+      'Fråga om den avlidne ägde kryptovalutor (Bitcoin, Ethereum, etc.) eller hade digitala plånböcker. Dessa kan lagras på olika plattformar eller i hårdvaruplånböcker, och kan försvinna helt om lösenord eller privata nycklar går förlorade. Kan vara mycket värdefullt för dödsboet - sök brett innan du går vidare.',
+    url: null,
+    phase: 'Direkt efter dödsfall',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Pausa onlinebutiker och digitala affärer',
+    description: 'En aktiv webbutik måste pausas snabbt för att undvika okontrollerad försäljning eller uttag.',
+    moreInfo:
+      'Om den avlidne drev en webbutik, Etsy-butik eller andra onlineaffärer måste dessa pausas omedelbart för att undvika att varor säljs eller pengar dras utan övervakning. Notera all information (inloggning, saldo, pågående ordrar) för senare värdering och avveckling.',
+    url: null,
+    phase: 'Direkt efter dödsfall',
+    priority: 'NOW',
+    timeEstimate: '1 timme',
     responsibleRole: 'Dödsbodelägare',
   },
 
@@ -377,6 +461,613 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
     timeEstimate: '1-2 timmar',
     responsibleRole: 'Dödsbodelägare',
   },
+  {
+    title: 'Vilka bankkonton och värdepapper finns?',
+    description: 'En samlad lista på alla konton och värdepapper gör resten av bouppteckningen mycket enklare.',
+    moreInfo:
+      'Gå igenom alla banker den avlidne kan ha haft konton hos, samt eventuella depåer, fonder och aktier. Kontakta varje bank för kontobesked per dödsdagen. Notera kontonummer, saldo och ISIN-koder för värdepapper - detta behövs både för inventeringen och för värderingen.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'NOW',
+    timeEstimate: '2-3 timmar',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Finns försäkringar som behöver anmälas?',
+    description: 'Livförsäkringar och andra försäkringar kan ge utbetalningar som måste begäras aktivt.',
+    moreInfo:
+      'Sök efter försäkringsbrev i hemmet och fråga arbetsgivare (grupplivförsäkring är vanligt). Kontrollera liv-, olycksfalls- och tjänstegruppslivförsäkringar. Många försäkringar betalas inte ut automatiskt - dödsboet eller förmånstagaren måste anmäla dödsfallet till bolaget.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Kontrollera om det finns arvsavtal, gåvobrev eller enskild egendom',
+    description: 'Äktenskapsförord, gåvobrev och enskild egendom kan påverka vad som ingår i bouppteckningen.',
+    moreInfo:
+      'Utöver testamentet: leta efter äktenskapsförord, gåvobrev med villkor om enskild egendom, eller arvsavtal mellan makar. Dessa avgör vad som räknas som den avlidnes egendom respektive den efterlevande makens, vilket påverkar både bodelning och bouppteckning.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Är något samägt med annan person?',
+    description: 'Fastigheter, bostadsrätter eller andra tillgångar som delas med någon annan skapar extra steg.',
+    moreInfo:
+      'Kontrollera om den avlidne ägde fastigheter, bostadsrätter, fordon eller andra tillgångar tillsammans med en sambo, ex-make, barn eller vän. Om ja - kryssa i "Samägande" i projektets inställningar för att få tillgång till en fördjupad checklista för detta.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Medlemskap i bostadsrättsförening upphör automatiskt',
+    description: 'Vid dödsfall upphör bostadsrättshavarens medlemskap direkt - dödsboet behöver inte bli medlem.',
+    moreInfo:
+      'När en bostadsrättshavare dör upphör medlemskapet i föreningen omedelbart. Ni behöver INTE bli medlem själva - dödsboet kan äga bostadsrätten utan medlemskap under en övergångsperiod. Informera föreningen om dödsfallet så snart som möjligt.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Ansök om medlemskap i bostadsrättsföreningen om aktuellt',
+    description: 'Dödsboet kan ansöka om medlemskap som juridisk person, men föreningen kan neka.',
+    moreInfo:
+      'Om det finns en bostadsrätt kan dödsboet ansöka om att bli medlem i föreningen som juridisk person. Observera: föreningen är inte skyldig att acceptera ett dödsbo som medlem - planera för att ansökan kan avslås och att bostadsrätten då måste överlåtas eller säljas.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Notera tre-årsregeln för bostadsrätt i dödsbo',
+    description: 'Ett dödsbo får normalt äga en bostadsrätt utan medlemskap i högst tre år.',
+    moreInfo:
+      'Enligt bostadsrättslagen kan ett dödsbo äga en bostadsrätt i upp till tre år utan medlemskap i föreningen. Efter tre år kan föreningen kräva att bostadsrätten säljs eller överlåts till en av dödsbodelägarna. Notera datumet så ni har koll på tidsfristen.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '15 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Godkännande krävs för andrahandsuthyrning av bostadsrätt',
+    description: 'Andrahandsuthyrning av en bostadsrätt i dödsboet kräver styrelsens godkännande.',
+    moreInfo:
+      'Om någon bor i lägenheten i andra hand (hyr av dödsboet) måste detta godkännas av bostadsrättsföreningens styrelse. Utan godkännande kan föreningen neka och kräva att hyresgästen flyttar. Ansök i god tid om ni planerar att hyra ut.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Fortsätt betala månadsavgift till bostadsrättsföreningen',
+    description: 'Avgiften till föreningen måste betalas hela tiden dödsboet äger bostadsrätten.',
+    moreInfo:
+      'Dödsboet måste betala månadsavgift till bostadsrättsföreningen för hela perioden det äger lägenheten, även om ingen bor där. Missade avgifter kan leda till att föreningen kräver försäljning - se till att betalningarna sköts löpande, till exempel via autogiro från dödsboets konto.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Kontrollera personliga lån från privatpersoner',
+    description: 'Lån mellan privatpersoner syns inte hos kreditupplysningen och måste letas fram manuellt.',
+    moreInfo:
+      'Kontrollera om den avlidne lånade pengar av eller till familj, vänner eller kollegor. Dessa skulder ska normalt regleras från dödsboet innan arvet delas ut. Sök efter skuldebrev eller skriftliga avtal i hemmet, och fråga närstående direkt.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Lista kreditkort och återstående skuld',
+    description: 'Kreditkortsskulder fortsätter generera ränta efter dödsfallet om de inte hanteras.',
+    moreInfo:
+      'Lista alla kreditkort den avlidne hade och kontrollera återstående saldo på varje. Räntekostnader kan fortsätta växa efter dödsfallet om skulden inte betalas eller spärras. Dödsboet ska betala av dessa innan arvet delas ut - kontakta varje kortutgivare för aktuellt saldo.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Sök efter skuldebrev eller fordringar',
+    description: 'Den avlidne kan både ha lånat ut och lånat in pengar - båda delarna hör till dödsboet.',
+    moreInfo:
+      'Kontrollera om den avlidne hade lånat ut eller lånat in pengar dokumenterat i skuldebrev. Ett skuldebrev där den avlidne var långivare är en tillgång i dödsboet (någon är skyldig dödsboet pengar); ett där den avlidne var låntagare är en skuld som ska regleras.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Kontrollera förfallen skatt från tidigare år',
+    description: 'Obetald skatt från tidigare år är en skuld som dödsboet ansvarar för.',
+    moreInfo:
+      'Kontrollera med Skatteverket om den avlidne hade obetalda skatteskulder från tidigare år, till exempel kvarskatt. Dödsboet måste betala dessa innan bouppteckningen kan slutföras och arvet delas ut.',
+    url: 'https://www.skatteverket.se/',
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '30 min - 1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Kontrollera pensionsfordringar (ATP, tjänstepension)',
+    description: 'Det kan finnas intjänad pension som ännu inte betalats ut och som ska tas om hand.',
+    moreInfo:
+      'Kontrollera om den avlidne hade intjänad allmän pension (ATP) eller tjänstepension som ännu inte betalats ut fullt ut. Ibland finns pengar kvar att hämta hos Pensionsmyndigheten eller tidigare arbetsgivares pensionsbolag - kontakta dem för besked.',
+    url: 'https://www.pensionsmyndigheten.se',
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Kontrollera löpande vård- eller omsorgsavtal',
+    description: 'Avtal om hemtjänst eller äldreomsorg kan medföra kostnader som fortsätter en tid efter dödsfallet.',
+    moreInfo:
+      'Om den avlidne hade avtal om hemtjänst, hemsjukvård eller annan omsorg - kontrollera uppsägningstider och om några avgifter redan är fakturerade. De flesta avtal upphör vid dödsfallet, men vissa kan medföra en sista faktura som dödsboet ska betala.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+
+  // Inför bouppteckning - Företag & näringsverksamhet (visas om projektet har markerat "Företag")
+  {
+    title: 'Äger den avlidne ett aktiebolag?',
+    description: 'Aktier i ett bolag är en del av dödsboet och måste identifieras och värderas.',
+    moreInfo:
+      'Lista alla aktiebolag där den avlidne var aktieägare. Hämta företagsnamn, organisationsnummer och ägarandel - detta kan sökas fram på bolagsverket.se. Aktierna räknas som en tillgång i dödsboet och ska tas upp i bouppteckningen.',
+    url: 'https://www.bolagsverket.se',
+    phase: 'Inför bouppteckning',
+    priority: 'NOW',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'company',
+  },
+  {
+    title: 'Äger den avlidne en enskild firma?',
+    description: 'En enskild firma har ingen egen juridisk person - allt ingår direkt i dödsboet.',
+    moreInfo:
+      'En enskild firma har ingen separat juridisk person, utan ägs direkt av den avlidne. Kontrollera om den avlidne drev egen verksamhet under eget namn eller firmanamn. Gå igenom avtal, bokslut och senaste redovisning tillsammans med ev. revisor.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'NOW',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'company',
+  },
+  {
+    title: 'Äger den avlidne handelsbolag eller kommanditbolag?',
+    description: 'Handelsbolag och kommanditbolag är mer komplicerade eftersom dödsboet blir delägare.',
+    moreInfo:
+      'Kontrollera om den avlidne var bolagsman i ett handelsbolag (HB) eller kommanditbolag (KB). Vid dödsfall blir dödsboet normalt tillfällig delägare, och bolagsavtalet styr vad som händer härnäst - läs det noggrant tillsammans med övriga bolagsmän.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'company',
+  },
+  {
+    title: 'Finns ett aktieägaravtal?',
+    description: 'Ett aktieägaravtal kan innehålla inlösenregler som styr vad som händer med aktierna.',
+    moreInfo:
+      'Hitta ett eventuellt aktieägaravtal. Det kan innehålla inlösenregler som ger de andra aktieägarna rätt att köpa ut dödsboets aktier, eller som tvingar dödsboet att sälja. Detta kan påverka arvet betydligt - läs villkoren noga.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare eller jurist',
+    scenario: 'company',
+  },
+  {
+    title: 'Finns en bolagsordning?',
+    description: 'Bolagsordningen kan innehålla särskilda regler för vad som händer när en ägare dör.',
+    moreInfo:
+      'Läs bolagets bolagsordning. Den kan innehålla särskilda regler för vad som händer när en aktieägare avlider, till exempel tvingande försäljning eller övergång av aktier till andra ägare. Bolagsordningen går normalt att hämta hos Bolagsverket.',
+    url: 'https://www.bolagsverket.se',
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare eller jurist',
+    scenario: 'company',
+  },
+  {
+    title: 'Vilka är co-ägarna eller kompanjonerna?',
+    description: 'Övriga ägare måste informeras och kan ha rätt att påverka vad som händer med bolaget.',
+    moreInfo:
+      'Lista alla övriga ägare av företaget. De ska informeras om dödsfallet så snart som möjligt, och kan enligt avtal ha rätt att köpa ut dödsboets andel eller på annat sätt påverka vad som händer med bolaget framöver.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'company',
+  },
+  {
+    title: 'Värdera företaget - substansvärde eller marknadsvärde?',
+    description: 'Ett företag kan vara värt mycket och behöver en korrekt värdering för bouppteckningen.',
+    moreInfo:
+      'Ett företag ska tas upp till sitt verkliga värde i bouppteckningen. Ni behöver en professionell värdering - kontakta företagets revisor eller en värderingsbyrå. Värderingen kan baseras på substansvärde (tillgångar minus skulder) eller marknadsvärde beroende på verksamhet. Den måste vara klar innan bouppteckningen skickas in till Skatteverket.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'NOW',
+    timeEstimate: '2-4 timmar',
+    responsibleRole: 'Revisor eller värderingsman',
+    scenario: 'company',
+  },
+  {
+    title: 'Behöver vi hjälp av revisor eller jurist för värderingen?',
+    description: 'De flesta företagsvärderingar kräver professionell hjälp för att bli juridiskt hållbara.',
+    moreInfo:
+      'För de flesta företag krävs en professionell värdering. Kontakta företagets revisor eller en jurist med erfarenhet av företagsvärdering. Det kostar pengar men är nödvändigt för en korrekt bouppteckning och för att undvika framtida tvister om värdet.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'company',
+  },
+  {
+    title: 'Är den avlidne styrelseledamot eller suppleant?',
+    description: 'Ett bolag behöver en fungerande styrelse - vakanser måste fyllas snabbt.',
+    moreInfo:
+      'Om den avlidne var styrelseledamot eller ordförande träder en eventuell suppleant in automatiskt. Finns ingen suppleant måste en ny styrelseledamot utses snarast, annars kan bolaget bli handlingsförlamat. Kontakta övriga styrelsemedlemmar direkt.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'NOW',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'company',
+  },
+  {
+    title: 'Måste vi sälja, likvidera eller överta företaget?',
+    description: 'Dödsboet behöver ta ett tydligt beslut om företagets framtid.',
+    moreInfo:
+      'Dödsboet måste besluta: ska företaget säljas (ofta snabbast), likvideras (avvecklas successivt), eller ska en arvinge ta över driften? Det är ett stort beslut som påverkar både ekonomi och familjens framtid - ta gärna hjälp av revisor eller jurist inför beslutet.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '2-3 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'company',
+  },
+  {
+    title: 'Måste kvarlevande kompanjoner köpa ut dödsboets andel?',
+    description: 'Ett aktieägaravtal kan ge eller ålägga övriga ägare att köpa ut dödsboet.',
+    moreInfo:
+      'Om det finns ett aktieägaravtal kan övriga ägare ha rätt - eller skyldighet - att köpa ut dödsboets aktier. Fråga dem så snart som möjligt vad de önskar göra, och se till att en eventuell utköpsprocess dokumenteras och värderas korrekt.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'company',
+  },
+  {
+    title: 'Är det ett fåmansföretag?',
+    description: 'Fåmansföretag kan omfattas av särskilda skatteregler (3:12-reglerna).',
+    moreInfo:
+      'Om företaget är ett fåmansföretag (få ägare med stort inflytande) kan särskilda skatteregler, de så kallade 3:12-reglerna, gälla. En revisor eller skattejurist kan förklara vad detta innebär och hur mycket skatt som kan bli aktuell.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Revisor eller skattejurist',
+    scenario: 'company',
+  },
+
+  // Inför bouppteckning - Samägendom & komplicerade äganderätter (visas om projektet har markerat "Samägande")
+  {
+    title: 'Är någon fastighet eller bostadsrätt samägd?',
+    description: 'Samägda fastigheter skapar extra komplikationer vid dödsfall.',
+    moreInfo:
+      'Kontrollera om den avlidne ägde fastigheten eller bostadsrätten tillsammans med någon annan - sambo, ex-make, barn eller vän. Samägande innebär att flera parter måste vara överens om vad som ska hända med tillgången.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'NOW',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'coOwnership',
+  },
+  {
+    title: 'Med vem är egendomen samägd?',
+    description: 'Vem co-ägaren är avgör vilka regler som gäller.',
+    moreInfo:
+      'Skriv upp exakt namn på co-ägaren/co-ägarna. Det spelar stor roll om det är en sambo (andra regler än gifta), en ex-make, ett barn eller en helt utomstående part - det påverkar vilka rättigheter respektive part har.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'coOwnership',
+  },
+  {
+    title: 'Vilka är ägarandelarnas storlek (50/50, 60/40, etc)?',
+    description: 'En felaktig ägarandel kan leda till stora problem längre fram.',
+    moreInfo:
+      'Ta reda på de exakta ägarandelarna. Kontrollera lagfarten, köpekontraktet eller andra ägarhandlingar. Andelarna avgör hur stor del av tillgången som ingår i dödsboet och hur den ska värderas i bouppteckningen.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'coOwnership',
+  },
+  {
+    title: 'Kan kvarlevande sambo begära bodelning?',
+    description: 'Sambor har särskilda rättigheter som kan påverka vad som ingår i arvet.',
+    moreInfo:
+      'Om den avlidne var sambo (inte gift) och ägde bostaden tillsammans med sambon har den efterlevande sambon rätt att begära bodelning av samboegendomen enligt sambolagen. Det kan påverka vad som faktiskt ingår i dödsboet - rådfråga gärna en jurist.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Efterlevande sambo eller jurist',
+    scenario: 'coOwnership',
+  },
+  {
+    title: 'Måste vi anlita en boutredningsman?',
+    description: 'Vid oenighet om en samägd fastighet kan en boutredningsman behöva utses.',
+    moreInfo:
+      'Om dödsbodelägarna inte kan komma överens om vad som ska göras med en samägd fastighet kan dödsboet behöva en boutredningsman som tingsrätten utser. Det är ett dyrt men ibland nödvändigt steg för att lösa en låst situation.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'coOwnership',
+  },
+  {
+    title: 'Kan arvingarna sälja sin andel utan övriga samägares samtycke?',
+    description: 'Det går att sälja bara sin andel, men det är svårt och kan skapa konflikter.',
+    moreInfo:
+      'Om flera personer äger en fastighet kan en av dem försöka sälja bara sin egen andel. Det är juridiskt möjligt men praktiskt svårt - en köpare får då bara en del av en fastighet som redan delvis ägs av andra, vilket kan skapa spänningar mellan parterna.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare eller jurist',
+    scenario: 'coOwnership',
+  },
+  {
+    title: 'Behöver vi tingsrättsbeslut för att lösa oenigheten?',
+    description: 'Tingsrätten kan tvinga fram en lösning när samägarna inte kommer överens.',
+    moreInfo:
+      'Om arvingarna eller samägarna inte kan komma överens kan tingsrätten behöva fatta beslut, till exempel om tvångsförsäljning enligt samäganderättslagen. Tingsrätten kan även utse en god man som förvaltar egendomen tills en lösning är på plats.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Jurist',
+    scenario: 'coOwnership',
+  },
+
+  // Inför bouppteckning - Hyresrätt (visas om projektet har markerat "Hyresrätt")
+  {
+    title: 'Vilka hyresrätter äger den avlidne?',
+    description: 'Alla hyreskontrakt behöver identifieras - en hyresrätt kan ha värde för dödsboet.',
+    moreInfo:
+      'Lista alla hyreskontrakt där den avlidne var hyresgäst. Hitta kontrakt, hyresbelopp och villkor. En hyresrätt i attraktivt läge kan ha ett visst värde för dödsboet, till exempel om den kan överlåtas.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'rentalProperty',
+  },
+  {
+    title: 'Vilka är hyresförhållandets villkor?',
+    description: 'Kontraktets villkor styr vad dödsboet kan och inte kan göra med hyresrätten.',
+    moreInfo:
+      'Läs hyreskontraktet noggrant. Kontrollera bindningstid, uppsägningstid, möjlighet till andrahandsuthyrning och eventuella specialvillkor. Detta avgör hur snabbt dödsboet kan avveckla eller överlåta hyresrätten.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'rentalProperty',
+  },
+  {
+    title: 'Kan hyresrätten hyras ut i andrahand?',
+    description: 'Andrahandsuthyrning kräver oftast hyresvärdens godkännande.',
+    moreInfo:
+      'Om dödsboet inte vill avsluta hyresrätten direkt kan den hyras ut i andra hand under en period. Många hyresvärdar förbjuder detta eller kräver skriftligt godkännande - kontrollera villkoren i kontraktet innan ni går vidare.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'rentalProperty',
+  },
+  {
+    title: 'Vad är uppsägningstiden för hyresavtalet?',
+    description: 'Uppsägningstiden avgör hur snabbt dödsboet slipper hyreskostnaden.',
+    moreInfo:
+      'Hyresavtal har normalt en uppsägningstid, ofta 1-3 månader. Dödsboet måste säga upp avtalet enligt dessa villkor om ingen ska bo kvar, annars fortsätter hyran att löpa och belasta dödsboets ekonomi.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'rentalProperty',
+  },
+  {
+    title: 'Kan hyresgästen själv överta rätten?',
+    description: 'En dödsbodelägare som redan bor i lägenheten kan ofta ta över hyreskontraktet.',
+    moreInfo:
+      'Om en av dödsbodelägarna vill bo kvar i lägenheten kan de ofta överta hyresrätten i eget namn. Kontakta hyresvärden så snart som möjligt för att ansöka om övertagande - det är ofta den enklaste lösningen för alla parter.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'rentalProperty',
+  },
+
+  // Inför bouppteckning - Utlandstillgångar (visas om projektet har markerat "Utlandstillgångar")
+  {
+    title: 'Äger den avlidne fastigheter utomlands?',
+    description: 'Utländska fastigheter skapar extra juridiska och skattemässiga komplikationer.',
+    moreInfo:
+      'Kontrollera om den avlidne ägde hus, lägenhet eller mark utanför Sverige - till exempel ett sommarhus eller en investeringsfastighet. Utländska fastigheter hanteras ofta enligt det landets egna arvsregler, inte svensk lag.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'foreignAssets',
+  },
+  {
+    title: 'Har den avlidne bankkonton i utländska länder?',
+    description: 'Utländska bankkonton måste sökas upp aktivt - de dyker inte upp automatiskt.',
+    moreInfo:
+      'Fråga om den avlidne hade sparkonton, lönekonton eller investeringar i andra länder, till exempel i ett tidigare hemland. Dessa måste kontaktas direkt av dödsboet med dödsbevis och arvsintyg för att kunna avslutas eller överföras.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'foreignAssets',
+  },
+  {
+    title: 'Äger den avlidne värdepapper eller aktier utomlands?',
+    description: 'Utländska värdepapper kan vara svåra att hantera utan lokal hjälp.',
+    moreInfo:
+      'Kontrollera om den avlidne ägde aktier, obligationer eller andra värdepapper via utländska banker eller mäklare. Dessa kan vara värdefulla men ofta svåra att komma åt utan kontakt med den utländska institutionen och rätt dokumentation.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'foreignAssets',
+  },
+  {
+    title: 'Vilka länder är inblandade?',
+    description: 'En tydlig lista på länder gör det enklare att bedöma vilka regler som gäller.',
+    moreInfo:
+      'Gör en lista på alla länder där den avlidne hade tillgångar. Olika länder har olika regler för dödsbon och arv, och listan behövs för att avgöra vilka avtal och myndigheter som blir aktuella framöver.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'foreignAssets',
+  },
+  {
+    title: 'Behöver vi kontrollera dubbelbeskattningsavtal?',
+    description: 'Sveriges avtal med andra länder kan påverka hur arvet beskattas.',
+    moreInfo:
+      'Om till exempel Spanien eller Danmark är inblandat kan ett dubbelbeskattningsavtal mellan Sverige och det landet påverka hur tillgångarna beskattas och registreras. En jurist eller revisor med internationell erfarenhet kan reda ut vad som gäller.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Jurist eller revisor',
+    scenario: 'foreignAssets',
+  },
+  {
+    title: 'Måste vi skicka ansökningar till utländska myndigheter?',
+    description: 'De flesta länder kräver en egen ansökningsprocess för att arvingarna ska få tillgångarna.',
+    moreInfo:
+      'De flesta länder kräver särskilda ansökningar innan dödsboet eller arvingarna kan ta över utländska tillgångar, ofta med bestyrkta och översatta kopior av svenska dokument. Detta kan ta betydligt längre tid än den svenska processen - räkna med flera månader.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '2-3 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'foreignAssets',
+  },
+  {
+    title: 'Behöver vi en jurist eller agent i det andra landet?',
+    description: 'Lokal juridisk hjälp är ofta nödvändig för att reda ut utlandstillgångar.',
+    moreInfo:
+      'För de flesta utlandstillgångar krävs lokal juridisk hjälp. En jurist eller agent i det andra landet kan hantera lokala regler, myndighetskontakter och registrering. Det är ofta nödvändigt och medför en extra kostnad, men sparar mycket tid och krångel.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'foreignAssets',
+  },
+
+  // Inför bouppteckning - Digitala tillgångar (visas om projektet har markerat "Digitala tillgångar")
+  {
+    title: 'Inventera alla digitala abonnemang',
+    description: 'Bortglömda abonnemang fortsätter kosta pengar tills de sägs upp.',
+    moreInfo:
+      'Gör en lista på alla digitala tjänster som kostar pengar - Spotify, Netflix, Disney+, Dropbox, molnlagring, LinkedIn Premium, med mera. Många av dessa glöms bort och fortsätter dra pengar från kort eller konto tills de sägs upp aktivt.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'digitalAssets',
+  },
+  {
+    title: 'Webbplatser och domäner - vem ska överta?',
+    description: 'Webbplatser och domäner kan ha ekonomiskt eller sentimentalt värde.',
+    moreInfo:
+      'Om den avlidne ägde webbplatser, bloggar eller domäner måste dödsboet besluta: ska de sparas, säljas eller stängas? Vissa domäner och etablerade webbplatser kan ha ett ekonomiskt värde värt att ta hänsyn till.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'digitalAssets',
+  },
+  {
+    title: 'Onlinebutiker - vilken status?',
+    description: 'En webbutik som lämnas obevakad kan orsaka både förlorade intäkter och missnöjda kunder.',
+    moreInfo:
+      'Om den avlidne drev en webbutik (Amazon, Etsy, eBay eller egen sajt) - se till att allt är pausat och inventerat. Det kan finnas pengar kvar att hämta ut eller varor i lager som behöver säljas eller returneras.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'digitalAssets',
+  },
+  {
+    title: 'Licensierade verk - böcker, musik, mjukvara',
+    description: 'Digitala licenser kan sällan överlåtas, men bör noteras för dödsboet.',
+    moreInfo:
+      'Kontrollera om den avlidne ägde licensierade e-böcker (Kindle), musiksamlingar (Spotify-listor, iTunes) eller mjukvarulicenser. De flesta går inte att överföra till någon annan enligt användarvillkoren, men värdet bör noteras och kontona avslutas eller sägas upp.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'digitalAssets',
+  },
+  {
+    title: 'Spara lösenord säkert för senare överföring',
+    description: 'Lösenord som behövs för webbplatser eller digitala tjänster måste hanteras säkert.',
+    moreInfo:
+      'Om någon ska ta över webbplatser eller digitala tjänster behöver de lösenorden. Överför dem säkert - använd en lösenordshanterare eller ett säkerhetsbrev, aldrig okrypterat via e-post eller SMS.',
+    url: null,
+    phase: 'Inför bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'digitalAssets',
+  },
 
   // Under bouppteckning
   {
@@ -483,6 +1174,63 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
     priority: 'SOON',
     timeEstimate: '1-3 timmar (löpande)',
     responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Finns pågående rättsliga tvister?',
+    description: 'Pågående rättsprocesser övergår till dödsboet och kan innebära både kostnader och intäkter.',
+    moreInfo:
+      'Kontrollera om den avlidne hade någon pågående rättegång eller domstolsprocess. Dödsboet blir part i dessa processer och kan behöva betala advokatkostnader eller ha rätt att få pengar tillbaka, beroende på hur tvisten slutar.',
+    url: null,
+    phase: 'Under bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare eller jurist',
+  },
+  {
+    title: 'Finns miljöansvar för förorenad mark?',
+    description: 'Ägande av förorenad mark kan innebära ett ansvar som följer med dödsboet.',
+    moreInfo:
+      'Om den avlidne ägde mark eller en fastighet som är eller misstänks vara förorenad kan dödsboet ha ett miljöansvar enligt miljöbalken. Kontakta länsstyrelsen för att kontrollera om fastigheten är registrerad som ett potentiellt förorenat område.',
+    url: null,
+    phase: 'Under bouppteckning',
+    priority: 'LATER',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Finns arbetsskadeanspråk från tidigare anställda?',
+    description: 'Som tidigare arbetsgivare kan den avlidne ha kvarstående ansvar gentemot anställda.',
+    moreInfo:
+      'Om den avlidne var arbetsgivare kan det finnas väntande arbetsrättsliga ärenden eller skadereglering från nuvarande eller tidigare anställda. Dessa övergår till dödsboet och måste lösas innan bouppteckningen kan slutföras.',
+    url: null,
+    phase: 'Under bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1-2 timmar',
+    responsibleRole: 'Dödsbodelägare eller jurist',
+  },
+  {
+    title: 'Är företagets värdering klar för Skatteverket?',
+    description: 'Värderingen av företaget måste vara färdig och väl dokumenterad innan bouppteckningen skickas in.',
+    moreInfo:
+      'Se till att den professionella värderingen av företaget är helt klar innan bouppteckningen skickas till Skatteverket. Värderingen ska vara väl dokumenterad så att den håller om Skatteverket ifrågasätter värdet.',
+    url: null,
+    phase: 'Under bouppteckning',
+    priority: 'NOW',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Revisor',
+    scenario: 'company',
+  },
+  {
+    title: 'Är fåmansföretag-reglerna tillämpliga (3:12)?',
+    description: 'Fåmansföretagsreglerna kan påverka både bouppteckningen och framtida deklaration.',
+    moreInfo:
+      'Om bolaget är ett fåmansföretag kan de särskilda 3:12-reglerna gälla. Revisor eller skattejurist bör klargöra hur detta påverkar värderingen i bouppteckningen och den framtida deklarationen för arvingarna som tar över aktierna.',
+    url: null,
+    phase: 'Under bouppteckning',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Revisor eller skattejurist',
+    scenario: 'company',
   },
 
   // Avslut & arvskifte
@@ -632,5 +1380,96 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
     priority: 'LATER',
     timeEstimate: '30 min',
     responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Hur sparas dokumentationen långsiktigt (minst 10 år)?',
+    description: 'All dokumentation från dödsboet ska sparas i minst 10 år enligt lag.',
+    moreInfo:
+      'Efter arvskiftet måste all dokumentation sparas på ett säkert ställe i minst 10 år. Det kan behövas senare för Skatteverkets kontroller eller om en tvist skulle uppstå mellan familjemedlemmar. Överväg digitala säkerhetskopior utöver pappersoriginalen.',
+    url: null,
+    phase: 'Avslut & arvskifte',
+    priority: 'LATER',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Digitala säkerhetskopior av viktiga papper',
+    description: 'Digitala kopior gör det lättare att hitta viktiga dokument i framtiden.',
+    moreInfo:
+      'Skanna och gör digitala kopior av alla viktiga handlingar - testamente, bouppteckning, arvskifteshandling, lagfarter, skuldebrev. Spara dem på en säker plats, till exempel en krypterad molntjänst eller ett USB-minne som förvaras säkert.',
+    url: null,
+    phase: 'Avslut & arvskifte',
+    priority: 'LATER',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Åtkomstskydd för känslig data',
+    description: 'Personuppgifter i digitala dödsbo-filer behöver skyddas mot obehörig åtkomst.',
+    moreInfo:
+      'Lösenordsskydda alla digitala filer som innehåller känslig information, till exempel personnummer, bostadsadress eller kontonummer. I fel händer kan sådana uppgifter användas för identitetsstöld eller bedrägerier.',
+    url: null,
+    phase: 'Avslut & arvskifte',
+    priority: 'LATER',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Var sparas lösenord till digitala konton?',
+    description: 'Lösenord som någon arving behöver senare bör sparas på ett säkert, delbart sätt.',
+    moreInfo:
+      'Om någon arvinge ska ta över digitala konton, webbplatser eller ett företag längre fram behöver de lösenorden. Se till att de är sparade på en säker plats som går att överföra, till exempel en delad lösenordshanterare eller ett förseglat säkerhetsbrev.',
+    url: null,
+    phase: 'Avslut & arvskifte',
+    priority: 'LATER',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Behövde vi tingsrätt eller domstol för något?',
+    description: 'Alla domstolsbeslut som förekommit under processen bör arkiveras tillsammans med övrig dokumentation.',
+    moreInfo:
+      'Om tingsrätten behövde kopplas in för att lösa tvister eller utse en boutredningsman - se till att alla beslut är dokumenterade och arkiverade tillsammans med övrig dödsboedokumentation, för det fall frågor skulle komma upp längre fram.',
+    url: null,
+    phase: 'Avslut & arvskifte',
+    priority: 'LATER',
+    timeEstimate: '30 min',
+    responsibleRole: 'Dödsbodelägare',
+  },
+  {
+    title: 'Behöver revisorn spara dokumentationen för företaget?',
+    description: 'Bokföring och räkenskaper för ett företag ska sparas långsiktigt enligt bokföringslagen.',
+    moreInfo:
+      'Om dödsboet ägde ett företag måste bokföringen och räkenskapsmaterialet sparas enligt bokföringslagens regler, normalt i minst 7 år. En revisor kan hantera arkiveringen eller ge råd om vad som gäller för just ert bolag.',
+    url: null,
+    phase: 'Avslut & arvskifte',
+    priority: 'LATER',
+    timeEstimate: '30 min',
+    responsibleRole: 'Revisor',
+    scenario: 'company',
+  },
+  {
+    title: 'Löstes alla tvister kring företaget?',
+    description: 'Olösta tvister om företaget kan orsaka framtida konflikter mellan arvingarna.',
+    moreInfo:
+      'Kontrollera att alla tvister om företagets värde, vem som ska ta över det, eller en eventuell försäljning är helt lösta och dokumenterade. Olösta frågor riskerar att blossa upp som konflikter mellan arvingarna långt senare.',
+    url: null,
+    phase: 'Avslut & arvskifte',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'company',
+  },
+  {
+    title: 'Löstes alla tvister kring samägda fastigheter?',
+    description: 'Olösta samägandefrågor är en vanlig källa till framtida familjekonflikter.',
+    moreInfo:
+      'Se till att arvingarna och eventuella co-ägare är överens om vad som ska göras med samägda fastigheter innan dödsboet avslutas. Olösta frågor kan leda till tvister många år senare, ofta efter att detaljerna glömts bort.',
+    url: null,
+    phase: 'Avslut & arvskifte',
+    priority: 'SOON',
+    timeEstimate: '1 timme',
+    responsibleRole: 'Dödsbodelägare',
+    scenario: 'coOwnership',
   },
 ];
