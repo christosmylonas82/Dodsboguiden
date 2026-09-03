@@ -3,6 +3,15 @@ import { ModalOverlay } from './ModalOverlay';
 
 const CATEGORIES = [
   {
+    icon: TbHeartHandshake,
+    title: 'Stöd och välmående',
+    tips: [
+      'Det är helt normalt att processen känns tung - ta hjälp av familj, vänner eller en jurist vid behov.',
+      'Fördela uppgifterna mellan familjemedlemmarna så att inte allt hamnar på en person.',
+      'Ta det i den takt ni orkar - de flesta steg har inga akuta deadlines.',
+    ],
+  },
+  {
     icon: TbCoins,
     title: 'Ekonomi och betalningar',
     tips: [
@@ -27,15 +36,6 @@ const CATEGORIES = [
       'Skatteverket får automatiskt information om dödsfallet, men bouppteckningen måste ni skicka in själva.',
       'Leta efter testamente, äktenskapsförord och försäkringsbrev - de påverkar bodelningen.',
       'Bouppteckningen ska vara inskickad till Skatteverket senast fyra månader efter dödsfallet.',
-    ],
-  },
-  {
-    icon: TbHeartHandshake,
-    title: 'Stöd och välmående',
-    tips: [
-      'Det är helt normalt att processen känns tung - ta hjälp av familj, vänner eller en jurist vid behov.',
-      'Fördela uppgifterna mellan familjemedlemmarna så att inte allt hamnar på en person.',
-      'Ta det i den takt ni orkar - de flesta steg har inga akuta deadlines.',
     ],
   },
 ];
