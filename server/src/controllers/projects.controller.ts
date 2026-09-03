@@ -96,36 +96,45 @@ export async function updateProjectScenarios(req: Request, res: Response) {
   const newlyEnabled = SCENARIO_KEYS.filter(
     ({ field, key }) => body[field] === true && !existing[field],
   ).map(({ key }) => key);
+  const newlyDisabled = SCENARIO_KEYS.filter(
+    ({ field, key }) => body[field] === false && existing[field],
+  ).map(({ key }) => key);
 
   const existingTitles = new Set(existing.tasks.map((t) => t.title));
   const nextOrderIndex = existing.tasks.length ? Math.max(...existing.tasks.map((t) => t.orderIndex)) + 1 : 0;
   const tasksToAdd = getChecklistItems(newlyEnabled).filter(
     (item) => newlyEnabled.includes(item.scenario!) && !existingTitles.has(item.title),
   );
+  const titlesToRemove = getChecklistItems(newlyDisabled)
+    .filter((item) => newlyDisabled.includes(item.scenario!))
+    .map((item) => item.title);
 
   const project = await prisma.project.update({
     where: { id: projectId },
     data: {
       ...body,
-      tasks: tasksToAdd.length
-        ? {
-            create: tasksToAdd.map((item, index) => ({
-              title: item.title,
-              description: item.description,
-              moreInfo: item.moreInfo,
-              url: item.url,
-              phase: item.phase,
-              priority: item.priority,
-              timeEstimate: item.timeEstimate,
-              responsibleRole: item.responsibleRole,
-              orderIndex: nextOrderIndex + index,
-              dueDate:
-                existing.deceasedDate && TASK_DAY_OFFSETS[item.title] !== undefined
-                  ? calculateDueDate(existing.deceasedDate, TASK_DAY_OFFSETS[item.title])
-                  : undefined,
-            })),
-          }
-        : undefined,
+      tasks: {
+        ...(titlesToRemove.length ? { deleteMany: { title: { in: titlesToRemove }, isCustom: false } } : {}),
+        ...(tasksToAdd.length
+          ? {
+              create: tasksToAdd.map((item, index) => ({
+                title: item.title,
+                description: item.description,
+                moreInfo: item.moreInfo,
+                url: item.url,
+                phase: item.phase,
+                priority: item.priority,
+                timeEstimate: item.timeEstimate,
+                responsibleRole: item.responsibleRole,
+                orderIndex: nextOrderIndex + index,
+                dueDate:
+                  existing.deceasedDate && TASK_DAY_OFFSETS[item.title] !== undefined
+                    ? calculateDueDate(existing.deceasedDate, TASK_DAY_OFFSETS[item.title])
+                    : undefined,
+              })),
+            }
+          : {}),
+      },
     },
     include: { tasks: { orderBy: { orderIndex: 'asc' } } },
   });
@@ -135,6 +144,13 @@ export async function updateProjectScenarios(req: Request, res: Response) {
       projectId,
       userId,
       action: `aktiverade checklista för: ${newlyEnabled.map((s) => SCENARIO_LABELS[s]).join(', ')}`,
+    });
+  }
+  if (newlyDisabled.length) {
+    await logActivity({
+      projectId,
+      userId,
+      action: `tog bort checklista för: ${newlyDisabled.map((s) => SCENARIO_LABELS[s]).join(', ')}`,
     });
   }
 
