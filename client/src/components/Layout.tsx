@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, Outlet, useLocation, useParams } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   TbAddressBook,
   TbClipboardList,
@@ -14,6 +14,7 @@ import {
   TbCoin,
   TbFiles,
   TbShieldLock,
+  TbRoute,
 } from 'react-icons/tb';
 import dodsboguidenLogo from '../assets/dodsboguiden-logo.png';
 import { useAuth } from '../context/AuthContext';
@@ -65,6 +66,7 @@ type ModalKey =
 export function Layout() {
   const { user, logout, markTipsSeen } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
   const { id: projectId } = useParams<{ id?: string }>();
   const isInProject = Boolean(projectId);
@@ -129,6 +131,12 @@ export function Layout() {
 
   function openModalAndCloseMenu(modal: ModalKey) {
     setOpenModal(modal);
+    setMobileMenuOpen(false);
+  }
+
+  function startGuidedTour() {
+    if (!projectId) return;
+    navigate(`/projects/${projectId}/dashboard`, { state: { startTour: true } });
     setMobileMenuOpen(false);
   }
 
@@ -283,6 +291,17 @@ export function Layout() {
               </nav>
 
               <div className="hidden flex-1 items-center justify-end gap-2 md:flex">
+                {isInProject && (
+                  <button
+                    type="button"
+                    onClick={startGuidedTour}
+                    aria-label="Guidad tur"
+                    title="Guidad tur"
+                    className="rounded-lg bg-transparent p-2 text-muted hover:bg-primary-light hover:text-text"
+                  >
+                    <TbRoute size={20} />
+                  </button>
+                )}
                 <div data-tour="notifications">
                   <NotificationsBell />
                 </div>
@@ -293,6 +312,17 @@ export function Layout() {
               </div>
 
               <div className="flex flex-1 items-center justify-end gap-2 md:hidden">
+                {isInProject && (
+                  <button
+                    type="button"
+                    onClick={startGuidedTour}
+                    aria-label="Guidad tur"
+                    title="Guidad tur"
+                    className="rounded-lg bg-transparent p-2 text-muted hover:bg-primary-light hover:text-text"
+                  >
+                    <TbRoute size={20} />
+                  </button>
+                )}
                 <NotificationsBell />
                 <ThemeToggle />
                 <button

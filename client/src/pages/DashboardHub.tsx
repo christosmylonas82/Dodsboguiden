@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { TbProgress, TbUsers, TbBell, TbUserPlus, TbArrowRight, TbPencil, TbClock } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { ActivityEntry, ProjectDetail } from '../lib/types';
@@ -24,6 +24,7 @@ import { DEADLINE_REMINDER_MILESTONES, daysUntilDeadline, formatDeadlineDate } f
 export function DashboardHubPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, markOnboardingSeen } = useAuth();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
@@ -66,6 +67,14 @@ export function DashboardHubPage() {
       setShowTour(true);
     }
   }, [project, user]);
+
+  useEffect(() => {
+    if ((location.state as { startTour?: boolean } | null)?.startTour) {
+      setShowTour(true);
+      navigate('.', { replace: true, state: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
 
   useEffect(() => {
     if (!project?.deceasedDate || !id) return;
