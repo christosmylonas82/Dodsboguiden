@@ -198,6 +198,7 @@ export function DashboardHubPage() {
             icon={<TbBell size={20} />}
             label="Senaste aktivitet"
             value={lastActivity ? formatRelativeTime(lastActivity.timestamp) : '—'}
+            valueClassName="text-lg"
             hint={lastActivity ? `${lastActivity.user.name} ${formatActivityAction(lastActivity.action)}` : 'Ingen aktivitet än'}
             onClick={() => setOpenModal('activity')}
             centered
