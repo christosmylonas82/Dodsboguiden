@@ -1012,7 +1012,7 @@ export const DEFAULT_CHECKLIST: ChecklistTemplateItem[] = [
     title: 'Inventera alla digitala abonnemang',
     description: 'Bortglömda abonnemang fortsätter kosta pengar tills de sägs upp.',
     moreInfo:
-      'Gör en lista på alla digitala tjänster som kostar pengar - Spotify, Netflix, Disney+, Dropbox, molnlagring, LinkedIn Premium, med mera. Många av dessa glöms bort och fortsätter dra pengar från kort eller konto tills de sägs upp aktivt.',
+      'Gör en lista på alla digitala tjänster som kostar pengar - Spotify, Netflix, Disney+, Dropbox, molnlagring, LinkedIn Premium, med mera. Många av dessa glöms bort och fortsätter dra pengar från kort eller konto tills de sägs upp aktivt. Skriv antingen in tjänsterna i anteckningsfältet här, eller skapa en egen uppgift för varje tjänst så att den kan bockas av och tilldelas för sig.',
     url: null,
     phase: 'Inför bouppteckning',
     priority: 'SOON',
