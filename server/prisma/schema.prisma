@@ -103,6 +103,7 @@ model User {
   hasSeenTipsOnboarding Boolean @default(false) @map("has_seen_tips_onboarding")
   onboardingVersionSeen Int @default(0) @map("onboarding_version_seen")
   profileImageUrl String? @db.Text @map("profile_image_url")
+  emailVerifiedAt DateTime? @map("email_verified_at")
   createdAt    DateTime @default(now()) @map("created_at")
   deletedAt    DateTime? @map("deleted_at")
 
@@ -115,11 +116,26 @@ model User {
   sentInvitations     Invitation[] @relation("InvitationSender")
   receivedInvitations Invitation[] @relation("InvitationRecipient")
   passwordResets      PasswordReset[]
+  emailVerifications  EmailVerification[]
   authEvents          AuthEvent[]
   uploadedDocuments   Document[]
   notifications       Notification[]
 
   @@map("users")
+}
+
+model EmailVerification {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  token     String    @unique
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("email_verifications")
 }
 
 model PasswordReset {

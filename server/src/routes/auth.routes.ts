@@ -11,6 +11,7 @@ import {
   updateName,
   updatePassword,
   updateProfileImage,
+  verifyEmail,
 } from '../controllers/auth.controller.js';
 import { deleteAccount, exportData } from '../controllers/gdpr.controller.js';
 import { requireAuth } from '../middleware/auth.js';
@@ -19,6 +20,7 @@ import { asyncHandler } from '../lib/asyncHandler.js';
 const router = Router();
 
 router.post('/register', asyncHandler(register));
+router.get('/verify', asyncHandler(verifyEmail));
 router.post('/login', asyncHandler(login));
 router.post('/reset-password', asyncHandler(resetPassword));
 router.get('/me', requireAuth, asyncHandler(me));

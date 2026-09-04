@@ -6,6 +6,8 @@ import { hashPassword, verifyPassword } from '../lib/password.js';
 import { signToken } from '../lib/jwt.js';
 import { HttpError } from '../middleware/errorHandler.js';
 import { usePasswordResetToken } from '../lib/passwordReset.js';
+import { createEmailVerificationToken, useEmailVerificationToken } from '../lib/emailVerification.js';
+import { sendVerificationEmail, sendWelcomeEmail } from '../lib/email.js';
 import { logAuthEvent } from '../lib/authEvent.js';
 import { CURRENT_ONBOARDING_VERSION } from '../lib/onboarding.js';
 
@@ -60,8 +62,36 @@ export async function register(req: Request, res: Response) {
     data: { invitedUserId: user.id },
   });
 
+  const verificationToken = await createEmailVerificationToken(user.id);
+  const verifyLink = `${process.env.API_BASE_URL ?? 'http://localhost:4000'}/auth/verify?token=${verificationToken}`;
+  sendVerificationEmail(user.email, user.name, verifyLink).catch((err) =>
+    console.error('Failed to send verification email:', err),
+  );
+
   const token = signToken({ userId: user.id, role: user.role });
   res.status(201).json({ token, user: toUserResponse(user) });
+}
+
+export async function verifyEmail(req: Request, res: Response) {
+  const clientOrigin = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173';
+  const token = typeof req.query.token === 'string' ? req.query.token : null;
+  if (!token) {
+    return res.redirect(`${clientOrigin}/login?emailVerified=0`);
+  }
+
+  const verification = await useEmailVerificationToken(token);
+  if (!verification) {
+    return res.redirect(`${clientOrigin}/login?emailVerified=0`);
+  }
+
+  const user = await prisma.user.update({
+    where: { id: verification.userId },
+    data: { emailVerifiedAt: new Date() },
+  });
+
+  sendWelcomeEmail(user.email, user.name).catch((err) => console.error('Failed to send welcome email:', err));
+
+  res.redirect(`${clientOrigin}/dashboard?emailVerified=1`);
 }
 
 const loginSchema = z.object({
