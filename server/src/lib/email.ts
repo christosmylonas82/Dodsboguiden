@@ -2,9 +2,22 @@ import sgMail from '@sendgrid/mail';
 
 // Falls back to console-logging the message when SENDGRID_API_KEY isn't set
 // (e.g. local dev), so nothing breaks without SendGrid configured.
-const apiKey = process.env.SENDGRID_API_KEY;
+const rawApiKey = process.env.SENDGRID_API_KEY?.trim();
 const fromEmail = process.env.SENDGRID_FROM_EMAIL ?? 'no-reply@dodsboguiden.se';
 const fromName = process.env.SENDGRID_FROM_NAME ?? 'DödsboGuiden';
+
+// SendGrid keys always look like "SG.xxx.yyy" — a value that doesn't match is
+// almost certainly a copy-paste mistake (e.g. the "KEY = " prefix or quotes
+// pasted along with it). Treat it as unset rather than let every send fail.
+const apiKey = rawApiKey && rawApiKey.startsWith('SG.') ? rawApiKey : undefined;
+
+if (rawApiKey && !apiKey) {
+  console.error(
+    `[email] SENDGRID_API_KEY is set but doesn't start with "SG." — this looks like a copy-paste ` +
+      `mistake (e.g. the variable name or quotes got included in the value). Falling back to the ` +
+      `console-log stub, so verification/reset emails will NOT actually be sent until this is fixed.`,
+  );
+}
 
 if (apiKey) {
   sgMail.setApiKey(apiKey);
