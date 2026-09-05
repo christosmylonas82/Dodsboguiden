@@ -127,8 +127,9 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
     setDeletingAccount(true);
     try {
       await apiFetch('/auth/account', { method: 'DELETE' });
+      onClose?.();
       logout();
-      navigate('/login');
+      navigate('/login?accountDeleted=1');
     } finally {
       setDeletingAccount(false);
     }

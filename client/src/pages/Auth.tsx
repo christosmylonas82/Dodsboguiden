@@ -61,11 +61,13 @@ export function AuthPage() {
 function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showForgotHint, setShowForgotHint] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const accountDeleted = new URLSearchParams(location.search).get('accountDeleted') === '1';
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -83,6 +85,12 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
 
   return (
     <form onSubmit={handleSubmit}>
+      {accountDeleted && (
+        <p className="mb-4 rounded-lg border border-success bg-success-light px-4 py-2.5 text-sm text-text">
+          Ditt konto har raderats.
+        </p>
+      )}
+
       <div>
         <label htmlFor="loginEmail" className="text-xs font-medium uppercase tracking-wide text-muted">
           E-post
