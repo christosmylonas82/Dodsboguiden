@@ -36,7 +36,13 @@ async function send(to: string, subject: string, html: string, text: string): Pr
     await sgMail.send({ to, from: { email: fromEmail, name: fromName }, subject, text, html });
     return true;
   } catch (err) {
-    console.error(`[email] Failed to send "${subject}" to ${to}:`, err instanceof Error ? err.message : err);
+    const detail =
+      err && typeof err === 'object' && 'response' in err
+        ? JSON.stringify((err as { response?: { body?: unknown } }).response?.body)
+        : err instanceof Error
+          ? err.message
+          : err;
+    console.error(`[email] Failed to send "${subject}" to ${to}:`, detail);
     return false;
   }
 }
