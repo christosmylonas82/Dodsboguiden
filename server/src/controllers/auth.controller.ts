@@ -10,6 +10,7 @@ import { createEmailVerificationToken, useEmailVerificationToken } from '../lib/
 import { sendVerificationEmail, sendWelcomeEmail } from '../lib/email.js';
 import { logAuthEvent } from '../lib/authEvent.js';
 import { CURRENT_ONBOARDING_VERSION } from '../lib/onboarding.js';
+import { getPrimaryClientOrigin } from '../lib/clientOrigin.js';
 
 function toUserResponse(user: User) {
   return {
@@ -78,7 +79,7 @@ export async function register(req: Request, res: Response) {
 }
 
 export async function verifyEmail(req: Request, res: Response) {
-  const clientOrigin = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173';
+  const clientOrigin = getPrimaryClientOrigin();
   const token = typeof req.query.token === 'string' ? req.query.token : null;
   if (!token) {
     return res.redirect(`${clientOrigin}/login?emailVerified=0`);

@@ -6,15 +6,13 @@ import invitationRoutes from './routes/invitations.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import notificationsRoutes from './routes/notifications.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { getAllowedOrigins } from './lib/clientOrigin.js';
 
 export const app = express();
 
 app.set('trust proxy', process.env.TRUST_PROXY === 'true');
 
-const allowedOrigins = (process.env.CLIENT_ORIGIN ?? 'http://localhost:5173')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const allowedOrigins = getAllowedOrigins();
 
 app.use(
   cors({

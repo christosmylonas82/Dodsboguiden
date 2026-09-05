@@ -7,6 +7,7 @@ import { logAudit } from '../lib/audit.js';
 import { createPasswordResetToken } from '../lib/passwordReset.js';
 import { sendPasswordResetEmail } from '../lib/email.js';
 import { scrubAuthEventsForUser } from '../lib/authEvent.js';
+import { getPrimaryClientOrigin } from '../lib/clientOrigin.js';
 
 const listUsersQuerySchema = z.object({
   search: z.string().optional(),
@@ -383,7 +384,7 @@ export async function requestPasswordReset(req: Request, res: Response) {
   }
 
   const token = await createPasswordResetToken(userId);
-  const resetLink = `${process.env.CLIENT_ORIGIN ?? 'http://localhost:5173'}/reset-password?token=${token}`;
+  const resetLink = `${getPrimaryClientOrigin()}/reset-password?token=${token}`;
 
   await sendPasswordResetEmail(user.email, resetLink);
 
