@@ -258,18 +258,18 @@ export function Layout() {
     <div className="flex min-h-screen flex-col bg-bg">
       <header className="border-b border-border bg-surface">
         <div className="flex w-full items-center px-3 py-2 md:px-6">
-          <div className="flex flex-1 items-center gap-4">
+          <div className="flex shrink-0 items-center gap-2 md:gap-4">
             {isAuthPage ? (
               <Link
                 to="/"
                 aria-label="Dödsboguiden"
-                className="flex shrink-0 items-center rounded-md bg-white px-2 py-1 transition hover:opacity-90 md:px-3 md:py-1.5"
+                className="flex shrink-0 items-center rounded-md bg-white px-1.5 py-1 transition hover:opacity-90 md:px-3 md:py-1.5"
               >
-                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-6 w-auto shrink-0 md:h-10" />
+                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-5 w-auto shrink-0 md:h-10" />
               </Link>
             ) : (
-              <span className="flex shrink-0 items-center rounded-md bg-white px-2 py-1 md:px-3 md:py-1.5">
-                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-6 w-auto shrink-0 md:h-10" />
+              <span className="flex shrink-0 items-center rounded-md bg-white px-1.5 py-1 md:px-3 md:py-1.5">
+                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-5 w-auto shrink-0 md:h-10" />
               </span>
             )}
             {user && (
