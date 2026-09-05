@@ -106,6 +106,7 @@ export function BouppteckningGuidePage() {
   ];
 
   function handleExport() {
+    if (!project) return;
     const summary = [
       'BOUPPTECKNINGS-SAMMANFATTNING',
       '=============================',
