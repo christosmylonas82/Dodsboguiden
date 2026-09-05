@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { apiFetch, ApiError } from '../lib/api';
+import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
+import { isPasswordValid, PASSWORD_REQUIREMENTS_MESSAGE } from '../lib/passwordRequirements';
 
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -18,6 +20,10 @@ export function ResetPasswordPage() {
 
     if (!token) {
       setError('Länken saknar en giltig token.');
+      return;
+    }
+    if (!isPasswordValid(password)) {
+      setError(PASSWORD_REQUIREMENTS_MESSAGE);
       return;
     }
     if (password !== confirmPassword) {
@@ -71,6 +77,7 @@ export function ResetPasswordPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="mt-1.5 w-full h-11 rounded-lg border border-border px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
           />
+          {password && <PasswordStrengthMeter password={password} />}
 
           <label htmlFor="confirmPassword" className="mt-4 block text-xs font-medium uppercase tracking-wide text-muted">
             Bekräfta lösenord
@@ -88,7 +95,7 @@ export function ResetPasswordPage() {
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || !isPasswordValid(password)}
             className="mt-5 w-full rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
           >
             {submitting ? 'Sparar…' : 'Spara nytt lösenord'}

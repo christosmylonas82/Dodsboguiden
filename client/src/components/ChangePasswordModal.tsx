@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { apiFetch, ApiError } from '../lib/api';
 import { ModalOverlay } from './ModalOverlay';
+import { PasswordStrengthMeter } from './PasswordStrengthMeter';
+import { isPasswordValid, PASSWORD_REQUIREMENTS_MESSAGE } from '../lib/passwordRequirements';
 
 export function ChangePasswordModal({ onClose }: { onClose: () => void }) {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -13,6 +15,10 @@ export function ChangePasswordModal({ onClose }: { onClose: () => void }) {
     e.preventDefault();
     setError(null);
 
+    if (!isPasswordValid(newPassword)) {
+      setError(PASSWORD_REQUIREMENTS_MESSAGE);
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setError('Lösenorden matchar inte');
       return;
@@ -64,7 +70,7 @@ export function ChangePasswordModal({ onClose }: { onClose: () => void }) {
               onChange={(e) => setNewPassword(e.target.value)}
               className="h-11 rounded-lg border border-border px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
             />
-            <p className="text-xs text-muted">Minst 8 tecken, med både versaler, gemener och siffror.</p>
+            {newPassword && <PasswordStrengthMeter password={newPassword} />}
           </div>
           <div className="flex flex-col gap-1.5">
             <label htmlFor="confirmNewPassword" className="text-sm text-muted">
@@ -90,7 +96,7 @@ export function ChangePasswordModal({ onClose }: { onClose: () => void }) {
             </button>
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !isPasswordValid(newPassword)}
               className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
             >
               {submitting ? 'Uppdaterar…' : 'Uppdatera lösenord'}

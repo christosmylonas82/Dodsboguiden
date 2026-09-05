@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import type { User } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
-import { hashPassword, verifyPassword } from '../lib/password.js';
+import { hashPassword, verifyPassword, validatePassword } from '../lib/password.js';
 import { signToken } from '../lib/jwt.js';
 import { HttpError } from '../middleware/errorHandler.js';
 import { usePasswordResetToken } from '../lib/passwordReset.js';
@@ -28,7 +28,7 @@ function toUserResponse(user: User) {
 const registerSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1),
-  password: z.string().min(8),
+  password: z.string(),
   gdprConsent: z.literal(true, {
     errorMap: () => ({ message: 'GDPR consent is required to register' }),
   }),
@@ -36,6 +36,11 @@ const registerSchema = z.object({
 
 export async function register(req: Request, res: Response) {
   const body = registerSchema.parse(req.body);
+
+  const passwordError = validatePassword(body.password);
+  if (passwordError) {
+    throw new HttpError(400, passwordError);
+  }
 
   const existing = await prisma.user.findUnique({ where: { email: body.email } });
   if (existing) {
@@ -191,17 +196,17 @@ export async function updateEmail(req: Request, res: Response) {
 
 const updatePasswordSchema = z.object({
   currentPassword: z.string().min(1),
-  newPassword: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[a-z]/, 'Password must contain a lowercase letter')
-    .regex(/[A-Z]/, 'Password must contain an uppercase letter')
-    .regex(/[0-9]/, 'Password must contain a number'),
+  newPassword: z.string(),
 });
 
 export async function updatePassword(req: Request, res: Response) {
   const body = updatePasswordSchema.parse(req.body);
   const userId = req.user!.userId;
+
+  const passwordError = validatePassword(body.newPassword);
+  if (passwordError) {
+    throw new HttpError(400, passwordError);
+  }
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user || user.deletedAt) {
@@ -223,16 +228,16 @@ export async function updatePassword(req: Request, res: Response) {
 
 const resetPasswordSchema = z.object({
   token: z.string().min(1),
-  newPassword: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[a-z]/, 'Password must contain a lowercase letter')
-    .regex(/[A-Z]/, 'Password must contain an uppercase letter')
-    .regex(/[0-9]/, 'Password must contain a number'),
+  newPassword: z.string(),
 });
 
 export async function resetPassword(req: Request, res: Response) {
   const body = resetPasswordSchema.parse(req.body);
+
+  const passwordError = validatePassword(body.newPassword);
+  if (passwordError) {
+    throw new HttpError(400, passwordError);
+  }
 
   const reset = await usePasswordResetToken(body.token);
   if (!reset) {

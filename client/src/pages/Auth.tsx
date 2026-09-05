@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ApiError } from '../lib/api';
 import { PolicyModal } from '../components/PolicyModal';
+import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
+import { isPasswordValid, PASSWORD_REQUIREMENTS_MESSAGE } from '../lib/passwordRequirements';
 
 type Tab = 'login' | 'register';
 
@@ -168,8 +170,8 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
     }
     if (!password) {
       next.password = 'Lösenord är obligatoriskt';
-    } else if (password.length < 8) {
-      next.password = 'Lösenordet måste vara minst 8 tecken';
+    } else if (!isPasswordValid(password)) {
+      next.password = PASSWORD_REQUIREMENTS_MESSAGE;
     }
     if (!consent) {
       next.consent = 'Du måste godkänna användarvillkoren och integritetspolicyn';
@@ -253,6 +255,7 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
           className={fieldClass(Boolean(errors.password))}
         />
         {errors.password && <p className="mt-1 text-xs text-danger">{errors.password}</p>}
+        {password && <PasswordStrengthMeter password={password} />}
       </div>
 
       <div className="mt-5 rounded-xl bg-primary-light p-4 text-sm leading-relaxed text-text">
@@ -314,7 +317,7 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
 
       <button
         type="submit"
-        disabled={submitting}
+        disabled={submitting || !isPasswordValid(password)}
         className="mt-6 w-full rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
       >
         {submitting ? 'Skapar konto…' : 'Skapa konto'}
