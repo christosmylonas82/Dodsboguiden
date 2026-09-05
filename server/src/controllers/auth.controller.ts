@@ -120,6 +120,11 @@ export async function login(req: Request, res: Response) {
     throw new HttpError(401, 'Invalid email or password');
   }
 
+  if (!user.emailVerifiedAt) {
+    await logAuthEvent({ userId: user.id, email: user.email, action: 'login_failed' });
+    throw new HttpError(401, 'Email not verified. Please check your inbox for verification link.');
+  }
+
   await logAuthEvent({ userId: user.id, email: user.email, action: 'login_success' });
 
   const token = signToken({ userId: user.id, role: user.role });
