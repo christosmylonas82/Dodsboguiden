@@ -37,6 +37,7 @@ const registerSchema = z.object({
 
 export async function register(req: Request, res: Response) {
   const body = registerSchema.parse(req.body);
+  console.log(`[register] Registration started for ${body.email}`);
 
   const passwordError = validatePassword(body.password);
   if (passwordError) {
@@ -70,9 +71,17 @@ export async function register(req: Request, res: Response) {
 
   const verificationToken = await createEmailVerificationToken(user.id);
   const verifyLink = `${process.env.API_BASE_URL ?? 'http://localhost:4000'}/auth/verify?token=${verificationToken}`;
-  sendVerificationEmail(user.email, user.name, verifyLink).catch((err) =>
-    console.error('Failed to send verification email:', err),
-  );
+
+  console.log(`[register] Sending verification email to ${user.email}`);
+  sendVerificationEmail(user.email, user.name, verifyLink)
+    .then((sent) => {
+      if (sent) {
+        console.log(`[register] Email sent successfully to ${user.email}`);
+      } else {
+        console.error(`[register] Email send failed: sendVerificationEmail returned false for ${user.email}`);
+      }
+    })
+    .catch((err) => console.error(`[register] Email send failed: ${err instanceof Error ? err.message : err}`));
 
   const token = signToken({ userId: user.id, role: user.role });
   res.status(201).json({ token, user: toUserResponse(user) });
@@ -81,12 +90,16 @@ export async function register(req: Request, res: Response) {
 export async function verifyEmail(req: Request, res: Response) {
   const clientOrigin = getPrimaryClientOrigin();
   const token = typeof req.query.token === 'string' ? req.query.token : null;
+  console.log(`[verify] Verification started, token present: ${Boolean(token)}`);
+
   if (!token) {
+    console.error('[verify] Email send failed: no token provided in request');
     return res.redirect(`${clientOrigin}/login?emailVerified=0`);
   }
 
   const verification = await useEmailVerificationToken(token);
   if (!verification) {
+    console.error(`[verify] Email send failed: token invalid, expired, or already used`);
     return res.redirect(`${clientOrigin}/login?emailVerified=0`);
   }
 
@@ -95,7 +108,16 @@ export async function verifyEmail(req: Request, res: Response) {
     data: { emailVerifiedAt: new Date() },
   });
 
-  sendWelcomeEmail(user.email, user.name).catch((err) => console.error('Failed to send welcome email:', err));
+  console.log(`[verify] Sending welcome email to ${user.email}`);
+  sendWelcomeEmail(user.email, user.name)
+    .then((sent) => {
+      if (sent) {
+        console.log(`[verify] Email sent successfully to ${user.email}`);
+      } else {
+        console.error(`[verify] Email send failed: sendWelcomeEmail returned false for ${user.email}`);
+      }
+    })
+    .catch((err) => console.error(`[verify] Email send failed: ${err instanceof Error ? err.message : err}`));
 
   res.redirect(`${clientOrigin}/dashboard?emailVerified=1`);
 }
