@@ -43,6 +43,9 @@ async function send(to: string, subject: string, html: string, text: string, rep
     return true;
   }
 
+  console.log(`From email about to send: ${fromEmail}`);
+  console.log(`From name about to send: ${fromName}`);
+
   try {
     await sgMail.send({ to, from: { email: fromEmail, name: fromName }, replyTo, subject, text, html });
     return true;
@@ -86,6 +89,8 @@ export async function sendDeadlineReminderEmail(
 }
 
 export async function sendVerificationEmail(email: string, name: string, verifyLink: string): Promise<boolean> {
+  console.log(`From email about to send: ${fromEmail}`);
+  console.log(`From name about to send: ${fromName}`);
   return send(
     email,
     'Verifiera din DödsboGuiden-account',
