@@ -72,6 +72,7 @@ export async function register(req: Request, res: Response) {
   const verificationToken = await createEmailVerificationToken(user.id);
   const verifyLink = `${process.env.API_BASE_URL ?? 'http://localhost:4000'}/api/auth/verify?token=${verificationToken}`;
 
+  console.log(`[register] Verify link: ${verifyLink}`);
   console.log(`[register] Sending verification email to ${user.email}`);
   sendVerificationEmail(user.email, user.name, verifyLink)
     .then((sent) => {
