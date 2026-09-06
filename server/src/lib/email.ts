@@ -37,6 +37,26 @@ function escapeHtml(value: string): string {
 const UNSUBSCRIBE_NOTE =
   'Detta är ett transaktionsmejl kopplat till ditt konto på DödsboGuiden. Du kan när som helst radera ditt konto under Inställningar för att sluta ta emot mejl.';
 
+const BRAND_COLOR = '#0a4062';
+
+/** Wraps a template's inner HTML in a consistent, email-client-safe layout (table-based, inline styles only). */
+function emailLayout(title: string, bodyHtml: string): string {
+  return (
+    `<!doctype html>` +
+    `<html lang="sv"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />` +
+    `<title>${escapeHtml(title)}</title></head>` +
+    `<body style="margin:0;padding:0;background-color:#f6f5f4;font-family:Arial,Helvetica,sans-serif;">` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f6f5f4;padding:32px 16px;">` +
+    `<tr><td align="center">` +
+    `<table role="presentation" width="100%" style="max-width:480px;background-color:#ffffff;border-radius:12px;overflow:hidden;">` +
+    `<tr><td style="background-color:${BRAND_COLOR};padding:20px 32px;">` +
+    `<span style="color:#ffffff;font-size:18px;font-weight:bold;">DödsboGuiden</span>` +
+    `</td></tr>` +
+    `<tr><td style="padding:32px;color:#37352f;font-size:15px;line-height:1.6;">${bodyHtml}</td></tr>` +
+    `</table></td></tr></table></body></html>`
+  );
+}
+
 async function send(to: string, subject: string, html: string, text: string, replyTo?: string): Promise<boolean> {
   if (!apiKey) {
     console.log(`[email stub] To: ${to}\nSubject: ${subject}\n\n${text}`);
@@ -91,14 +111,27 @@ export async function sendDeadlineReminderEmail(
 export async function sendVerificationEmail(email: string, name: string, verifyLink: string): Promise<boolean> {
   console.log(`From email about to send: ${fromEmail}`);
   console.log(`From name about to send: ${fromName}`);
+
+  const safeName = escapeHtml(name);
+  const safeLink = escapeHtml(verifyLink);
+
+  const body =
+    `<h1 style="margin:0 0 16px;font-size:20px;color:${BRAND_COLOR};">Bekräfta din e-postadress</h1>` +
+    `<p style="margin:0 0 16px;">Hej ${safeName},</p>` +
+    `<p style="margin:0 0 24px;">Tack för att du skapat ett konto på DödsboGuiden. Klicka på knappen nedan för att verifiera din e-postadress. Länken är giltig i 24 timmar.</p>` +
+    `<p style="margin:0 0 24px;text-align:center;">` +
+    `<a href="${safeLink}" style="display:inline-block;background-color:${BRAND_COLOR};color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:bold;font-size:15px;">Verifiera min e-post</a>` +
+    `</p>` +
+    `<p style="margin:0 0 24px;font-size:13px;color:#787671;">Om knappen inte fungerar kan du kopiera och klistra in denna länk i din webbläsare:<br />` +
+    `<a href="${safeLink}" style="color:${BRAND_COLOR};word-break:break-all;">${safeLink}</a></p>` +
+    `<p style="margin:0 0 16px;">Om du inte skapade det här kontot kan du bortse från mejlet.</p>` +
+    `<hr style="border:none;border-top:1px solid #e5e3df;margin:24px 0;" />` +
+    `<p style="margin:0;font-size:12px;color:#787671;">${UNSUBSCRIBE_NOTE}</p>`;
+
   return send(
     email,
-    'Verifiera din DödsboGuiden-account',
-    `<p>Hej ${name},</p>` +
-      `<p>Tack för att du skapat ett konto på DödsboGuiden. Klicka på länken nedan för att verifiera din e-postadress. Länken är giltig i 24 timmar.</p>` +
-      `<p><a href="${verifyLink}">${verifyLink}</a></p>` +
-      `<p>Om du inte skapade det här kontot kan du bortse från mejlet.</p>` +
-      `<p style="color:#666;font-size:12px">${UNSUBSCRIBE_NOTE}</p>`,
+    'Bekräfta din e-postadress – DödsboGuiden',
+    emailLayout('Bekräfta din e-postadress', body),
     `Hej ${name},\n\nTack för att du skapat ett konto på DödsboGuiden. Klicka på länken nedan för att verifiera din e-postadress (giltig i 24 timmar):\n${verifyLink}\n\n` +
       `Om du inte skapade det här kontot kan du bortse från mejlet.\n\n${UNSUBSCRIBE_NOTE}`,
   );
