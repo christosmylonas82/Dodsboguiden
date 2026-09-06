@@ -18,7 +18,7 @@ export function Footer() {
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto max-w-5xl px-6 py-8 text-center">
         <p className="text-sm font-medium text-text">Här för er, steg för steg.</p>
-        <p className="mt-1 text-sm text-muted">© 2026 Dödsbo Guide — Gratis dödsbohantering</p>
+        <p className="mt-1 text-sm text-muted">© 2026 Dödsbo Guide — Gratis dödsbohantering · v{__APP_VERSION__}</p>
 
         <div className="mt-3 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           <button
