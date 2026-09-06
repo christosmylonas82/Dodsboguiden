@@ -290,7 +290,7 @@ export function Layout() {
                 {settingsNavItems}
               </nav>
 
-              <div className="hidden flex-1 items-center justify-end gap-2 md:flex">
+              <div className="hidden shrink-0 items-center justify-end gap-2 md:flex">
                 {isInProject && (
                   <button
                     type="button"
