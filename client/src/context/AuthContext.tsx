@@ -6,7 +6,7 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, name: string, password: string, gdprConsent: boolean) => Promise<void>;
+  register: (email: string, name: string, password: string, gdprConsent: boolean) => Promise<string>;
   logout: () => void;
   markTipsSeen: () => Promise<void>;
   markOnboardingSeen: () => Promise<void>;
@@ -40,12 +40,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function register(email: string, name: string, password: string, gdprConsent: boolean) {
-    const data = await apiFetch<{ token: string; user: User }>('/auth/register', {
+    const data = await apiFetch<{ message: string; user: User }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ email, name, password, gdprConsent }),
     });
-    setToken(data.token);
-    setUser(data.user);
+    return data.message;
   }
 
   function logout() {

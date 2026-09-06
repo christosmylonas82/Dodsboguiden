@@ -83,8 +83,10 @@ export async function register(req: Request, res: Response) {
     })
     .catch((err) => console.error(`[register] Email send failed: ${err instanceof Error ? err.message : err}`));
 
-  const token = signToken({ userId: user.id, role: user.role });
-  res.status(201).json({ token, user: toUserResponse(user) });
+  res.status(201).json({
+    message: 'Verifiera din email innan du loggar in',
+    user: toUserResponse(user),
+  });
 }
 
 export async function verifyEmail(req: Request, res: Response) {
@@ -144,7 +146,7 @@ export async function login(req: Request, res: Response) {
 
   if (!user.emailVerifiedAt) {
     await logAuthEvent({ userId: user.id, email: user.email, action: 'login_failed' });
-    throw new HttpError(401, 'Email not verified. Please check your inbox for verification link.');
+    throw new HttpError(401, 'Email not verified. Check your inbox.');
   }
 
   await logAuthEvent({ userId: user.id, email: user.email, action: 'login_success' });

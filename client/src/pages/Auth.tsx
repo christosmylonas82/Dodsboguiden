@@ -156,7 +156,6 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
 
 function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
   const { register } = useAuth();
-  const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -166,6 +165,7 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
   const [submitting, setSubmitting] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [registeredMessage, setRegisteredMessage] = useState<string | null>(null);
 
   function validate(): boolean {
     const next: Record<string, string> = {};
@@ -194,13 +194,34 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
     setSubmitting(true);
     try {
       const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-      await register(email, fullName, password, consent);
-      navigate('/dashboard');
+      const message = await register(email, fullName, password, consent);
+      setRegisteredMessage(message);
     } catch (err) {
       setErrors({ submit: err instanceof ApiError ? err.message : 'Kunde inte skapa konto' });
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (registeredMessage) {
+    return (
+      <div>
+        <p className="rounded-lg border border-success bg-success-light px-4 py-2.5 text-sm text-text">
+          {registeredMessage}
+        </p>
+        <p className="mt-3 text-sm text-muted">
+          Vi har skickat ett verifieringsmejl till <strong>{email}</strong>. Klicka på länken i mejlet, logga sedan
+          in.
+        </p>
+        <button
+          type="button"
+          onClick={onSwitchToLogin}
+          className="mt-5 w-full rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
+        >
+          Till inloggning
+        </button>
+      </div>
+    );
   }
 
   return (
