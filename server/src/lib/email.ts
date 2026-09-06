@@ -1,4 +1,5 @@
 import sgMail from '@sendgrid/mail';
+import { getPrimaryClientOrigin } from './clientOrigin.js';
 
 // Falls back to console-logging the message when SENDGRID_API_KEY isn't set
 // (e.g. local dev), so nothing breaks without SendGrid configured.
@@ -138,27 +139,37 @@ export async function sendVerificationEmail(email: string, name: string, verifyL
 }
 
 export async function sendWelcomeEmail(email: string, name: string): Promise<boolean> {
+  const safeName = escapeHtml(name);
+  const loginLink = getPrimaryClientOrigin();
+
+  const body =
+    `<h1 style="margin:0 0 16px;font-size:20px;color:${BRAND_COLOR};">Välkommen till DödsboGuiden</h1>` +
+    `<p style="margin:0 0 16px;">Hej ${safeName},</p>` +
+    `<p style="margin:0 0 16px;">Din e-postadress är nu verifierad och ditt konto är klart att användas.</p>` +
+    `<p style="margin:0 0 8px;">I DödsboGuiden kan du:</p>` +
+    `<ul style="margin:0 0 24px;padding-left:20px;">` +
+    `<li style="margin-bottom:4px;">Följa en checklista genom hela dödsboprocessen, uppdelad i tydliga faser</li>` +
+    `<li style="margin-bottom:4px;">Bjuda in familjemedlemmar för att samarbeta</li>` +
+    `<li style="margin-bottom:4px;">Hålla koll på inventarielista, dokument och ekonomi på ett ställe</li>` +
+    `<li>Få vägledning inför bouppteckningen</li>` +
+    `</ul>` +
+    `<p style="margin:0 0 24px;text-align:center;">` +
+    `<a href="${loginLink}" style="display:inline-block;background-color:${BRAND_COLOR};color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:bold;font-size:15px;">Logga in</a>` +
+    `</p>` +
+    `<hr style="border:none;border-top:1px solid #e5e3df;margin:24px 0;" />` +
+    `<p style="margin:0;font-size:12px;color:#787671;">${UNSUBSCRIBE_NOTE}</p>`;
+
   return send(
     email,
     'Välkommen till DödsboGuiden',
-    `<p>Hej ${name},</p>` +
-      `<p>Din e-postadress är nu verifierad och ditt konto är klart att användas.</p>` +
-      `<p>I DödsboGuiden kan du:</p>` +
-      `<ul>` +
-      `<li>Följa en checklista genom hela dödsboprocessen, uppdelad i tydliga faser</li>` +
-      `<li>Bjuda in familjemedlemmar för att samarbeta</li>` +
-      `<li>Hålla koll på inventarielista, dokument och ekonomi på ett ställe</li>` +
-      `<li>Få vägledning inför bouppteckningen</li>` +
-      `</ul>` +
-      `<p>Logga in för att komma igång.</p>` +
-      `<p style="color:#666;font-size:12px">${UNSUBSCRIBE_NOTE}</p>`,
+    emailLayout('Välkommen till DödsboGuiden', body),
     `Hej ${name},\n\nDin e-postadress är nu verifierad och ditt konto är klart att användas.\n\n` +
       `I DödsboGuiden kan du:\n` +
       `- Följa en checklista genom hela dödsboprocessen, uppdelad i tydliga faser\n` +
       `- Bjuda in familjemedlemmar för att samarbeta\n` +
       `- Hålla koll på inventarielista, dokument och ekonomi på ett ställe\n` +
       `- Få vägledning inför bouppteckningen\n\n` +
-      `Logga in för att komma igång.\n\n${UNSUBSCRIBE_NOTE}`,
+      `Logga in på ${loginLink} för att komma igång.\n\n${UNSUBSCRIBE_NOTE}`,
   );
 }
 
