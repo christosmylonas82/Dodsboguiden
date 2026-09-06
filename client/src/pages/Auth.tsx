@@ -67,7 +67,9 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
   const [showForgotHint, setShowForgotHint] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const accountDeleted = new URLSearchParams(location.search).get('accountDeleted') === '1';
+  const searchParams = new URLSearchParams(location.search);
+  const accountDeleted = searchParams.get('accountDeleted') === '1';
+  const emailVerified = searchParams.get('emailVerified');
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -88,6 +90,18 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
       {accountDeleted && (
         <p className="mb-4 rounded-lg border border-success bg-success-light px-4 py-2.5 text-sm text-text">
           Ditt konto har raderats.
+        </p>
+      )}
+
+      {emailVerified === '1' && (
+        <p className="mb-4 rounded-lg border border-success bg-success-light px-4 py-2.5 text-sm text-text">
+          Din e-postadress har verifierats. Du kan nu logga in.
+        </p>
+      )}
+
+      {emailVerified === '0' && (
+        <p className="mb-4 rounded-lg border border-danger bg-danger-light px-4 py-2.5 text-sm text-text">
+          Verifieringslänken är ogiltig eller har redan använts.
         </p>
       )}
 

@@ -122,7 +122,7 @@ export async function verifyEmail(req: Request, res: Response) {
     })
     .catch((err) => console.error(`[verify] Email send failed: ${err instanceof Error ? err.message : err}`));
 
-  res.redirect(`${clientOrigin}/dashboard?emailVerified=1`);
+  res.redirect(`${clientOrigin}/login?emailVerified=1`);
 }
 
 const loginSchema = z.object({
