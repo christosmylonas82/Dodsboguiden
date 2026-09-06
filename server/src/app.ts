@@ -5,6 +5,7 @@ import projectRoutes from './routes/projects.routes.js';
 import invitationRoutes from './routes/invitations.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import notificationsRoutes from './routes/notifications.routes.js';
+import contactRoutes from './routes/contact.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { getAllowedOrigins } from './lib/clientOrigin.js';
 
@@ -33,5 +34,6 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/invitations', invitationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationsRoutes);
+app.use('/api/contact', contactRoutes);
 
 app.use(errorHandler);

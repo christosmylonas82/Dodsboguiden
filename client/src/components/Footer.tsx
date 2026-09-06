@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { PolicyModal } from './PolicyModal';
+import { ContactModal } from './ContactModal';
 
 type PolicyKey = 'terms' | 'privacy' | 'cookies';
 
@@ -11,6 +12,7 @@ const POLICIES: Record<PolicyKey, { title: string; path: string }> = {
 
 export function Footer() {
   const [openPolicy, setOpenPolicy] = useState<PolicyKey | null>(null);
+  const [contactOpen, setContactOpen] = useState(false);
 
   return (
     <footer className="border-t border-border bg-surface">
@@ -40,8 +42,17 @@ export function Footer() {
           >
             Cookiespolicy
           </button>
+          <button
+            type="button"
+            onClick={() => setContactOpen(true)}
+            className="bg-transparent p-0 text-sm text-muted hover:text-text"
+          >
+            Kontakta oss
+          </button>
         </div>
       </div>
+
+      {contactOpen && <ContactModal onClose={() => setContactOpen(false)} />}
 
       {openPolicy && (
         <PolicyModal

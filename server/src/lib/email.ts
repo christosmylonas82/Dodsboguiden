@@ -23,17 +23,28 @@ if (apiKey) {
   sgMail.setApiKey(apiKey);
 }
 
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? 'info@dodsboguiden.se';
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const UNSUBSCRIBE_NOTE =
   'Detta är ett transaktionsmejl kopplat till ditt konto på DödsboGuiden. Du kan när som helst radera ditt konto under Inställningar för att sluta ta emot mejl.';
 
-async function send(to: string, subject: string, html: string, text: string): Promise<boolean> {
+async function send(to: string, subject: string, html: string, text: string, replyTo?: string): Promise<boolean> {
   if (!apiKey) {
     console.log(`[email stub] To: ${to}\nSubject: ${subject}\n\n${text}`);
     return true;
   }
 
   try {
-    await sgMail.send({ to, from: { email: fromEmail, name: fromName }, subject, text, html });
+    await sgMail.send({ to, from: { email: fromEmail, name: fromName }, replyTo, subject, text, html });
     return true;
   } catch (err) {
     const detail =
@@ -110,5 +121,18 @@ export async function sendWelcomeEmail(email: string, name: string): Promise<boo
       `- Hålla koll på inventarielista, dokument och ekonomi på ett ställe\n` +
       `- Få vägledning inför bouppteckningen\n\n` +
       `Logga in för att komma igång.\n\n${UNSUBSCRIBE_NOTE}`,
+  );
+}
+
+export async function sendContactEmail(name: string, fromAddress: string, message: string): Promise<boolean> {
+  return send(
+    CONTACT_EMAIL,
+    `Kontaktformulär: meddelande från ${name}`,
+    `<p><strong>Namn:</strong> ${escapeHtml(name)}</p>` +
+      `<p><strong>E-post:</strong> ${escapeHtml(fromAddress)}</p>` +
+      `<p><strong>Meddelande:</strong></p>` +
+      `<p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>`,
+    `Namn: ${name}\nE-post: ${fromAddress}\n\nMeddelande:\n${message}`,
+    fromAddress,
   );
 }
