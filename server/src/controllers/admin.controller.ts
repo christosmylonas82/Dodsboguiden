@@ -9,6 +9,9 @@ import { sendPasswordResetEmail } from '../lib/email.js';
 import { scrubAuthEventsForUser } from '../lib/authEvent.js';
 import { getPrimaryClientOrigin } from '../lib/clientOrigin.js';
 
+// Internal/team test accounts, excluded from usage statistics so they don't skew growth numbers.
+const EXCLUDED_STATS_EMAILS = ['christosmylonas82@gmail.com', 'christos@mylonas.se'];
+
 const listUsersQuerySchema = z.object({
   search: z.string().optional(),
   range: z.enum(['today', 'week', 'all']).optional(),
@@ -97,17 +100,23 @@ export async function statistics(_req: Request, res: Response) {
     completedTasks,
     activeProjectMemberCounts,
   ] = await Promise.all([
-    prisma.user.count(),
-    prisma.user.count({ where: { deletedAt: null } }),
-    prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
-    prisma.project.count(),
-    prisma.project.count({ where: { deletedAt: null } }),
-    prisma.project.count({ where: { deletedAt: null, createdAt: { gte: sevenDaysAgo } } }),
-    prisma.project.count({ where: { deletedAt: null, createdAt: { gte: thirtyDaysAgo } } }),
-    prisma.task.count(),
-    prisma.task.count({ where: { completed: true } }),
+    prisma.user.count({ where: { email: { notIn: EXCLUDED_STATS_EMAILS } } }),
+    prisma.user.count({ where: { deletedAt: null, email: { notIn: EXCLUDED_STATS_EMAILS } } }),
+    prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo }, email: { notIn: EXCLUDED_STATS_EMAILS } } }),
+    prisma.project.count({ where: { owner: { email: { notIn: EXCLUDED_STATS_EMAILS } } } }),
+    prisma.project.count({ where: { deletedAt: null, owner: { email: { notIn: EXCLUDED_STATS_EMAILS } } } }),
+    prisma.project.count({
+      where: { deletedAt: null, createdAt: { gte: sevenDaysAgo }, owner: { email: { notIn: EXCLUDED_STATS_EMAILS } } },
+    }),
+    prisma.project.count({
+      where: { deletedAt: null, createdAt: { gte: thirtyDaysAgo }, owner: { email: { notIn: EXCLUDED_STATS_EMAILS } } },
+    }),
+    prisma.task.count({ where: { project: { owner: { email: { notIn: EXCLUDED_STATS_EMAILS } } } } }),
+    prisma.task.count({
+      where: { completed: true, project: { owner: { email: { notIn: EXCLUDED_STATS_EMAILS } } } },
+    }),
     prisma.project.findMany({
-      where: { deletedAt: null },
+      where: { deletedAt: null, owner: { email: { notIn: EXCLUDED_STATS_EMAILS } } },
       select: { _count: { select: { members: true } } },
     }),
   ]);
@@ -179,7 +188,11 @@ export async function projectsPerDay(req: Request, res: Response) {
   const { start, end } = resolveDateRange(query, 30);
 
   const projects = await prisma.project.findMany({
-    where: { deletedAt: null, createdAt: { gte: start, lte: end } },
+    where: {
+      deletedAt: null,
+      createdAt: { gte: start, lte: end },
+      owner: { email: { notIn: EXCLUDED_STATS_EMAILS } },
+    },
     select: { createdAt: true },
   });
 
@@ -221,7 +234,7 @@ export async function featureUsage(req: Request, res: Response) {
   const { start, end } = resolveDateRange(query, 30);
 
   const entries = await prisma.activityLog.findMany({
-    where: { timestamp: { gte: start, lte: end } },
+    where: { timestamp: { gte: start, lte: end }, user: { email: { notIn: EXCLUDED_STATS_EMAILS } } },
     select: { action: true },
   });
 
@@ -260,7 +273,11 @@ export async function exportStatsCsv(req: Request, res: Response) {
 
   if (dataType === 'projects') {
     const projects = await prisma.project.findMany({
-      where: { createdAt: { gte: start, lte: end }, deletedAt: null },
+      where: {
+        createdAt: { gte: start, lte: end },
+        deletedAt: null,
+        owner: { email: { notIn: EXCLUDED_STATS_EMAILS } },
+      },
       select: { id: true, deceasedName: true, createdAt: true, _count: { select: { members: true } } },
     });
 
@@ -271,7 +288,7 @@ export async function exportStatsCsv(req: Request, res: Response) {
     }
   } else {
     const activities = await prisma.activityLog.findMany({
-      where: { timestamp: { gte: start, lte: end } },
+      where: { timestamp: { gte: start, lte: end }, user: { email: { notIn: EXCLUDED_STATS_EMAILS } } },
       select: { action: true, timestamp: true },
     });
 
@@ -411,9 +428,9 @@ export async function accountStats(_req: Request, res: Response) {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const [newToday, newThisWeek, totalActive] = await Promise.all([
-    prisma.user.count({ where: { createdAt: { gte: today } } }),
-    prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
-    prisma.user.count({ where: { deletedAt: null } }),
+    prisma.user.count({ where: { createdAt: { gte: today }, email: { notIn: EXCLUDED_STATS_EMAILS } } }),
+    prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo }, email: { notIn: EXCLUDED_STATS_EMAILS } } }),
+    prisma.user.count({ where: { deletedAt: null, email: { notIn: EXCLUDED_STATS_EMAILS } } }),
   ]);
 
   res.json({ accounts: { newToday, newThisWeek, totalActive } });
