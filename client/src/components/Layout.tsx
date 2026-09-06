@@ -275,9 +275,9 @@ export function Layout() {
             {user && (
               <Link
                 to="/dashboard"
-                className="hidden items-center gap-2 text-lg font-bold text-text transition hover:text-primary-dark md:flex"
+                className="hidden items-center gap-1.5 text-sm font-semibold text-text transition hover:text-primary-dark md:flex"
               >
-                <TbHome size={24} className="text-primary-dark" />
+                <TbHome size={18} className="text-primary-dark" />
                 Översikt dödsbon
               </Link>
             )}
@@ -285,7 +285,7 @@ export function Layout() {
 
           {user ? (
             <>
-              <nav className="hidden items-center justify-center gap-1 md:flex">
+              <nav className="hidden flex-1 items-center justify-center gap-1 md:flex">
                 {navItems}
                 {settingsNavItems}
               </nav>

@@ -197,6 +197,7 @@ export function DashboardHubPage() {
             icon={<TbUsers size={20} />}
             label="Familjemedlemmar"
             value={project.members.length}
+            valueClassName="text-xl"
             hint={project.members.length === 1 ? '1 medlem' : `${project.members.length} medlemmar`}
             onClick={() => setOpenModal('members')}
             centered
