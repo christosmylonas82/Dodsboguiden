@@ -11,7 +11,7 @@ DödsboGuiden är en gratis webbtjänst för dödsbohantering.
 
 **Datakontrollant (data controller) enligt GDPR:**
 - Namn: Christos Mylonas
-- E-post: christos@mylonas.se
+- E-post: privacy@dodsboguiden.se
 
 ---
 
@@ -145,13 +145,13 @@ Vi använder följande tjänster för att driften ska fungera:
 
 Du kan begära en kopia av all data vi lagrar om dig, direkt i appen via Inställningar → "Exportera data" (JSON-fil med ditt konto, dina dödsbon, och din inloggningshistorik).
 
-Du kan även begära det via e-post: christos@mylonas.se. Vi svarar inom 30 dagar.
+Du kan även begära det via e-post: privacy@dodsboguiden.se. Vi svarar inom 30 dagar.
 
 ### 8.2 Rätt att korrigera (GDPR Art. 16)
 
 Du kan uppdatera din egen data själv via Inställningar → "Redigera profil". Ändringar sparas omedelbart.
 
-För övriga korrigeringar, kontakta: christos@mylonas.se
+För övriga korrigeringar, kontakta: privacy@dodsboguiden.se
 
 ### 8.3 Rätt till radering (GDPR Art. 17 — Rätten att bli glömd)
 
@@ -168,15 +168,15 @@ Du kan radera ditt konto helt via Inställningar → "Radera konto".
 
 ### 8.4 Rätt att begränsa behandling (GDPR Art. 18)
 
-Du kan be oss pausa behandlingen av din data medan du ifrågasätter den. Kontakta: christos@mylonas.se
+Du kan be oss pausa behandlingen av din data medan du ifrågasätter den. Kontakta: privacy@dodsboguiden.se
 
 ### 8.5 Rätt att överföra data (GDPR Art. 20 — Data Portability)
 
-Du kan få din data i maskinläsbart format (JSON) direkt via Inställningar → "Exportera data", eller genom att kontakta christos@mylonas.se.
+Du kan få din data i maskinläsbart format (JSON) direkt via Inställningar → "Exportera data", eller genom att kontakta privacy@dodsboguiden.se.
 
 ### 8.6 Rätt att invända (GDPR Art. 21)
 
-Du kan invända mot behandling baserad på "berättigat intresse". Kontakta: christos@mylonas.se
+Du kan invända mot behandling baserad på "berättigat intresse". Kontakta: privacy@dodsboguiden.se
 
 ---
 
@@ -206,7 +206,7 @@ Du måste vara minst 18 år för att använda DödsboGuiden.
 
 Om vi upptäcker att ett barn använder tjänsten raderar vi kontot och all data, och försöker kontakta vårdnadshavaren.
 
-Rapportera barn-användning: christos@mylonas.se
+Rapportera barn-användning: privacy@dodsboguiden.se
 
 ---
 
@@ -226,7 +226,7 @@ Fortsatt användning av appen innebär att du godkänner den nya versionen.
 
 **För dataskyddsfrågor:**
 
-E-post: christos@mylonas.se
+E-post: privacy@dodsboguiden.se
 
 Vi svarar inom 3 arbetsdagar för enkla frågor, och inom 30 dagar för officiella GDPR-begäranden.
 
