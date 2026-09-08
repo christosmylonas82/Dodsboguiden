@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { FaFacebook } from 'react-icons/fa';
@@ -7,7 +7,7 @@ import { ApiError } from '../lib/api';
 import { PolicyModal } from '../components/PolicyModal';
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 import { isPasswordValid, PASSWORD_REQUIREMENTS_MESSAGE } from '../lib/passwordRequirements';
-import { loginWithFacebookPopup } from '../lib/facebook';
+import { loginWithFacebookPopup, preloadFacebookSdk } from '../lib/facebook';
 import { EmailPromptModal } from '../components/EmailPromptModal';
 
 const GOOGLE_CLIENT_ID_CONFIGURED = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
@@ -23,15 +23,20 @@ function GoogleDivider() {
   );
 }
 
-function FacebookLoginButton({ label, onClick }: { label: string; onClick: () => void }) {
+function FacebookLoginButton({ label, loading, onClick }: { label: string; loading: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-border bg-white text-sm font-medium text-text transition hover:bg-primary-light"
+      disabled={loading}
+      className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-border bg-white text-sm font-medium text-text transition hover:bg-primary-light disabled:opacity-60"
     >
-      <FaFacebook size={18} className="text-[#1877F2]" />
-      {label}
+      {loading ? (
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#1877F2] border-t-transparent" />
+      ) : (
+        <FaFacebook size={18} className="text-[#1877F2]" />
+      )}
+      {loading ? 'Ansluter till Facebook…' : label}
     </button>
   );
 }
@@ -48,6 +53,12 @@ export function AuthPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>(location.pathname === '/register' ? 'register' : 'login');
+
+  useEffect(() => {
+    if (FACEBOOK_APP_ID_CONFIGURED) {
+      preloadFacebookSdk();
+    }
+  }, []);
 
   function selectTab(next: Tab) {
     setTab(next);
@@ -194,7 +205,7 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
               />
             )}
             {FACEBOOK_APP_ID_CONFIGURED && (
-              <FacebookLoginButton label="Logga in med Facebook" onClick={handleFacebookLogin} />
+              <FacebookLoginButton label="Logga in med Facebook" loading={submitting} onClick={handleFacebookLogin} />
             )}
           </div>
           <GoogleDivider />
@@ -398,7 +409,7 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
               />
             )}
             {FACEBOOK_APP_ID_CONFIGURED && (
-              <FacebookLoginButton label="Skapa konto med Facebook" onClick={handleFacebookLogin} />
+              <FacebookLoginButton label="Skapa konto med Facebook" loading={submitting} onClick={handleFacebookLogin} />
             )}
           </div>
           <GoogleDivider />

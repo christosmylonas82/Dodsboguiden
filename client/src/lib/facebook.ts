@@ -37,6 +37,15 @@ function loadFacebookSdk(): Promise<void> {
   return sdkPromise;
 }
 
+// Starts loading the SDK ahead of time (e.g. on mount of the login page) so the
+// actual FB.login() click doesn't have to wait for the script + FB.init round trip.
+export function preloadFacebookSdk(): void {
+  loadFacebookSdk().catch(() => {
+    // Swallowed — a real failure surfaces again (with a user-facing message) when
+    // loginWithFacebookPopup() is actually called from a button click.
+  });
+}
+
 export function loginWithFacebookPopup(): Promise<string> {
   return loadFacebookSdk().then(
     () =>
