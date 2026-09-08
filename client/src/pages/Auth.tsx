@@ -13,23 +13,35 @@ import { EmailPromptModal } from '../components/EmailPromptModal';
 const GOOGLE_CLIENT_ID_CONFIGURED = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 const FACEBOOK_APP_ID_CONFIGURED = Boolean(import.meta.env.VITE_FACEBOOK_APP_ID);
 
-function GoogleDivider() {
+function SocialDivider() {
   return (
-    <div className="my-4 flex items-center gap-3">
+    <div className="my-5 flex items-center gap-3">
       <div className="h-px flex-1 bg-border" />
-      <span className="text-xs text-muted">eller</span>
+      <span className="text-xs font-medium uppercase tracking-wide text-muted">Eller logga in med</span>
       <div className="h-px flex-1 bg-border" />
     </div>
   );
 }
 
-function FacebookLoginButton({ label, loading, onClick }: { label: string; loading: boolean; onClick: () => void }) {
+function FacebookLoginButton({
+  label,
+  loading,
+  fullWidth,
+  onClick,
+}: {
+  label: string;
+  loading: boolean;
+  fullWidth?: boolean;
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={loading}
-      className="flex h-10 w-[300px] items-center justify-center gap-2 rounded-lg border border-border bg-white text-sm font-medium text-text transition hover:bg-primary-light disabled:opacity-60"
+      className={`flex h-11 min-h-[44px] items-center justify-center gap-2 rounded-lg border-2 border-primary bg-white text-sm font-medium text-text transition hover:bg-primary-light disabled:opacity-60 ${
+        fullWidth ? 'w-full' : 'w-[300px]'
+      }`}
     >
       {loading ? (
         <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#1877F2] border-t-transparent" />
@@ -218,48 +230,27 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
   return (
     <form onSubmit={handleSubmit}>
       {accountDeleted && (
-        <p className="mb-4 rounded-lg border border-success bg-success-light px-4 py-2.5 text-sm text-text">
+        <p className="mb-5 rounded-lg border border-success bg-success-light px-4 py-2.5 text-sm text-text">
           Ditt konto har raderats.
         </p>
       )}
 
       {emailVerified === '1' && (
-        <p className="mb-4 rounded-lg border border-success bg-success-light px-4 py-2.5 text-sm text-text">
+        <p className="mb-5 rounded-lg border border-success bg-success-light px-4 py-2.5 text-sm text-text">
           Din e-postadress har verifierats. Du kan nu logga in.
         </p>
       )}
 
       {emailVerified === '0' && (
-        <p className="mb-4 rounded-lg border border-danger bg-danger-light px-4 py-2.5 text-sm text-text">
+        <p className="mb-5 rounded-lg border border-danger bg-danger-light px-4 py-2.5 text-sm text-text">
           Verifieringslänken är ogiltig eller har redan använts.
         </p>
       )}
 
-      {(GOOGLE_CLIENT_ID_CONFIGURED || FACEBOOK_APP_ID_CONFIGURED) && (
-        <>
-          <div className="flex flex-col items-center gap-2">
-            {GOOGLE_CLIENT_ID_CONFIGURED && (
-              <GoogleLogin
-                onSuccess={(credentialResponse) => {
-                  if (credentialResponse.credential) {
-                    handleGoogleSuccess(credentialResponse.credential);
-                  }
-                }}
-                onError={() => setError('Kunde inte logga in med Google')}
-                text="signin_with"
-                size="large"
-                width={300}
-              />
-            )}
-            {FACEBOOK_APP_ID_CONFIGURED && (
-              <FacebookLoginButton label="Logga in med Facebook" loading={submitting} onClick={handleFacebookLogin} />
-            )}
-          </div>
-          <GoogleDivider />
-        </>
-      )}
+      <h1 className="text-2xl font-bold text-text">Logga in för att komma igång</h1>
+      <p className="mt-1 text-sm text-muted">Eller välj ett annat sätt att logga in</p>
 
-      <div>
+      <div className="mt-5">
         <label htmlFor="loginEmail" className="text-xs font-medium uppercase tracking-wide text-muted">
           E-post
         </label>
@@ -267,13 +258,14 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
           id="loginEmail"
           type="email"
           required
+          placeholder="din@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className={fieldClass(false)}
+          className="mt-1.5 h-12 w-full rounded-lg border-2 border-primary px-4 text-base text-text focus:outline-none"
         />
       </div>
 
-      <div className="mt-4">
+      <div className="mt-5">
         <label htmlFor="loginPassword" className="text-xs font-medium uppercase tracking-wide text-muted">
           Lösenord
         </label>
@@ -307,15 +299,46 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
       <button
         type="submit"
         disabled={submitting}
-        className="mt-5 w-full rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+        className="mt-5 min-h-[44px] w-full rounded-lg bg-primary px-4.5 py-3 text-base font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60"
       >
-        {submitting ? 'Loggar in…' : 'Logga in'}
+        {submitting ? 'Loggar in…' : 'Logga in med Email'}
       </button>
 
-      <p className="mt-4 text-center text-sm text-muted">
-        Inget konto än?{' '}
+      {(GOOGLE_CLIENT_ID_CONFIGURED || FACEBOOK_APP_ID_CONFIGURED) && (
+        <>
+          <SocialDivider />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {GOOGLE_CLIENT_ID_CONFIGURED && (
+              <div className="flex justify-center">
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    if (credentialResponse.credential) {
+                      handleGoogleSuccess(credentialResponse.credential);
+                    }
+                  }}
+                  onError={() => setError('Kunde inte logga in med Google')}
+                  text="signin_with"
+                  size="large"
+                  width={260}
+                />
+              </div>
+            )}
+            {FACEBOOK_APP_ID_CONFIGURED && (
+              <FacebookLoginButton
+                label="Logga in med Facebook"
+                loading={submitting}
+                fullWidth
+                onClick={handleFacebookLogin}
+              />
+            )}
+          </div>
+        </>
+      )}
+
+      <p className="mt-5 text-center text-sm text-muted">
+        Har du inget konto?{' '}
         <button type="button" onClick={onSwitchToRegister} className="bg-transparent p-0 text-primary-dark underline">
-          Skapa konto
+          Registrera dig
         </button>
       </p>
     </form>
@@ -461,7 +484,7 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
               <FacebookLoginButton label="Skapa konto med Facebook" loading={submitting} onClick={handleFacebookLogin} />
             )}
           </div>
-          <GoogleDivider />
+          <SocialDivider />
         </>
       )}
 
