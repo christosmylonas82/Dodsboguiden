@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { FaFacebook } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
@@ -129,7 +129,7 @@ export function AuthPage() {
 
       <div>
         {tab === 'login' ? (
-          <LoginForm onSwitchToRegister={() => selectTab('register')} />
+          <LoginForm />
         ) : (
           <RegisterForm onSwitchToLogin={() => selectTab('login')} />
         )}
@@ -138,7 +138,7 @@ export function AuthPage() {
   );
 }
 
-function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
+function LoginForm() {
   const { login, loginWithGoogle, loginWithFacebook, setEmail: submitEmailForAccount } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -315,10 +315,10 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
       )}
 
       <p className="mt-5 text-center text-sm text-muted">
-        Har du inget konto?{' '}
-        <button type="button" onClick={onSwitchToRegister} className="bg-transparent p-0 text-primary-dark underline">
-          Registrera dig
-        </button>
+        Har du inget konto &amp; vill registrera dig via mail?{' '}
+        <Link to="/register" className="text-primary-dark underline">
+          Registrera dig här
+        </Link>
       </p>
     </form>
   );
