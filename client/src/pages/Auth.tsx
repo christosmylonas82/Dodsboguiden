@@ -7,6 +7,8 @@ import { PolicyModal } from '../components/PolicyModal';
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 import { isPasswordValid, PASSWORD_REQUIREMENTS_MESSAGE } from '../lib/passwordRequirements';
 
+const GOOGLE_CLIENT_ID_CONFIGURED = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
+
 function GoogleDivider() {
   return (
     <div className="my-4 flex items-center gap-3">
@@ -129,18 +131,22 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
         </p>
       )}
 
-      <div className="flex justify-center">
-        <GoogleLogin
-          onSuccess={(credentialResponse) => {
-            if (credentialResponse.credential) {
-              handleGoogleSuccess(credentialResponse.credential);
-            }
-          }}
-          onError={() => setError('Kunde inte logga in med Google')}
-          text="signin_with"
-        />
-      </div>
-      <GoogleDivider />
+      {GOOGLE_CLIENT_ID_CONFIGURED && (
+        <>
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                if (credentialResponse.credential) {
+                  handleGoogleSuccess(credentialResponse.credential);
+                }
+              }}
+              onError={() => setError('Kunde inte logga in med Google')}
+              text="signin_with"
+            />
+          </div>
+          <GoogleDivider />
+        </>
+      )}
 
       <div>
         <label htmlFor="loginEmail" className="text-xs font-medium uppercase tracking-wide text-muted">
@@ -291,18 +297,22 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="flex justify-center">
-        <GoogleLogin
-          onSuccess={(credentialResponse) => {
-            if (credentialResponse.credential) {
-              handleGoogleSuccess(credentialResponse.credential);
-            }
-          }}
-          onError={() => setErrors({ submit: 'Kunde inte skapa konto med Google' })}
-          text="signup_with"
-        />
-      </div>
-      <GoogleDivider />
+      {GOOGLE_CLIENT_ID_CONFIGURED && (
+        <>
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                if (credentialResponse.credential) {
+                  handleGoogleSuccess(credentialResponse.credential);
+                }
+              }}
+              onError={() => setErrors({ submit: 'Kunde inte skapa konto med Google' })}
+              text="signup_with"
+            />
+          </div>
+          <GoogleDivider />
+        </>
+      )}
 
       <p className="text-xs text-muted">* Obligatoriska fält</p>
 
