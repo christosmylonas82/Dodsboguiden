@@ -124,28 +124,7 @@ export function AuthPage() {
         </p>
       )}
 
-      <div className="flex gap-1 rounded-lg bg-bg p-1">
-        <button
-          type="button"
-          onClick={() => selectTab('login')}
-          className={`flex-1 rounded-md px-4 py-2.5 text-sm font-medium transition ${
-            tab === 'login' ? 'bg-primary text-white' : 'bg-transparent text-muted hover:text-text'
-          }`}
-        >
-          Logga in
-        </button>
-        <button
-          type="button"
-          onClick={() => selectTab('register')}
-          className={`flex-1 rounded-md px-4 py-2.5 text-sm font-medium transition ${
-            tab === 'register' ? 'bg-primary text-white' : 'bg-transparent text-muted hover:text-text'
-          }`}
-        >
-          Skapa konto
-        </button>
-      </div>
-
-      <div className="mt-6">
+      <div>
         {tab === 'login' ? (
           <LoginForm onSwitchToRegister={() => selectTab('register')} />
         ) : (
@@ -319,7 +298,7 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
                   onError={() => setError('Kunde inte logga in med Google')}
                   text="signin_with"
                   size="large"
-                  width={260}
+                  width={200}
                 />
               </div>
             )}
