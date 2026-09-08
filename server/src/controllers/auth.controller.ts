@@ -28,6 +28,7 @@ function toUserResponse(user: User) {
     currentOnboardingVersion: CURRENT_ONBOARDING_VERSION,
     profileImageUrl: user.profileImageUrl,
     profilePicture: user.profilePicture,
+    hasPassword: user.hasPassword,
     createdAt: user.createdAt,
   };
 }
@@ -200,6 +201,7 @@ export async function googleCallback(req: Request, res: Response) {
           email: profile.email,
           name: profile.name,
           passwordHash: await hashPassword(randomPassword),
+          hasPassword: false,
           gdprConsent: true,
           consentDate: new Date(),
           emailVerifiedAt: new Date(),
@@ -269,6 +271,7 @@ export async function facebookCallback(req: Request, res: Response) {
           email,
           name: profile.name,
           passwordHash: await hashPassword(randomPassword),
+          hasPassword: false,
           gdprConsent: true,
           consentDate: new Date(),
           emailVerifiedAt: profile.email ? new Date() : null,

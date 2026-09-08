@@ -30,6 +30,39 @@ function memberSinceDate(createdAt: string): string {
   return new Date(createdAt).toLocaleDateString('sv-SE', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
+function AccountField({
+  label,
+  value,
+  muted,
+  editLabel,
+  onEdit,
+}: {
+  label: string;
+  value: string;
+  muted?: boolean;
+  editLabel: string;
+  onEdit?: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+      <div className="min-w-0 text-sm">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
+        <p className={`truncate ${muted ? 'italic text-muted' : 'text-text'}`}>{value}</p>
+      </div>
+      {onEdit && (
+        <button
+          type="button"
+          onClick={onEdit}
+          className="flex w-32 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-border bg-transparent px-3 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
+        >
+          <TbPencil size={16} />
+          {editLabel}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function SectionCard({
   title,
   children,
@@ -151,52 +184,27 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
       )}
 
       <SectionCard title="Kontouppgifter">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-center gap-4">
-            <Avatar name={user.name} imageUrl={user.profileImageUrl ?? user.profilePicture} userId={user.id} size="lg" />
-            <div className="flex flex-col gap-1 text-sm">
-              <div>
-                <span className="text-muted">Namn</span>{' '}
-                <span className="text-text">{user.name}</span>
-              </div>
-              <div>
-                <span className="text-muted">E-post</span>{' '}
-                <span className={user.emailIsPlaceholder ? 'text-muted italic' : 'text-text'}>
-                  {user.emailIsPlaceholder ? 'Ingen e-post registrerad' : user.email}
-                </span>{' '}
-                <button
-                  type="button"
-                  onClick={() => setEmailModalOpen(true)}
-                  className="bg-transparent p-0 text-xs text-primary-dark hover:underline"
-                >
-                  {user.emailIsPlaceholder ? 'Registrera' : 'Ändra'}
-                </button>
-              </div>
-              <div>
-                <span className="text-muted">Lösenord</span>{' '}
-                <span className="text-text">••••••••</span>{' '}
-                <button
-                  type="button"
-                  onClick={() => setPasswordModalOpen(true)}
-                  className="bg-transparent p-0 text-xs text-primary-dark hover:underline"
-                >
-                  Ändra
-                </button>
-              </div>
-              <div>
-                <span className="text-muted">Medlem sedan</span>{' '}
-                <span className="text-text">{memberSinceDate(user.createdAt)}</span>
-              </div>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => setEditNameModalOpen(true)}
-            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-transparent px-4.5 py-2.5 text-sm font-medium text-text hover:bg-primary-light"
-          >
-            <TbPencil size={16} />
-            Redigera
-          </button>
+        <div className="flex items-center gap-4">
+          <Avatar name={user.name} imageUrl={user.profileImageUrl ?? user.profilePicture} userId={user.id} size="lg" />
+          <div className="text-sm text-muted">Medlem sedan {memberSinceDate(user.createdAt)}</div>
+        </div>
+
+        <div className="mt-4 flex flex-col divide-y divide-border border-t border-border">
+          <AccountField label="Namn" value={user.name} onEdit={() => setEditNameModalOpen(true)} editLabel="Ändra" />
+          <AccountField
+            label="E-post"
+            value={user.emailIsPlaceholder ? 'Ingen e-post registrerad' : user.email}
+            muted={user.emailIsPlaceholder}
+            onEdit={() => setEmailModalOpen(true)}
+            editLabel={user.emailIsPlaceholder ? 'Registrera' : 'Ändra'}
+          />
+          <AccountField
+            label="Lösenord"
+            value={user.hasPassword ? '••••••••' : 'Inloggning via Google/Facebook'}
+            muted={!user.hasPassword}
+            onEdit={user.hasPassword ? () => setPasswordModalOpen(true) : undefined}
+            editLabel="Ändra"
+          />
         </div>
 
         <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">

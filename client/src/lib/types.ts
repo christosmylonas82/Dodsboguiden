@@ -9,6 +9,7 @@ export interface User {
   currentOnboardingVersion: number;
   profileImageUrl: string | null;
   profilePicture: string | null;
+  hasPassword: boolean;
   createdAt: string;
 }
 
