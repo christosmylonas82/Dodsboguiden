@@ -25,16 +25,10 @@ function CtaButtons() {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4">
       <Link
-        to="/register"
+        to="/login"
         className="rounded-lg bg-primary px-8 py-3.5 font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-primary-dark hover:shadow-md"
       >
-        Kom igång nu
-      </Link>
-      <Link
-        to="/login"
-        className="rounded-lg border border-border bg-surface px-8 py-3.5 font-medium text-text transition hover:-translate-y-0.5 hover:shadow-md"
-      >
-        Jag har redan ett konto
+        Kom igång
       </Link>
     </div>
   );

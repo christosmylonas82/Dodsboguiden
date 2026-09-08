@@ -325,8 +325,7 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
 }
 
 function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
-  const { register, loginWithGoogle, loginWithFacebook, setEmail: submitEmailForAccount } = useAuth();
-  const navigate = useNavigate();
+  const { register } = useAuth();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -337,7 +336,6 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
   const [termsOpen, setTermsOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [registeredMessage, setRegisteredMessage] = useState<string | null>(null);
-  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
 
   function validate(): boolean {
     const next: Record<string, string> = {};
@@ -375,51 +373,6 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
     }
   }
 
-  async function handleGoogleSuccess(credential: string) {
-    setErrors({});
-    setSubmitting(true);
-    try {
-      await loginWithGoogle(credential);
-      navigate('/dashboard');
-    } catch (err) {
-      setErrors({ submit: err instanceof ApiError ? err.message : 'Kunde inte skapa konto med Google' });
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  async function handleFacebookLogin() {
-    setErrors({});
-    setSubmitting(true);
-    try {
-      const accessToken = await loginWithFacebookPopup();
-      const { emailRequired } = await loginWithFacebook(accessToken);
-      if (emailRequired) {
-        setShowEmailPrompt(true);
-      } else {
-        navigate('/dashboard');
-      }
-    } catch (err) {
-      setErrors({
-        submit: err instanceof ApiError || err instanceof Error ? err.message : 'Kunde inte skapa konto med Facebook',
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  if (showEmailPrompt) {
-    return (
-      <EmailPromptModal
-        onSave={async (newEmail) => {
-          await submitEmailForAccount(newEmail);
-          navigate('/dashboard');
-        }}
-        onSkip={() => navigate('/dashboard')}
-      />
-    );
-  }
-
   if (registeredMessage) {
     return (
       <div>
@@ -443,30 +396,6 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      {(GOOGLE_CLIENT_ID_CONFIGURED || FACEBOOK_APP_ID_CONFIGURED) && (
-        <>
-          <div className="flex flex-col items-center gap-2">
-            {GOOGLE_CLIENT_ID_CONFIGURED && (
-              <GoogleLogin
-                onSuccess={(credentialResponse) => {
-                  if (credentialResponse.credential) {
-                    handleGoogleSuccess(credentialResponse.credential);
-                  }
-                }}
-                onError={() => setErrors({ submit: 'Kunde inte skapa konto med Google' })}
-                text="signup_with"
-                size="large"
-                width={300}
-              />
-            )}
-            {FACEBOOK_APP_ID_CONFIGURED && (
-              <FacebookLoginButton label="Skapa konto med Facebook" loading={submitting} onClick={handleFacebookLogin} />
-            )}
-          </div>
-          <SocialDivider />
-        </>
-      )}
-
       <p className="text-xs text-muted">* Obligatoriska fält</p>
 
       <div className="mt-3 grid gap-4 sm:grid-cols-2">
