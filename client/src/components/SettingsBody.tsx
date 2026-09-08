@@ -153,7 +153,7 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
       <SectionCard title="Kontouppgifter">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
-            <Avatar name={user.name} imageUrl={user.profileImageUrl} userId={user.id} size="lg" />
+            <Avatar name={user.name} imageUrl={user.profileImageUrl ?? user.profilePicture} userId={user.id} size="lg" />
             <div className="flex flex-col gap-1 text-sm">
               <div>
                 <span className="text-muted">Namn</span>{' '}

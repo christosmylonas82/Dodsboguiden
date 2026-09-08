@@ -46,7 +46,12 @@ export function RecentActivityModal({
                   index < recent.length - 1 ? 'border-b border-border' : ''
                 }`}
               >
-                <Avatar name={entry.user.name} imageUrl={entry.user.profileImageUrl} userId={entry.user.id} size="md" />
+                <Avatar
+                  name={entry.user.name}
+                  imageUrl={entry.user.profileImageUrl ?? entry.user.profilePicture}
+                  userId={entry.user.id}
+                  size="md"
+                />
                 <div className="flex flex-col gap-1">
                   <span className="text-sm font-semibold text-text">{entry.user.name}</span>
                   <span className="text-sm text-muted">{formatActivityAction(entry.action)}</span>

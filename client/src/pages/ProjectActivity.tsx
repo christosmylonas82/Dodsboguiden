@@ -69,7 +69,12 @@ export function ProjectActivityPage() {
           <ul className="flex flex-col">
             {activity.map((entry) => (
               <li key={entry.id} className="flex gap-3 border-b border-border py-3 first:pt-0 last:border-0 last:pb-0">
-                <Avatar name={entry.user.name} imageUrl={entry.user.profileImageUrl} userId={entry.user.id} size="md" />
+                <Avatar
+                  name={entry.user.name}
+                  imageUrl={entry.user.profileImageUrl ?? entry.user.profilePicture}
+                  userId={entry.user.id}
+                  size="md"
+                />
                 <div className="flex flex-col gap-1">
                   <span className="text-sm font-semibold text-text">{entry.user.name}</span>
                   <span className="text-sm text-muted">{formatActivityAction(entry.action)}</span>

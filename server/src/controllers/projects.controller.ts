@@ -197,12 +197,12 @@ export async function getProject(req: Request, res: Response) {
     include: {
       tasks: {
         orderBy: { orderIndex: 'asc' },
-        include: { assignedUser: { select: { id: true, name: true, email: true, profileImageUrl: true } } },
+        include: { assignedUser: { select: { id: true, name: true, email: true, profileImageUrl: true, profilePicture: true } } },
       },
-      members: { include: { user: { select: { id: true, name: true, email: true, profileImageUrl: true } } } },
+      members: { include: { user: { select: { id: true, name: true, email: true, profileImageUrl: true, profilePicture: true } } } },
       invitations: {
         where: { status: 'PENDING' },
-        include: { invitedUser: { select: { id: true, name: true, email: true, profileImageUrl: true } } },
+        include: { invitedUser: { select: { id: true, name: true, email: true, profileImageUrl: true, profilePicture: true } } },
         orderBy: { createdAt: 'desc' },
       },
     },

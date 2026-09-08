@@ -72,7 +72,11 @@ export function MembersModal({
             return (
               <li key={m.id} className="flex min-h-[64px] items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
-                  <Avatar name={m.user?.name ?? m.email} imageUrl={m.user?.profileImageUrl} userId={m.userId ?? m.id} />
+                  <Avatar
+                    name={m.user?.name ?? m.email}
+                    imageUrl={m.user?.profileImageUrl ?? m.user?.profilePicture}
+                    userId={m.userId ?? m.id}
+                  />
                   <div className="min-w-0">
                     <p className="truncate text-sm text-text">{m.user?.name ?? m.email}</p>
                     {m.user && <p className="truncate text-xs text-muted">{m.email}</p>}
@@ -113,7 +117,7 @@ export function MembersModal({
                   <div className="flex min-w-0 items-center gap-3">
                     <Avatar
                       name={invite.invitedUser?.name ?? invite.invitedEmail}
-                      imageUrl={invite.invitedUser?.profileImageUrl}
+                      imageUrl={invite.invitedUser?.profileImageUrl ?? invite.invitedUser?.profilePicture}
                       userId={invite.invitedUser?.id ?? invite.id}
                     />
                     <div className="min-w-0">

@@ -47,7 +47,7 @@ export interface Task {
   timeEstimate: string | null;
   responsibleRole: string | null;
   assignedTo: string | null;
-  assignedUser: { id: string; name: string; email: string; profileImageUrl: string | null } | null;
+  assignedUser: { id: string; name: string; email: string; profileImageUrl: string | null; profilePicture: string | null } | null;
   orderIndex: number;
   notes: string | null;
   dueDate: string | null;
@@ -61,7 +61,7 @@ export interface ProjectMember {
   userId: string | null;
   email: string;
   role: 'ADMIN' | 'MEMBER';
-  user: { id: string; name: string; email: string; profileImageUrl: string | null } | null;
+  user: { id: string; name: string; email: string; profileImageUrl: string | null; profilePicture: string | null } | null;
 }
 
 export interface ProjectDetail {
@@ -86,7 +86,7 @@ export interface PendingInvitation {
   invitedEmail: string;
   status: InvitationStatus;
   createdAt: string;
-  invitedUser: { id: string; name: string; email: string; profileImageUrl: string | null } | null;
+  invitedUser: { id: string; name: string; email: string; profileImageUrl: string | null; profilePicture: string | null } | null;
 }
 
 export interface Contact {
@@ -185,6 +185,6 @@ export interface ActivityEntry {
   id: string;
   action: string;
   timestamp: string;
-  user: { id: string; name: string; profileImageUrl: string | null };
+  user: { id: string; name: string; profileImageUrl: string | null; profilePicture: string | null };
   taskId: string | null;
 }

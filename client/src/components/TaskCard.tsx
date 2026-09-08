@@ -99,7 +99,7 @@ export function TaskCard({
                 <div className="flex items-center gap-2">
                   <Avatar
                     name={task.assignedUser.name}
-                    imageUrl={task.assignedUser.profileImageUrl}
+                    imageUrl={task.assignedUser.profileImageUrl ?? task.assignedUser.profilePicture}
                     userId={task.assignedUser.id}
                     size="sm"
                   />
