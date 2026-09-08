@@ -5,10 +5,12 @@ import { ModalOverlay } from './ModalOverlay';
 
 export function ChangeEmailModal({
   currentEmail,
+  requiresPassword = true,
   onClose,
   onUpdated,
 }: {
   currentEmail: string;
+  requiresPassword?: boolean;
   onClose: () => void;
   onUpdated: (user: User) => void;
 }) {
@@ -22,10 +24,15 @@ export function ChangeEmailModal({
     setError(null);
     setSubmitting(true);
     try {
-      const updated = await apiFetch<User>('/auth/email', {
-        method: 'PUT',
-        body: JSON.stringify({ newEmail, password }),
-      });
+      const updated = requiresPassword
+        ? await apiFetch<User>('/auth/email', {
+            method: 'PUT',
+            body: JSON.stringify({ newEmail, password }),
+          })
+        : await apiFetch<User>('/auth/set-email', {
+            method: 'PUT',
+            body: JSON.stringify({ email: newEmail }),
+          });
       onUpdated(updated);
       onClose();
     } catch (err) {
@@ -38,15 +45,17 @@ export function ChangeEmailModal({
   return (
     <ModalOverlay onClose={onClose}>
       <div className="rounded-xl border border-border bg-surface p-4 sm:p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
-        <h3 className="text-lg font-semibold text-text">Ändra email</h3>
+        <h3 className="text-lg font-semibold text-text">{requiresPassword ? 'Ändra email' : 'Registrera e-post'}</h3>
         <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4">
-          <div>
-            <p className="text-sm text-muted">Nuvarande email</p>
-            <p className="text-sm text-text">{currentEmail}</p>
-          </div>
+          {requiresPassword && (
+            <div>
+              <p className="text-sm text-muted">Nuvarande email</p>
+              <p className="text-sm text-text">{currentEmail}</p>
+            </div>
+          )}
           <div className="flex flex-col gap-1.5">
             <label htmlFor="newEmail" className="text-sm text-muted">
-              Nytt email
+              {requiresPassword ? 'Nytt email' : 'E-postadress'}
             </label>
             <input
               id="newEmail"
@@ -58,19 +67,21 @@ export function ChangeEmailModal({
               className="h-11 rounded-lg border border-border px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
             />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="confirmPassword" className="text-sm text-muted">
-              Bekräfta lösenord
-            </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="h-11 rounded-lg border border-border px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
-            />
-          </div>
+          {requiresPassword && (
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="confirmPassword" className="text-sm text-muted">
+                Bekräfta lösenord
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-11 rounded-lg border border-border px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
+              />
+            </div>
+          )}
           {error && <p className="text-sm text-danger">{error}</p>}
           <div className="mt-1 flex justify-end gap-3">
             <button
@@ -85,7 +96,7 @@ export function ChangeEmailModal({
               disabled={submitting}
               className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
             >
-              {submitting ? 'Uppdaterar…' : 'Uppdatera email'}
+              {submitting ? 'Sparar…' : requiresPassword ? 'Uppdatera email' : 'Spara e-post'}
             </button>
           </div>
         </form>

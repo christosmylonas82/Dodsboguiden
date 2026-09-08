@@ -161,13 +161,15 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
               </div>
               <div>
                 <span className="text-muted">E-post</span>{' '}
-                <span className="text-text">{user.email}</span>{' '}
+                <span className={user.emailIsPlaceholder ? 'text-muted italic' : 'text-text'}>
+                  {user.emailIsPlaceholder ? 'Ingen e-post registrerad' : user.email}
+                </span>{' '}
                 <button
                   type="button"
                   onClick={() => setEmailModalOpen(true)}
                   className="bg-transparent p-0 text-xs text-primary-dark hover:underline"
                 >
-                  Ändra
+                  {user.emailIsPlaceholder ? 'Registrera' : 'Ändra'}
                 </button>
               </div>
               <div>
@@ -369,10 +371,11 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
       {emailModalOpen && (
         <ChangeEmailModal
           currentEmail={user.email}
+          requiresPassword={!user.emailIsPlaceholder}
           onClose={() => setEmailModalOpen(false)}
           onUpdated={(updated) => {
             updateUser(updated);
-            flashMessage('Email uppdaterad');
+            flashMessage(user.emailIsPlaceholder ? 'E-post registrerad' : 'Email uppdaterad');
           }}
         />
       )}

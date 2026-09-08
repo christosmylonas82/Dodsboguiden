@@ -29,7 +29,7 @@ function FacebookLoginButton({ label, loading, onClick }: { label: string; loadi
       type="button"
       onClick={onClick}
       disabled={loading}
-      className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-border bg-white text-sm font-medium text-text transition hover:bg-primary-light disabled:opacity-60"
+      className="flex h-10 w-[300px] items-center justify-center gap-2 rounded-lg border border-border bg-white text-sm font-medium text-text transition hover:bg-primary-light disabled:opacity-60"
     >
       {loading ? (
         <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#1877F2] border-t-transparent" />
@@ -202,6 +202,8 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
                 }}
                 onError={() => setError('Kunde inte logga in med Google')}
                 text="signin_with"
+                size="large"
+                width={300}
               />
             )}
             {FACEBOOK_APP_ID_CONFIGURED && (
@@ -406,6 +408,8 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
                 }}
                 onError={() => setErrors({ submit: 'Kunde inte skapa konto med Google' })}
                 text="signup_with"
+                size="large"
+                width={300}
               />
             )}
             {FACEBOOK_APP_ID_CONFIGURED && (

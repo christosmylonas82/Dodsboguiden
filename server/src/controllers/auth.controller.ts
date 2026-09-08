@@ -20,6 +20,7 @@ function toUserResponse(user: User) {
   return {
     id: user.id,
     email: user.email,
+    emailIsPlaceholder: isPlaceholderEmail(user.email),
     name: user.name,
     role: user.role,
     hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,

@@ -1,6 +1,7 @@
 export interface User {
   id: string;
   email: string;
+  emailIsPlaceholder: boolean;
   name: string;
   role?: 'USER' | 'ADMIN';
   hasSeenTipsOnboarding: boolean;
