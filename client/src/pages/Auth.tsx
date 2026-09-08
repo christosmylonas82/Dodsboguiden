@@ -73,6 +73,13 @@ export function AuthPage() {
   const [redirectPending, setRedirectPending] = useState(false);
   const [redirectError, setRedirectError] = useState<string | null>(null);
 
+  // Keeps `tab` in sync with the URL for navigations that don't go through
+  // selectTab() below — e.g. the plain <Link> to /register in LoginForm, or the
+  // browser's back/forward buttons — so the rendered form always matches the URL.
+  useEffect(() => {
+    setTab(location.pathname === '/register' ? 'register' : 'login');
+  }, [location.pathname]);
+
   useEffect(() => {
     if (FACEBOOK_APP_ID_CONFIGURED) {
       preloadFacebookSdk();
