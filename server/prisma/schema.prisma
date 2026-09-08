@@ -103,6 +103,8 @@ model User {
   hasSeenTipsOnboarding Boolean @default(false) @map("has_seen_tips_onboarding")
   onboardingVersionSeen Int @default(0) @map("onboarding_version_seen")
   profileImageUrl String? @db.Text @map("profile_image_url")
+  googleId       String?  @unique @map("google_id")
+  profilePicture String?  @map("profile_picture")
   emailVerifiedAt DateTime? @map("email_verified_at")
   createdAt    DateTime @default(now()) @map("created_at")
   deletedAt    DateTime? @map("deleted_at")

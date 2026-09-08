@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  googleCallback,
   login,
   markOnboardingSeen,
   markTipsSeen,
@@ -37,6 +38,7 @@ const loginRateLimit = rateLimit('login', {
 router.post('/register', signupRateLimit, asyncHandler(register));
 router.get('/verify', asyncHandler(verifyEmail));
 router.post('/login', loginRateLimit, asyncHandler(login));
+router.post('/google-callback', loginRateLimit, asyncHandler(googleCallback));
 router.post('/reset-password', asyncHandler(resetPassword));
 router.get('/me', requireAuth, asyncHandler(me));
 router.put('/me', requireAuth, asyncHandler(updateName));

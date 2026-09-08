@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import type { Request, Response } from 'express';
 import type { User } from '@prisma/client';
 import { z } from 'zod';
@@ -11,6 +12,7 @@ import { sendVerificationEmail, sendWelcomeEmail } from '../lib/email.js';
 import { logAuthEvent } from '../lib/authEvent.js';
 import { CURRENT_ONBOARDING_VERSION } from '../lib/onboarding.js';
 import { getPrimaryClientOrigin } from '../lib/clientOrigin.js';
+import { verifyGoogleIdToken } from '../lib/googleAuth.js';
 
 function toUserResponse(user: User) {
   return {
@@ -22,6 +24,7 @@ function toUserResponse(user: User) {
     onboardingVersionSeen: user.onboardingVersionSeen,
     currentOnboardingVersion: CURRENT_ONBOARDING_VERSION,
     profileImageUrl: user.profileImageUrl,
+    profilePicture: user.profilePicture,
     createdAt: user.createdAt,
   };
 }
@@ -148,6 +151,71 @@ export async function login(req: Request, res: Response) {
   if (!user.emailVerifiedAt) {
     await logAuthEvent({ userId: user.id, email: user.email, action: 'login_failed' });
     throw new HttpError(401, 'Email not verified. Check your inbox.');
+  }
+
+  await logAuthEvent({ userId: user.id, email: user.email, action: 'login_success' });
+
+  const token = signToken({ userId: user.id, role: user.role });
+  res.json({ token, user: toUserResponse(user) });
+}
+
+const googleCallbackSchema = z.object({
+  idToken: z.string().min(1),
+});
+
+export async function googleCallback(req: Request, res: Response) {
+  const body = googleCallbackSchema.parse(req.body);
+
+  let profile;
+  try {
+    profile = await verifyGoogleIdToken(body.idToken);
+  } catch (err) {
+    console.error(`[googleCallback] Token verification failed: ${err instanceof Error ? err.message : err}`);
+    throw new HttpError(401, 'Could not verify Google sign-in');
+  }
+
+  let user = await prisma.user.findUnique({ where: { googleId: profile.sub } });
+
+  if (!user) {
+    const existingByEmail = await prisma.user.findUnique({ where: { email: profile.email } });
+    if (existingByEmail) {
+      if (existingByEmail.deletedAt) {
+        throw new HttpError(401, 'This account has been deleted');
+      }
+      user = await prisma.user.update({
+        where: { id: existingByEmail.id },
+        data: {
+          googleId: profile.sub,
+          profilePicture: profile.picture,
+          emailVerifiedAt: existingByEmail.emailVerifiedAt ?? new Date(),
+        },
+      });
+    } else {
+      const randomPassword = crypto.randomUUID() + crypto.randomUUID();
+      user = await prisma.user.create({
+        data: {
+          email: profile.email,
+          name: profile.name,
+          passwordHash: await hashPassword(randomPassword),
+          gdprConsent: true,
+          consentDate: new Date(),
+          emailVerifiedAt: new Date(),
+          googleId: profile.sub,
+          profilePicture: profile.picture,
+        },
+      });
+
+      await prisma.projectMember.updateMany({
+        where: { email: profile.email, userId: null },
+        data: { userId: user.id },
+      });
+      await prisma.invitation.updateMany({
+        where: { invitedEmail: profile.email, invitedUserId: null },
+        data: { invitedUserId: user.id },
+      });
+    }
+  } else if (user.deletedAt) {
+    throw new HttpError(401, 'This account has been deleted');
   }
 
   await logAuthEvent({ userId: user.id, email: user.email, action: 'login_success' });

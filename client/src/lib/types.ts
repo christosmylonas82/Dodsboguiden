@@ -7,6 +7,7 @@ export interface User {
   onboardingVersionSeen: number;
   currentOnboardingVersion: number;
   profileImageUrl: string | null;
+  profilePicture: string | null;
   createdAt: string;
 }
 

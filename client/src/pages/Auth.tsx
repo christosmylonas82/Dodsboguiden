@@ -1,10 +1,21 @@
 import { useState, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import { ApiError } from '../lib/api';
 import { PolicyModal } from '../components/PolicyModal';
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 import { isPasswordValid, PASSWORD_REQUIREMENTS_MESSAGE } from '../lib/passwordRequirements';
+
+function GoogleDivider() {
+  return (
+    <div className="my-4 flex items-center gap-3">
+      <div className="h-px flex-1 bg-border" />
+      <span className="text-xs text-muted">eller</span>
+      <div className="h-px flex-1 bg-border" />
+    </div>
+  );
+}
 
 type Tab = 'login' | 'register';
 
@@ -59,7 +70,7 @@ export function AuthPage() {
 }
 
 function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -85,6 +96,19 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
     }
   }
 
+  async function handleGoogleSuccess(credential: string) {
+    setError(null);
+    setSubmitting(true);
+    try {
+      await loginWithGoogle(credential);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Kunde inte logga in med Google');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit}>
       {accountDeleted && (
@@ -104,6 +128,19 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
           Verifieringslänken är ogiltig eller har redan använts.
         </p>
       )}
+
+      <div className="flex justify-center">
+        <GoogleLogin
+          onSuccess={(credentialResponse) => {
+            if (credentialResponse.credential) {
+              handleGoogleSuccess(credentialResponse.credential);
+            }
+          }}
+          onError={() => setError('Kunde inte logga in med Google')}
+          text="signin_with"
+        />
+      </div>
+      <GoogleDivider />
 
       <div>
         <label htmlFor="loginEmail" className="text-xs font-medium uppercase tracking-wide text-muted">
@@ -169,7 +206,8 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
 }
 
 function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -217,6 +255,19 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
     }
   }
 
+  async function handleGoogleSuccess(credential: string) {
+    setErrors({});
+    setSubmitting(true);
+    try {
+      await loginWithGoogle(credential);
+      navigate('/dashboard');
+    } catch (err) {
+      setErrors({ submit: err instanceof ApiError ? err.message : 'Kunde inte skapa konto med Google' });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   if (registeredMessage) {
     return (
       <div>
@@ -240,6 +291,19 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
 
   return (
     <form onSubmit={handleSubmit}>
+      <div className="flex justify-center">
+        <GoogleLogin
+          onSuccess={(credentialResponse) => {
+            if (credentialResponse.credential) {
+              handleGoogleSuccess(credentialResponse.credential);
+            }
+          }}
+          onError={() => setErrors({ submit: 'Kunde inte skapa konto med Google' })}
+          text="signup_with"
+        />
+      </div>
+      <GoogleDivider />
+
       <p className="text-xs text-muted">* Obligatoriska fält</p>
 
       <div className="mt-3 grid gap-4 sm:grid-cols-2">
