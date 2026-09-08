@@ -376,6 +376,9 @@ export async function deleteUser(req: Request, res: Response) {
       email: `deleted-${userId}@dodsboguiden.invalid`,
       name: 'Raderad användare',
       passwordHash: '',
+      googleId: null,
+      facebookId: null,
+      profilePicture: null,
     },
   });
 
