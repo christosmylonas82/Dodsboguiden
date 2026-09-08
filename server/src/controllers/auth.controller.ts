@@ -13,6 +13,7 @@ import { logAuthEvent } from '../lib/authEvent.js';
 import { CURRENT_ONBOARDING_VERSION } from '../lib/onboarding.js';
 import { getPrimaryClientOrigin } from '../lib/clientOrigin.js';
 import { verifyGoogleIdToken } from '../lib/googleAuth.js';
+import { verifyFacebookAccessToken } from '../lib/facebookAuth.js';
 
 function toUserResponse(user: User) {
   return {
@@ -201,6 +202,71 @@ export async function googleCallback(req: Request, res: Response) {
           consentDate: new Date(),
           emailVerifiedAt: new Date(),
           googleId: profile.sub,
+          profilePicture: profile.picture,
+        },
+      });
+
+      await prisma.projectMember.updateMany({
+        where: { email: profile.email, userId: null },
+        data: { userId: user.id },
+      });
+      await prisma.invitation.updateMany({
+        where: { invitedEmail: profile.email, invitedUserId: null },
+        data: { invitedUserId: user.id },
+      });
+    }
+  } else if (user.deletedAt) {
+    throw new HttpError(401, 'This account has been deleted');
+  }
+
+  await logAuthEvent({ userId: user.id, email: user.email, action: 'login_success' });
+
+  const token = signToken({ userId: user.id, role: user.role });
+  res.json({ token, user: toUserResponse(user) });
+}
+
+const facebookCallbackSchema = z.object({
+  accessToken: z.string().min(1),
+});
+
+export async function facebookCallback(req: Request, res: Response) {
+  const body = facebookCallbackSchema.parse(req.body);
+
+  let profile;
+  try {
+    profile = await verifyFacebookAccessToken(body.accessToken);
+  } catch (err) {
+    console.error(`[facebookCallback] Token verification failed: ${err instanceof Error ? err.message : err}`);
+    throw new HttpError(401, 'Could not verify Facebook sign-in');
+  }
+
+  let user = await prisma.user.findUnique({ where: { facebookId: profile.id } });
+
+  if (!user) {
+    const existingByEmail = await prisma.user.findUnique({ where: { email: profile.email } });
+    if (existingByEmail) {
+      if (existingByEmail.deletedAt) {
+        throw new HttpError(401, 'This account has been deleted');
+      }
+      user = await prisma.user.update({
+        where: { id: existingByEmail.id },
+        data: {
+          facebookId: profile.id,
+          profilePicture: profile.picture,
+          emailVerifiedAt: existingByEmail.emailVerifiedAt ?? new Date(),
+        },
+      });
+    } else {
+      const randomPassword = crypto.randomUUID() + crypto.randomUUID();
+      user = await prisma.user.create({
+        data: {
+          email: profile.email,
+          name: profile.name,
+          passwordHash: await hashPassword(randomPassword),
+          gdprConsent: true,
+          consentDate: new Date(),
+          emailVerifiedAt: new Date(),
+          facebookId: profile.id,
           profilePicture: profile.picture,
         },
       });

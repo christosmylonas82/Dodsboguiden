@@ -1,13 +1,16 @@
 import { useState, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
+import { FaFacebook } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { ApiError } from '../lib/api';
 import { PolicyModal } from '../components/PolicyModal';
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 import { isPasswordValid, PASSWORD_REQUIREMENTS_MESSAGE } from '../lib/passwordRequirements';
+import { loginWithFacebookPopup } from '../lib/facebook';
 
 const GOOGLE_CLIENT_ID_CONFIGURED = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
+const FACEBOOK_APP_ID_CONFIGURED = Boolean(import.meta.env.VITE_FACEBOOK_APP_ID);
 
 function GoogleDivider() {
   return (
@@ -16,6 +19,19 @@ function GoogleDivider() {
       <span className="text-xs text-muted">eller</span>
       <div className="h-px flex-1 bg-border" />
     </div>
+  );
+}
+
+function FacebookLoginButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-border bg-white text-sm font-medium text-text transition hover:bg-primary-light"
+    >
+      <FaFacebook size={18} className="text-[#1877F2]" />
+      {label}
+    </button>
   );
 }
 
@@ -72,7 +88,7 @@ export function AuthPage() {
 }
 
 function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, loginWithFacebook } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -111,6 +127,20 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
     }
   }
 
+  async function handleFacebookLogin() {
+    setError(null);
+    setSubmitting(true);
+    try {
+      const accessToken = await loginWithFacebookPopup();
+      await loginWithFacebook(accessToken);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err instanceof ApiError || err instanceof Error ? err.message : 'Kunde inte logga in med Facebook');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit}>
       {accountDeleted && (
@@ -131,18 +161,23 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
         </p>
       )}
 
-      {GOOGLE_CLIENT_ID_CONFIGURED && (
+      {(GOOGLE_CLIENT_ID_CONFIGURED || FACEBOOK_APP_ID_CONFIGURED) && (
         <>
-          <div className="flex justify-center">
-            <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                if (credentialResponse.credential) {
-                  handleGoogleSuccess(credentialResponse.credential);
-                }
-              }}
-              onError={() => setError('Kunde inte logga in med Google')}
-              text="signin_with"
-            />
+          <div className="flex flex-col items-center gap-2">
+            {GOOGLE_CLIENT_ID_CONFIGURED && (
+              <GoogleLogin
+                onSuccess={(credentialResponse) => {
+                  if (credentialResponse.credential) {
+                    handleGoogleSuccess(credentialResponse.credential);
+                  }
+                }}
+                onError={() => setError('Kunde inte logga in med Google')}
+                text="signin_with"
+              />
+            )}
+            {FACEBOOK_APP_ID_CONFIGURED && (
+              <FacebookLoginButton label="Logga in med Facebook" onClick={handleFacebookLogin} />
+            )}
           </div>
           <GoogleDivider />
         </>
@@ -212,7 +247,7 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
 }
 
 function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
-  const { register, loginWithGoogle } = useAuth();
+  const { register, loginWithGoogle, loginWithFacebook } = useAuth();
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -274,6 +309,22 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
     }
   }
 
+  async function handleFacebookLogin() {
+    setErrors({});
+    setSubmitting(true);
+    try {
+      const accessToken = await loginWithFacebookPopup();
+      await loginWithFacebook(accessToken);
+      navigate('/dashboard');
+    } catch (err) {
+      setErrors({
+        submit: err instanceof ApiError || err instanceof Error ? err.message : 'Kunde inte skapa konto med Facebook',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   if (registeredMessage) {
     return (
       <div>
@@ -297,18 +348,23 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      {GOOGLE_CLIENT_ID_CONFIGURED && (
+      {(GOOGLE_CLIENT_ID_CONFIGURED || FACEBOOK_APP_ID_CONFIGURED) && (
         <>
-          <div className="flex justify-center">
-            <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                if (credentialResponse.credential) {
-                  handleGoogleSuccess(credentialResponse.credential);
-                }
-              }}
-              onError={() => setErrors({ submit: 'Kunde inte skapa konto med Google' })}
-              text="signup_with"
-            />
+          <div className="flex flex-col items-center gap-2">
+            {GOOGLE_CLIENT_ID_CONFIGURED && (
+              <GoogleLogin
+                onSuccess={(credentialResponse) => {
+                  if (credentialResponse.credential) {
+                    handleGoogleSuccess(credentialResponse.credential);
+                  }
+                }}
+                onError={() => setErrors({ submit: 'Kunde inte skapa konto med Google' })}
+                text="signup_with"
+              />
+            )}
+            {FACEBOOK_APP_ID_CONFIGURED && (
+              <FacebookLoginButton label="Skapa konto med Facebook" onClick={handleFacebookLogin} />
+            )}
           </div>
           <GoogleDivider />
         </>

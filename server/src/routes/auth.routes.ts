@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  facebookCallback,
   googleCallback,
   login,
   markOnboardingSeen,
@@ -39,6 +40,7 @@ router.post('/register', signupRateLimit, asyncHandler(register));
 router.get('/verify', asyncHandler(verifyEmail));
 router.post('/login', loginRateLimit, asyncHandler(login));
 router.post('/google-callback', loginRateLimit, asyncHandler(googleCallback));
+router.post('/facebook-callback', loginRateLimit, asyncHandler(facebookCallback));
 router.post('/reset-password', asyncHandler(resetPassword));
 router.get('/me', requireAuth, asyncHandler(me));
 router.put('/me', requireAuth, asyncHandler(updateName));
