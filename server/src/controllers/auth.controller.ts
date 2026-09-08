@@ -14,6 +14,7 @@ import { CURRENT_ONBOARDING_VERSION } from '../lib/onboarding.js';
 import { getPrimaryClientOrigin } from '../lib/clientOrigin.js';
 import { verifyGoogleIdToken } from '../lib/googleAuth.js';
 import { verifyFacebookAccessToken } from '../lib/facebookAuth.js';
+import { isPlaceholderEmail, makePlaceholderEmail } from '../lib/placeholderEmail.js';
 
 function toUserResponse(user: User) {
   return {
@@ -243,7 +244,10 @@ export async function facebookCallback(req: Request, res: Response) {
   let user = await prisma.user.findUnique({ where: { facebookId: profile.id } });
 
   if (!user) {
-    const existingByEmail = await prisma.user.findUnique({ where: { email: profile.email } });
+    // Facebook Login no longer requests the email permission, so profile.email is
+    // normally null — only try to link an existing password account by email in the
+    // rare case a future scope change does return one.
+    const existingByEmail = profile.email ? await prisma.user.findUnique({ where: { email: profile.email } }) : null;
     if (existingByEmail) {
       if (existingByEmail.deletedAt) {
         throw new HttpError(401, 'This account has been deleted');
@@ -258,27 +262,32 @@ export async function facebookCallback(req: Request, res: Response) {
       });
     } else {
       const randomPassword = crypto.randomUUID() + crypto.randomUUID();
+      const email = profile.email ?? makePlaceholderEmail('fb', profile.id);
       user = await prisma.user.create({
         data: {
-          email: profile.email,
+          email,
           name: profile.name,
           passwordHash: await hashPassword(randomPassword),
           gdprConsent: true,
           consentDate: new Date(),
-          emailVerifiedAt: new Date(),
+          emailVerifiedAt: profile.email ? new Date() : null,
           facebookId: profile.id,
           profilePicture: profile.picture,
         },
       });
 
-      await prisma.projectMember.updateMany({
-        where: { email: profile.email, userId: null },
-        data: { userId: user.id },
-      });
-      await prisma.invitation.updateMany({
-        where: { invitedEmail: profile.email, invitedUserId: null },
-        data: { invitedUserId: user.id },
-      });
+      // Only match pending invites/memberships when we have a real email — a
+      // placeholder address must never be treated as if the user provided it.
+      if (profile.email) {
+        await prisma.projectMember.updateMany({
+          where: { email: profile.email, userId: null },
+          data: { userId: user.id },
+        });
+        await prisma.invitation.updateMany({
+          where: { invitedEmail: profile.email, invitedUserId: null },
+          data: { invitedUserId: user.id },
+        });
+      }
     }
   } else if (user.deletedAt) {
     throw new HttpError(401, 'This account has been deleted');
@@ -287,7 +296,43 @@ export async function facebookCallback(req: Request, res: Response) {
   await logAuthEvent({ userId: user.id, email: user.email, action: 'login_success' });
 
   const token = signToken({ userId: user.id, role: user.role });
-  res.json({ token, user: toUserResponse(user) });
+  res.json({ token, user: toUserResponse(user), emailRequired: isPlaceholderEmail(user.email) });
+}
+
+const setEmailSchema = z.object({
+  email: z.string().email(),
+});
+
+export async function setEmail(req: Request, res: Response) {
+  const body = setEmailSchema.parse(req.body);
+  const userId = req.user!.userId;
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || user.deletedAt) {
+    throw new HttpError(404, 'User not found');
+  }
+  if (!isPlaceholderEmail(user.email)) {
+    throw new HttpError(400, 'E-postadressen är redan satt. Byt den istället under Inställningar.');
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email: body.email } });
+  if (existing && existing.id !== userId) {
+    throw new HttpError(409, 'Den här e-postadressen används redan av ett annat konto');
+  }
+
+  const verificationToken = await createEmailVerificationToken(userId);
+  const verifyLink = `${process.env.API_BASE_URL ?? 'http://localhost:4000'}/api/auth/verify?token=${verificationToken}`;
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { email: body.email, emailVerifiedAt: null },
+  });
+
+  sendVerificationEmail(updated.email, updated.name, verifyLink).catch((err) =>
+    console.error(`[setEmail] Email send failed: ${err instanceof Error ? err.message : err}`),
+  );
+
+  res.json({ user: toUserResponse(updated) });
 }
 
 export async function me(req: Request, res: Response) {

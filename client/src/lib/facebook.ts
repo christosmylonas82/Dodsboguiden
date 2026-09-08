@@ -53,7 +53,7 @@ export function loginWithFacebookPopup(): Promise<string> {
               reject(new Error('Inloggningen med Facebook avbröts'));
             }
           },
-          { scope: 'email,public_profile' },
+          { scope: 'public_profile' },
         );
       }),
   );

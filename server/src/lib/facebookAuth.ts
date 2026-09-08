@@ -1,6 +1,6 @@
 export interface FacebookProfile {
   id: string;
-  email: string;
+  email: string | null;
   name: string;
   picture?: string;
 }
@@ -16,7 +16,6 @@ interface DebugTokenResponse {
 interface MeResponse {
   id?: string;
   name?: string;
-  email?: string;
   picture?: { data?: { url?: string } };
   error?: { message?: string };
 }
@@ -28,6 +27,8 @@ function getAppCredentials(): { appId: string; appSecret: string } {
   return { appId, appSecret };
 }
 
+// Only requests public_profile (no email permission) — Facebook accounts sign in with
+// just id/name/picture, and email is optionally added later via PUT /api/auth/set-email.
 export async function verifyFacebookAccessToken(accessToken: string): Promise<FacebookProfile> {
   const { appId, appSecret } = getAppCredentials();
 
@@ -40,20 +41,17 @@ export async function verifyFacebookAccessToken(accessToken: string): Promise<Fa
     throw new Error(debugBody.data?.error?.message ?? 'Invalid Facebook access token');
   }
 
-  const meUrl = `https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${encodeURIComponent(accessToken)}`;
+  const meUrl = `https://graph.facebook.com/me?fields=id,name,picture.type(large)&access_token=${encodeURIComponent(accessToken)}`;
   const meRes = await fetch(meUrl);
   const me = (await meRes.json()) as MeResponse;
   if (!meRes.ok || me.error || !me.id) {
     throw new Error(me.error?.message ?? 'Could not fetch Facebook profile');
   }
-  if (!me.email) {
-    throw new Error('Facebook account has no email address to share');
-  }
 
   return {
     id: me.id,
-    email: me.email,
-    name: me.name ?? me.email,
+    email: null,
+    name: me.name ?? `Facebook-användare ${me.id}`,
     picture: me.picture?.data?.url,
   };
 }

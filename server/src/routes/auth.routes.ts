@@ -9,6 +9,7 @@ import {
   register,
   removeProfileImage,
   resetPassword,
+  setEmail,
   updateEmail,
   updateName,
   updatePassword,
@@ -47,6 +48,7 @@ router.put('/me', requireAuth, asyncHandler(updateName));
 router.put('/me/seen-tips', requireAuth, asyncHandler(markTipsSeen));
 router.put('/me/seen-onboarding', requireAuth, asyncHandler(markOnboardingSeen));
 router.put('/email', requireAuth, asyncHandler(updateEmail));
+router.put('/set-email', requireAuth, asyncHandler(setEmail));
 router.put('/password', requireAuth, asyncHandler(updatePassword));
 router.put('/profile-image', requireAuth, asyncHandler(updateProfileImage));
 router.delete('/profile-image', requireAuth, asyncHandler(removeProfileImage));

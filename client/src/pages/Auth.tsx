@@ -8,6 +8,7 @@ import { PolicyModal } from '../components/PolicyModal';
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 import { isPasswordValid, PASSWORD_REQUIREMENTS_MESSAGE } from '../lib/passwordRequirements';
 import { loginWithFacebookPopup } from '../lib/facebook';
+import { EmailPromptModal } from '../components/EmailPromptModal';
 
 const GOOGLE_CLIENT_ID_CONFIGURED = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 const FACEBOOK_APP_ID_CONFIGURED = Boolean(import.meta.env.VITE_FACEBOOK_APP_ID);
@@ -88,7 +89,7 @@ export function AuthPage() {
 }
 
 function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
-  const { login, loginWithGoogle, loginWithFacebook } = useAuth();
+  const { login, loginWithGoogle, loginWithFacebook, setEmail: submitEmailForAccount } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -96,6 +97,7 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
   const [showForgotHint, setShowForgotHint] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
   const searchParams = new URLSearchParams(location.search);
   const accountDeleted = searchParams.get('accountDeleted') === '1';
   const emailVerified = searchParams.get('emailVerified');
@@ -132,13 +134,29 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
     setSubmitting(true);
     try {
       const accessToken = await loginWithFacebookPopup();
-      await loginWithFacebook(accessToken);
-      navigate('/dashboard');
+      const { emailRequired } = await loginWithFacebook(accessToken);
+      if (emailRequired) {
+        setShowEmailPrompt(true);
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError(err instanceof ApiError || err instanceof Error ? err.message : 'Kunde inte logga in med Facebook');
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (showEmailPrompt) {
+    return (
+      <EmailPromptModal
+        onSave={async (newEmail) => {
+          await submitEmailForAccount(newEmail);
+          navigate('/dashboard');
+        }}
+        onSkip={() => navigate('/dashboard')}
+      />
+    );
   }
 
   return (
@@ -247,7 +265,7 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
 }
 
 function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
-  const { register, loginWithGoogle, loginWithFacebook } = useAuth();
+  const { register, loginWithGoogle, loginWithFacebook, setEmail: submitEmailForAccount } = useAuth();
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -259,6 +277,7 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
   const [termsOpen, setTermsOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [registeredMessage, setRegisteredMessage] = useState<string | null>(null);
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
 
   function validate(): boolean {
     const next: Record<string, string> = {};
@@ -314,8 +333,12 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
     setSubmitting(true);
     try {
       const accessToken = await loginWithFacebookPopup();
-      await loginWithFacebook(accessToken);
-      navigate('/dashboard');
+      const { emailRequired } = await loginWithFacebook(accessToken);
+      if (emailRequired) {
+        setShowEmailPrompt(true);
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setErrors({
         submit: err instanceof ApiError || err instanceof Error ? err.message : 'Kunde inte skapa konto med Facebook',
@@ -323,6 +346,18 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (showEmailPrompt) {
+    return (
+      <EmailPromptModal
+        onSave={async (newEmail) => {
+          await submitEmailForAccount(newEmail);
+          navigate('/dashboard');
+        }}
+        onSkip={() => navigate('/dashboard')}
+      />
+    );
   }
 
   if (registeredMessage) {

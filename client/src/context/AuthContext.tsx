@@ -7,7 +7,8 @@ interface AuthContextValue {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: (idToken: string) => Promise<void>;
-  loginWithFacebook: (accessToken: string) => Promise<void>;
+  loginWithFacebook: (accessToken: string) => Promise<{ emailRequired: boolean }>;
+  setEmail: (email: string) => Promise<void>;
   register: (email: string, name: string, password: string, gdprConsent: boolean) => Promise<string>;
   logout: () => void;
   markTipsSeen: () => Promise<void>;
@@ -51,11 +52,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function loginWithFacebook(accessToken: string) {
-    const data = await apiFetch<{ token: string; user: User }>('/auth/facebook-callback', {
+    const data = await apiFetch<{ token: string; user: User; emailRequired: boolean }>('/auth/facebook-callback', {
       method: 'POST',
       body: JSON.stringify({ accessToken }),
     });
     setToken(data.token);
+    setUser(data.user);
+    return { emailRequired: data.emailRequired };
+  }
+
+  async function setEmail(email: string) {
+    const data = await apiFetch<{ user: User }>('/auth/set-email', {
+      method: 'PUT',
+      body: JSON.stringify({ email }),
+    });
     setUser(data.user);
   }
 
@@ -90,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         loginWithGoogle,
         loginWithFacebook,
+        setEmail,
         register,
         logout,
         markTipsSeen,
