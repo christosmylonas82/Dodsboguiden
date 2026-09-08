@@ -7,13 +7,7 @@ import { ApiError } from '../lib/api';
 import { PolicyModal } from '../components/PolicyModal';
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 import { isPasswordValid, PASSWORD_REQUIREMENTS_MESSAGE } from '../lib/passwordRequirements';
-import {
-  consumeFacebookRedirectToken,
-  isMobileDevice,
-  loginWithFacebookPopup,
-  preloadFacebookSdk,
-  redirectToFacebookLogin,
-} from '../lib/facebook';
+import { consumeFacebookRedirectToken, loginWithFacebookPopup, preloadFacebookSdk } from '../lib/facebook';
 import { EmailPromptModal } from '../components/EmailPromptModal';
 
 const GOOGLE_CLIENT_ID_CONFIGURED = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
@@ -65,7 +59,7 @@ export function AuthPage() {
   const [redirectError, setRedirectError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (FACEBOOK_APP_ID_CONFIGURED && !isMobileDevice()) {
+    if (FACEBOOK_APP_ID_CONFIGURED) {
       preloadFacebookSdk();
     }
 
@@ -192,10 +186,6 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
   }
 
   async function handleFacebookLogin() {
-    if (isMobileDevice()) {
-      redirectToFacebookLogin();
-      return;
-    }
     setError(null);
     setSubmitting(true);
     try {
@@ -397,10 +387,6 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
   }
 
   async function handleFacebookLogin() {
-    if (isMobileDevice()) {
-      redirectToFacebookLogin();
-      return;
-    }
     setErrors({});
     setSubmitting(true);
     try {
