@@ -7,7 +7,7 @@ import { ApiError } from '../lib/api';
 import { PolicyModal } from '../components/PolicyModal';
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 import { isPasswordValid, PASSWORD_REQUIREMENTS_MESSAGE } from '../lib/passwordRequirements';
-import { loginWithFacebookPopup, preloadFacebookSdk } from '../lib/facebook';
+import { consumeFacebookRedirectToken, loginWithFacebookPopup, preloadFacebookSdk } from '../lib/facebook';
 import { EmailPromptModal } from '../components/EmailPromptModal';
 
 const GOOGLE_CLIENT_ID_CONFIGURED = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
@@ -52,12 +52,34 @@ function fieldClass(hasError: boolean) {
 export function AuthPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { loginWithFacebook, setEmail: submitEmailForAccount } = useAuth();
   const [tab, setTab] = useState<Tab>(location.pathname === '/register' ? 'register' : 'login');
+  const [redirectEmailPrompt, setRedirectEmailPrompt] = useState(false);
+  const [redirectPending, setRedirectPending] = useState(false);
+  const [redirectError, setRedirectError] = useState<string | null>(null);
 
   useEffect(() => {
     if (FACEBOOK_APP_ID_CONFIGURED) {
       preloadFacebookSdk();
     }
+
+    const token = consumeFacebookRedirectToken();
+    if (token) {
+      setRedirectPending(true);
+      loginWithFacebook(token)
+        .then(({ emailRequired }) => {
+          if (emailRequired) {
+            setRedirectEmailPrompt(true);
+          } else {
+            navigate('/dashboard');
+          }
+        })
+        .catch((err) => {
+          setRedirectError(err instanceof Error ? err.message : 'Kunde inte logga in med Facebook');
+        })
+        .finally(() => setRedirectPending(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function selectTab(next: Tab) {
@@ -65,8 +87,31 @@ export function AuthPage() {
     navigate(next === 'register' ? '/register' : '/login', { replace: true });
   }
 
+  if (redirectEmailPrompt) {
+    return (
+      <EmailPromptModal
+        onSave={async (newEmail) => {
+          await submitEmailForAccount(newEmail);
+          navigate('/dashboard');
+        }}
+        onSkip={() => navigate('/dashboard')}
+      />
+    );
+  }
+
   return (
     <div className="mx-auto max-w-lg rounded-xl border border-border bg-surface p-6 shadow-sm sm:p-8">
+      {redirectPending && (
+        <p className="mb-4 rounded-lg border border-border bg-primary-light px-4 py-2.5 text-sm text-text">
+          Loggar in med Facebook…
+        </p>
+      )}
+      {redirectError && (
+        <p className="mb-4 rounded-lg border border-danger bg-danger-light px-4 py-2.5 text-sm text-text">
+          {redirectError}
+        </p>
+      )}
+
       <div className="flex gap-1 rounded-lg bg-bg p-1">
         <button
           type="button"

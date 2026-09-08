@@ -34,12 +34,14 @@ function AccountField({
   label,
   value,
   muted,
+  hint,
   editLabel,
   onEdit,
 }: {
   label: string;
   value: string;
   muted?: boolean;
+  hint?: string;
   editLabel: string;
   onEdit?: () => void;
 }) {
@@ -48,6 +50,7 @@ function AccountField({
       <div className="min-w-0 text-sm">
         <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
         <p className={`truncate ${muted ? 'italic text-muted' : 'text-text'}`}>{value}</p>
+        {hint && <p className="text-xs text-muted">{hint}</p>}
       </div>
       {onEdit && (
         <button
@@ -195,7 +198,8 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
             label="E-post"
             value={user.emailIsPlaceholder ? 'Ingen e-post registrerad' : user.email}
             muted={user.emailIsPlaceholder}
-            onEdit={() => setEmailModalOpen(true)}
+            hint={!user.emailEditable ? 'Kopplad till ditt Google-konto' : undefined}
+            onEdit={user.emailEditable ? () => setEmailModalOpen(true) : undefined}
             editLabel={user.emailIsPlaceholder ? 'Registrera' : 'Ändra'}
           />
           <AccountField

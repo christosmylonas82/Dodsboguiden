@@ -5,7 +5,7 @@ declare global {
       init: (options: { appId: string; cookie: boolean; xfbml: boolean; version: string }) => void;
       login: (
         callback: (response: { authResponse?: { accessToken: string } | null; status?: string }) => void,
-        options?: { scope?: string },
+        options?: { scope?: string; fallback_redirect_uri?: string },
       ) => void;
     };
   }
@@ -62,8 +62,33 @@ export function loginWithFacebookPopup(): Promise<string> {
               reject(new Error('Inloggningen med Facebook avbröts'));
             }
           },
-          { scope: 'public_profile' },
+          {
+            scope: 'public_profile',
+            // If the popup fails to open (common on mobile browsers, especially after
+            // the async SDK-load step above), the SDK redirects the whole page to
+            // Facebook's own login dialog instead — which, on mobile, opens the native
+            // Facebook app via Universal/App Links if it's installed, falling back to
+            // the mobile web login page otherwise. Requires this exact URL to be listed
+            // in the Facebook app's "Valid OAuth Redirect URIs".
+            fallback_redirect_uri: window.location.origin + window.location.pathname,
+          },
         );
       }),
   );
+}
+
+// Called once on the login/register page's mount to pick up an access token that
+// Facebook appended to the URL after a fallback_redirect_uri round trip (see above).
+// Returns null when there's nothing to consume (the normal, non-redirect case).
+export function consumeFacebookRedirectToken(): string | null {
+  const sources = [window.location.hash.replace(/^#/, ''), window.location.search.replace(/^\?/, '')];
+  for (const source of sources) {
+    const params = new URLSearchParams(source);
+    const token = params.get('access_token');
+    if (token) {
+      history.replaceState(null, '', window.location.pathname);
+      return token;
+    }
+  }
+  return null;
 }

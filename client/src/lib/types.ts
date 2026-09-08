@@ -2,6 +2,7 @@ export interface User {
   id: string;
   email: string;
   emailIsPlaceholder: boolean;
+  emailEditable: boolean;
   name: string;
   role?: 'USER' | 'ADMIN';
   hasSeenTipsOnboarding: boolean;

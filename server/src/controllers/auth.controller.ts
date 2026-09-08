@@ -21,6 +21,7 @@ function toUserResponse(user: User) {
     id: user.id,
     email: user.email,
     emailIsPlaceholder: isPlaceholderEmail(user.email),
+    emailEditable: !user.googleId,
     name: user.name,
     role: user.role,
     hasSeenTipsOnboarding: user.hasSeenTipsOnboarding,
@@ -315,6 +316,9 @@ export async function setEmail(req: Request, res: Response) {
   if (!user || user.deletedAt) {
     throw new HttpError(404, 'User not found');
   }
+  if (user.googleId) {
+    throw new HttpError(400, 'E-postadressen är kopplad till ditt Google-konto och kan inte ändras här.');
+  }
   if (!isPlaceholderEmail(user.email)) {
     throw new HttpError(400, 'E-postadressen är redan satt. Byt den istället under Inställningar.');
   }
@@ -388,6 +392,9 @@ export async function updateEmail(req: Request, res: Response) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user || user.deletedAt) {
     throw new HttpError(404, 'User not found');
+  }
+  if (user.googleId) {
+    throw new HttpError(400, 'E-postadressen är kopplad till ditt Google-konto och kan inte ändras här.');
   }
 
   const valid = await verifyPassword(body.password, user.passwordHash);
