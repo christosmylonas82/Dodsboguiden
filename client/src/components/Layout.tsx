@@ -338,11 +338,8 @@ export function Layout() {
           ) : (
             <nav className="flex flex-1 items-center justify-end gap-3 text-sm">
               <ThemeToggle />
-              <Link to="/login" className="text-text hover:text-primary-dark">
+              <Link to="/login" className="rounded-lg bg-primary px-3 py-1.5 text-white hover:bg-primary-dark">
                 Logga in
-              </Link>
-              <Link to="/register" className="rounded-lg bg-primary px-3 py-1.5 text-white hover:bg-primary-dark">
-                Registrera dig
               </Link>
             </nav>
           )}

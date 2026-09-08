@@ -27,11 +27,13 @@ function FacebookLoginButton({
   label,
   loading,
   fullWidth,
+  iconOnly,
   onClick,
 }: {
   label: string;
   loading: boolean;
   fullWidth?: boolean;
+  iconOnly?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -39,16 +41,17 @@ function FacebookLoginButton({
       type="button"
       onClick={onClick}
       disabled={loading}
+      aria-label={iconOnly ? label : undefined}
       className={`flex h-11 min-h-[44px] items-center justify-center gap-2 rounded-lg border-2 border-primary bg-white text-sm font-medium text-text transition hover:bg-primary-light disabled:opacity-60 ${
-        fullWidth ? 'w-full' : 'w-[300px]'
+        iconOnly ? 'w-11 px-0' : fullWidth ? 'w-full' : 'w-[300px]'
       }`}
     >
       {loading ? (
         <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#1877F2] border-t-transparent" />
       ) : (
-        <FaFacebook size={18} className="text-[#1877F2]" />
+        <FaFacebook size={iconOnly ? 22 : 18} className="text-[#1877F2]" />
       )}
-      {loading ? 'Ansluter till Facebook…' : label}
+      {!iconOnly && (loading ? 'Ansluter till Facebook…' : label)}
     </button>
   );
 }
@@ -286,27 +289,24 @@ function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
       {(GOOGLE_CLIENT_ID_CONFIGURED || FACEBOOK_APP_ID_CONFIGURED) && (
         <>
           <SocialDivider />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="flex items-center justify-center gap-3">
             {GOOGLE_CLIENT_ID_CONFIGURED && (
-              <div className="flex justify-center">
-                <GoogleLogin
-                  onSuccess={(credentialResponse) => {
-                    if (credentialResponse.credential) {
-                      handleGoogleSuccess(credentialResponse.credential);
-                    }
-                  }}
-                  onError={() => setError('Kunde inte logga in med Google')}
-                  text="signin_with"
-                  size="large"
-                  width={200}
-                />
-              </div>
+              <GoogleLogin
+                onSuccess={(credentialResponse) => {
+                  if (credentialResponse.credential) {
+                    handleGoogleSuccess(credentialResponse.credential);
+                  }
+                }}
+                onError={() => setError('Kunde inte logga in med Google')}
+                type="icon"
+                size="large"
+              />
             )}
             {FACEBOOK_APP_ID_CONFIGURED && (
               <FacebookLoginButton
                 label="Logga in med Facebook"
                 loading={submitting}
-                fullWidth
+                iconOnly
                 onClick={handleFacebookLogin}
               />
             )}
