@@ -95,7 +95,7 @@ export function ResultCard({ result, onRestart }: { result: QuizResult; onRestar
               to="/register"
               className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
             >
-              Starta ändå
+              Kom igång ändå
             </Link>
           </>
         )}
