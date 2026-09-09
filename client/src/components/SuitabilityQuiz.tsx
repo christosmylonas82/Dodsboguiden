@@ -173,7 +173,7 @@ export function SuitabilityQuiz() {
             options={question.options}
             selected={selected}
             onSelect={selectAnswer}
-            onBack={currentQuestion > 1 ? goBack : undefined}
+            onBack={currentQuestion > 0 ? goBack : undefined}
           />
         )}
       </div>
