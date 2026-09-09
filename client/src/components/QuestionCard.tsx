@@ -8,7 +8,6 @@ export function QuestionCard({
   options,
   selected,
   onSelect,
-  onNext,
   onBack,
 }: {
   questionNumber: number;
@@ -18,7 +17,6 @@ export function QuestionCard({
   options: { value: string; label: string }[];
   selected: string | null;
   onSelect: (value: string) => void;
-  onNext: () => void;
   onBack?: () => void;
 }) {
   return (
@@ -56,8 +54,8 @@ export function QuestionCard({
         ))}
       </div>
 
-      <div className="mt-6 flex items-center justify-between gap-3">
-        {onBack ? (
+      {onBack && (
+        <div className="mt-6">
           <button
             type="button"
             onClick={onBack}
@@ -65,18 +63,8 @@ export function QuestionCard({
           >
             Tillbaka
           </button>
-        ) : (
-          <span />
-        )}
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={!selected}
-          className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
-        >
-          Nästa
-        </button>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { QuestionCard } from './QuestionCard';
 import { ResultCard } from './ResultCard';
 import {
@@ -119,9 +119,18 @@ export function SuitabilityQuiz() {
 
   const question = QUESTIONS[currentQuestion];
   const selected = question ? (answers[question.key] as string | null) : null;
+  const advanceTimeout = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (advanceTimeout.current) window.clearTimeout(advanceTimeout.current);
+    };
+  }, []);
 
   function selectAnswer(value: string) {
     setAnswers((prev) => ({ ...prev, [question.key]: value }));
+    if (advanceTimeout.current) window.clearTimeout(advanceTimeout.current);
+    advanceTimeout.current = window.setTimeout(() => goNext(), 300);
   }
 
   function goNext() {
@@ -133,6 +142,7 @@ export function SuitabilityQuiz() {
   }
 
   function goBack() {
+    if (advanceTimeout.current) window.clearTimeout(advanceTimeout.current);
     setCurrentQuestion((i) => Math.max(0, i - 1));
   }
 
@@ -163,8 +173,7 @@ export function SuitabilityQuiz() {
             options={question.options}
             selected={selected}
             onSelect={selectAnswer}
-            onNext={goNext}
-            onBack={currentQuestion > 0 ? goBack : undefined}
+            onBack={currentQuestion > 1 ? goBack : undefined}
           />
         )}
       </div>
