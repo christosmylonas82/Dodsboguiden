@@ -237,7 +237,6 @@ function LoginForm() {
       )}
 
       <h1 className="text-2xl font-bold text-text">Logga in för att komma igång</h1>
-      <p className="mt-1 text-sm text-muted">Eller välj ett annat sätt att logga in</p>
 
       <div className="mt-5">
         <label htmlFor="loginEmail" className="text-xs font-medium uppercase tracking-wide text-muted">
