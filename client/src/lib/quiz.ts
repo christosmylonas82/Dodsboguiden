@@ -28,6 +28,54 @@ export const INITIAL_QUIZ_ANSWERS: QuizAnswers = {
 
 export type QuizResult = 'fits' | 'warning' | 'no-fit';
 
+export const RESULT_LABELS: Record<QuizResult, string> = {
+  fits: 'Passar bra',
+  warning: 'Passar med förbehåll',
+  'no-fit': 'Passar inte',
+};
+
+export const QUESTION_LABELS: Record<keyof QuizAnswers, { title: string; answers: Record<string, string> }> = {
+  domicile: {
+    title: 'Hemvist',
+    answers: { sweden: 'Sverige', abroad: 'Utlandet', unknown: 'Vet inte' },
+  },
+  will: {
+    title: 'Testamente',
+    answers: { yes: 'Ja, testamente/arvsförord', no: 'Nej', unknown: 'Vet inte' },
+  },
+  familySituation: {
+    title: 'Familjesituation',
+    answers: {
+      cohabitant: 'Sambo',
+      married: 'Gifta makar',
+      'widowed-with-prior-children': 'Änka/änkling med barn sedan tidigare',
+      single: 'Ogift/frånskild',
+      'other-unknown': 'Annat/vet inte',
+    },
+  },
+  complexity: {
+    title: 'Komplexitet',
+    answers: { simple: 'Enkelt', medium: 'Medel', complex: 'Komplext', unknown: 'Vet inte' },
+  },
+  company: {
+    title: 'Företag',
+    answers: {
+      'stock-company': 'Aktiebolag',
+      'sole-trader-or-partnership': 'Enskild firma/handelsbolag',
+      no: 'Nej',
+      unknown: 'Vet inte',
+    },
+  },
+  coOwnership: {
+    title: 'Samägande',
+    answers: { yes: 'Ja', no: 'Nej', unknown: 'Vet inte' },
+  },
+  foreignAssets: {
+    title: 'Utlandstillgångar',
+    answers: { 'real-estate': 'Fastigheter', 'accounts-or-securities': 'Konton/värdepapper', no: 'Nej', unknown: 'Vet inte' },
+  },
+};
+
 export function calculateQuizResult(answers: QuizAnswers): QuizResult {
   const complexYesCount = [
     answers.company === 'stock-company' || answers.company === 'sole-trader-or-partnership',

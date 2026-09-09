@@ -455,3 +455,21 @@ model AuditLog {
 
   @@map("audit_log")
 }
+
+// Anonymous submissions from the public "suitability quiz" on the landing page
+// (client/src/components/SuitabilityQuiz.tsx). No user/session link — just the
+// answers + computed result, for admin-facing aggregate statistics.
+model QuizResponse {
+  id              String   @id @default(uuid())
+  result          String
+  domicile        String?
+  will            String?
+  familySituation String?  @map("family_situation")
+  complexity      String?
+  company         String?
+  coOwnership     String?  @map("co_ownership")
+  foreignAssets   String?  @map("foreign_assets")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("quiz_responses")
+}

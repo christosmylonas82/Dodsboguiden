@@ -18,6 +18,7 @@ import {
   statistics,
   updateUserRole,
 } from '../controllers/admin.controller.js';
+import { quizStats } from '../controllers/quiz.controller.js';
 
 const router = Router();
 
@@ -37,5 +38,6 @@ router.get('/auth/reset-stats', asyncHandler(resetStats));
 router.get('/auth/failed-login-stats', asyncHandler(failedLoginStats));
 router.get('/auth/activity-log', asyncHandler(authActivityLog));
 router.get('/audit-log', asyncHandler(auditLog));
+router.get('/quiz-stats', asyncHandler(quizStats));
 
 export default router;

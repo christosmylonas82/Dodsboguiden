@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { TbDownload, TbTrendingUp, TbTrendingDown, TbMinus } from 'react-icons/tb';
 import { apiFetch, ApiError, BASE_URL, getToken } from '../../lib/api';
+import { QUESTION_LABELS, RESULT_LABELS, type QuizAnswers, type QuizResult } from '../../lib/quiz';
 
 interface ProjectsPerDay {
   date: string;
@@ -40,6 +41,18 @@ interface Trend {
   percentChange: number;
 }
 
+interface QuizStats {
+  total: number;
+  resultBreakdown: { result: QuizResult; count: number }[];
+  questionBreakdown: Record<keyof QuizAnswers, { answer: string; count: number }[]>;
+}
+
+const RESULT_COLORS: Record<QuizResult, string> = {
+  fits: '#10b981',
+  warning: '#f59e0b',
+  'no-fit': '#ef4444',
+};
+
 const CHART_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 function isoDate(date: Date): string {
@@ -60,11 +73,19 @@ export function AdminStatsPage() {
   const [loading, setLoading] = useState(true);
   const [chartsLoading, setChartsLoading] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [quizStats, setQuizStats] = useState<QuizStats | null>(null);
+  const [quizLoading, setQuizLoading] = useState(true);
 
   useEffect(() => {
     apiFetch<Overview>('/admin/statistics')
       .then(setOverview)
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    apiFetch<QuizStats>('/admin/quiz-stats')
+      .then(setQuizStats)
+      .finally(() => setQuizLoading(false));
   }, []);
 
   useEffect(() => {
@@ -292,6 +313,101 @@ export function AdminStatsPage() {
           </ResponsiveContainer>
         )}
       </div>
+
+      <h2 className="mb-5 mt-10 text-xl font-semibold text-text">Frågeformulär (lämplighetstest)</h2>
+
+      {quizLoading ? (
+        <p className="text-sm text-muted">Laddar quiz-statistik…</p>
+      ) : !quizStats || quizStats.total === 0 ? (
+        <p className="text-sm text-muted">Inga svar registrerade än.</p>
+      ) : (
+        <>
+          <div className="mb-8 grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5">
+            <div className="rounded-xl border border-border bg-surface p-5">
+              <div className="text-xs text-muted">Totalt antal svar</div>
+              <div className="mt-1.5 text-2xl font-semibold text-text">{quizStats.total}</div>
+            </div>
+            {quizStats.resultBreakdown.map((r) => (
+              <div key={r.result} className="rounded-xl border border-border bg-surface p-5">
+                <div className="text-xs text-muted">{RESULT_LABELS[r.result] ?? r.result}</div>
+                <div className="mt-1.5 text-2xl font-semibold text-text">{r.count}</div>
+                <div className="mt-1.5 text-xs text-muted">
+                  {quizStats.total > 0 ? Math.round((r.count / quizStats.total) * 100) : 0}% av svaren
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mb-8 rounded-xl border border-border bg-surface p-5">
+            <h3 className="mb-4 text-sm font-semibold text-text">Resultatfördelning</h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart
+                data={quizStats.resultBreakdown.map((r) => ({
+                  label: RESULT_LABELS[r.result] ?? r.result,
+                  count: r.count,
+                  result: r.result,
+                }))}
+                layout="vertical"
+                margin={{ left: 24 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                <XAxis type="number" stroke="var(--color-muted)" fontSize={12} allowDecimals={false} />
+                <YAxis dataKey="label" type="category" width={160} stroke="var(--color-muted)" fontSize={12} />
+                <Tooltip
+                  contentStyle={{
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: '8px',
+                    color: 'var(--color-text)',
+                  }}
+                />
+                <Bar dataKey="count" name="Antal">
+                  {quizStats.resultBreakdown.map((r) => (
+                    <Cell key={r.result} fill={RESULT_COLORS[r.result] ?? '#94a3b8'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-5">
+            {(Object.keys(QUESTION_LABELS) as (keyof QuizAnswers)[]).map((field) => {
+              const rows = quizStats.questionBreakdown[field] ?? [];
+              const labels = QUESTION_LABELS[field];
+              if (rows.length === 0) return null;
+              const chartData = rows.map((row) => ({
+                label: labels.answers[row.answer] ?? row.answer,
+                count: row.count,
+              }));
+              return (
+                <div key={field} className="rounded-xl border border-border bg-surface p-5">
+                  <h3 className="mb-4 text-sm font-semibold text-text">{labels.title}</h3>
+                  <ResponsiveContainer width="100%" height={Math.max(140, chartData.length * 40)}>
+                    <BarChart data={chartData} layout="vertical" margin={{ left: 24 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                      <XAxis type="number" stroke="var(--color-muted)" fontSize={12} allowDecimals={false} />
+                      <YAxis dataKey="label" type="category" width={140} stroke="var(--color-muted)" fontSize={11} />
+                      <Tooltip
+                        contentStyle={{
+                          background: 'var(--color-surface)',
+                          border: '1px solid var(--color-border)',
+                          borderRadius: '8px',
+                          color: 'var(--color-text)',
+                        }}
+                      />
+                      <Bar dataKey="count" name="Antal">
+                        {chartData.map((entry, index) => (
+                          <Cell key={entry.label} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }

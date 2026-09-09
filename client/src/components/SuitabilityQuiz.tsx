@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { QuestionCard } from './QuestionCard';
 import { ResultCard } from './ResultCard';
+import { apiFetch } from '../lib/api';
 import {
   calculateQuizResult,
   INITIAL_QUIZ_ANSWERS,
@@ -120,12 +121,24 @@ export function SuitabilityQuiz() {
   const question = QUESTIONS[currentQuestion];
   const selected = question ? (answers[question.key] as string | null) : null;
   const advanceTimeout = useRef<number | null>(null);
+  const submitted = useRef(false);
 
   useEffect(() => {
     return () => {
       if (advanceTimeout.current) window.clearTimeout(advanceTimeout.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!showResult || submitted.current) return;
+    submitted.current = true;
+    apiFetch('/quiz/responses', {
+      method: 'POST',
+      body: JSON.stringify({ result: calculateQuizResult(answers), ...answers }),
+    }).catch(() => {
+      // Anonymous stats submission — never worth surfacing an error to the visitor.
+    });
+  }, [showResult, answers]);
 
   function selectAnswer(value: string) {
     setAnswers((prev) => ({ ...prev, [question.key]: value }));
@@ -150,6 +163,7 @@ export function SuitabilityQuiz() {
     setAnswers(INITIAL_QUIZ_ANSWERS);
     setCurrentQuestion(0);
     setShowResult(false);
+    submitted.current = false;
   }
 
   return (
