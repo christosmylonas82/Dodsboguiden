@@ -92,7 +92,7 @@ export function ResultCard({ result, onRestart }: { result: QuizResult; onRestar
               <TbExternalLink size={14} />
             </a>
             <Link
-              to="/register"
+              to="/login"
               className="rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
             >
               Kom igång ändå
