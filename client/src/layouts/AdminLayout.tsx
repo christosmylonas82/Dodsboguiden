@@ -77,6 +77,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           <TbLogout2 size={18} className="shrink-0" />
           {sidebarOpen && 'Logga ut'}
         </button>
+
+        {sidebarOpen && (
+          <p className="mt-2 text-center text-xs text-muted">v{__APP_VERSION__}</p>
+        )}
       </aside>
 
       <div className="flex flex-1 flex-col">
