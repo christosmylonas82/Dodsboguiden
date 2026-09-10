@@ -342,7 +342,11 @@ export function Layout() {
           ) : (
             <>
               <nav className="flex flex-1 items-center justify-center">
-                <Link to="/om" className="text-sm font-medium text-muted transition hover:text-text">
+                <Link
+                  to="/om"
+                  onClick={() => window.scrollTo(0, 0)}
+                  className="text-sm font-medium text-muted transition hover:text-text"
+                >
                   Om oss
                 </Link>
               </nav>

@@ -22,7 +22,7 @@ export function Footer() {
         <p className="mt-1 text-sm text-muted">© 2026 Dödsbo Guide — Gratis dödsbohantering</p>
 
         <div className="mt-3 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          <Link to="/om" className="text-sm text-muted hover:text-text">
+          <Link to="/om" onClick={() => window.scrollTo(0, 0)} className="text-sm text-muted hover:text-text">
             Om oss
           </Link>
           <button
