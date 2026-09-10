@@ -259,7 +259,7 @@ export function Layout() {
       <header className="border-b border-border bg-surface">
         <div className="flex w-full items-center px-3 py-2 md:px-6">
           <div className="flex shrink-0 items-center gap-2 md:gap-4">
-            {isAuthPage ? (
+            {isAuthPage || location.pathname === '/om' ? (
               <Link
                 to="/"
                 aria-label="Dödsboguiden"

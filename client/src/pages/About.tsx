@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-14 first:mt-0">
-      <h2 className="text-xl font-semibold text-text sm:text-2xl">{title}</h2>
+      <h2 className="text-2xl font-semibold text-text sm:text-3xl">{title}</h2>
       <div className="mt-4 flex flex-col gap-4 text-[15px] leading-[1.7] text-muted sm:text-base">{children}</div>
     </section>
   );
@@ -14,7 +14,7 @@ export function AboutPage() {
     <div className="mx-auto max-w-[640px]">
       {/* Hero */}
       <div className="flex flex-col gap-3 text-center">
-        <span className="text-sm font-medium tracking-wide text-link uppercase">Historien bakom verktyget</span>
+        <span className="text-sm font-medium tracking-wide text-muted uppercase">Historien bakom verktyget</span>
         <h1 className="text-3xl font-semibold text-text sm:text-4xl">Om DödsboGuiden</h1>
       </div>
 
