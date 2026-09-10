@@ -93,7 +93,7 @@ export function AboutPage() {
       <div className="mt-16 flex flex-col items-center gap-1 border-t border-border pt-10 pb-4 text-center">
         <Link
           to="/login"
-          className="rounded-lg border border-border bg-surface px-6 py-2.5 text-sm font-medium text-text transition hover:border-primary hover:text-primary-dark"
+          className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
         >
           Börja din dödsbo-process
         </Link>
