@@ -16,9 +16,18 @@ This project is tracked in Git and pushed to GitHub (`christosmylonas82/Dodsbogu
 
 Two local checkouts of the same repo are typically kept side by side:
 - `C:\Dodsboguiden` — working branch (e.g. `design/notion-v2`), where day-to-day edits happen.
-- `C:\Dodsboguiden-master` — a separate worktree on `master`, used only to fast-forward-merge the working branch in and push `master` (which Railway watches for server auto-deploys).
+- `C:\Dodsboguiden-master` — a separate worktree on `master`, used only to fast-forward-merge the working branch in and push `master`.
 
 Standard sequence for a change: commit on the working branch → push the working branch → `git fetch` + `git merge --ff-only` the working branch into the `master` worktree → push `master`. If `master` has diverged (e.g. someone pushed directly to it), merge it back into the working branch too before continuing, so the two branches don't drift apart.
+
+### Deployment (two separate targets — don't confuse them)
+
+The server and the client deploy through **different services**, both triggered by GitHub pushes:
+
+- **Server/API** (`server/`) — deploys on **Railway**, project `dodsboguiden`, service `dodsboguiden-server`. Railway builds via `railway.json` (`npm run build --workspace=server`, `npm run start --workspace=server`) and watches `master`. Confirm with `railway status` (after `railway service dodsboguiden-server` if a different service is linked) or `railway deployment list`.
+- **Client** (`client/`) — deploys on **Vercel**, project `dodsboguiden-client`, production domain **https://www.dodsboguiden.nu**. Vercel builds via the root `vercel.json` (`npm run build`, output `client/dist`) and auto-deploys on push: `master` → Production, other branches (e.g. `design/notion-v2`) → Preview. Confirm with `vercel ls dodsboguiden-client`.
+
+Both happen automatically from the standard push sequence above — no extra step needed — but when verifying a UI change is actually live, check **www.dodsboguiden.nu** (Vercel), not the Railway server URL, which serves the API only and has no frontend (`Cannot GET /` there is expected/normal).
 
 ## 🏢 Dödsboguiden - Multi-Agent Team
 
