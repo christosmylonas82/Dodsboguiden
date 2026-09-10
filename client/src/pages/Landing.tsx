@@ -26,7 +26,7 @@ function CtaButtons() {
     <div className="flex flex-wrap items-center justify-center gap-4">
       <Link
         to="/login"
-        className="rounded-lg border-2 border-white bg-primary px-8 py-3.5 font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-primary-dark hover:shadow-md"
+        className="rounded-lg border-2 border-white bg-cta px-8 py-3.5 font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-cta-hover hover:shadow-md"
       >
         Kom igång
       </Link>

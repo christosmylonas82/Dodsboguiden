@@ -13,6 +13,8 @@
   --color-primary: #0a4062; /* brand navy — from logo */
   --color-primary-dark: #072d44; /* pressed state */
   --color-primary-light: #dfe8ec; /* pale navy tint — hover backgrounds, hero gradient */
+  --color-cta: #3d8ab8; /* lighter brand blue — CTA buttons in light theme */
+  --color-cta-hover: #2f6f94;
   --color-border: #e5e3df; /* colors.hairline */
   --color-danger: #e03131; /* colors.semantic-error */
   --color-danger-light: #fde0ec; /* colors.card-tint-rose */
@@ -64,6 +66,8 @@ html, body, #root {
   --color-primary: #3d8ab8;
   --color-primary-dark: #0a4062;
   --color-primary-light: #17303d;
+  --color-cta: #0a4062; /* darker brand blue — CTA buttons in dark theme */
+  --color-cta-hover: #072d44;
   --color-border: #2f2f2f;
   --color-danger: #ff6b6b;
   --color-danger-light: #3a2020;
