@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { PolicyModal } from './PolicyModal';
 import { ContactModal } from './ContactModal';
 
@@ -21,6 +22,9 @@ export function Footer() {
         <p className="mt-1 text-sm text-muted">© 2026 Dödsbo Guide — Gratis dödsbohantering</p>
 
         <div className="mt-3 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <Link to="/om" className="text-sm text-muted hover:text-text">
+            Om oss
+          </Link>
           <button
             type="button"
             onClick={() => setOpenPolicy('terms')}

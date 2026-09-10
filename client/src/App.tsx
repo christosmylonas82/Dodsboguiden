@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 import { ProjectRedirect } from './components/ProjectRedirect';
 import { LandingPage } from './pages/Landing';
+import { AboutPage } from './pages/About';
 import { AuthPage } from './pages/Auth';
 import { ResetPasswordPage } from './pages/ResetPassword';
 import { DashboardPage } from './pages/Dashboard';
@@ -33,6 +34,7 @@ function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<HomeRoute />} />
+            <Route path="/om" element={<AboutPage />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="/register" element={<AuthPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
