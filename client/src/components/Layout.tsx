@@ -336,12 +336,19 @@ export function Layout() {
               </div>
             </>
           ) : (
-            <nav className="flex flex-1 items-center justify-end gap-3 text-sm">
-              <ThemeToggle />
-              <Link to="/login" className="rounded-lg bg-primary px-3 py-1.5 text-white hover:bg-primary-dark">
-                Logga in
-              </Link>
-            </nav>
+            <>
+              <nav className="flex flex-1 items-center justify-center">
+                <Link to="/om" className="text-sm font-medium text-muted transition hover:text-text">
+                  Om oss
+                </Link>
+              </nav>
+              <nav className="flex shrink-0 items-center justify-end gap-3 text-sm">
+                <ThemeToggle />
+                <Link to="/login" className="rounded-lg bg-primary px-3 py-1.5 text-white hover:bg-primary-dark">
+                  Logga in
+                </Link>
+              </nav>
+            </>
           )}
         </div>
 
