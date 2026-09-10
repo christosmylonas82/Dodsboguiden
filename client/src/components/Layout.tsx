@@ -80,6 +80,10 @@ export function Layout() {
   useTheme();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  useEffect(() => {
     if (!projectId) {
       setProjectName('');
       return;
