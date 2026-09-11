@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { TbProgress, TbUsers, TbBell, TbUserPlus, TbArrowRight, TbPencil, TbClock } from 'react-icons/tb';
+import { TbUserPlus, TbArrowRight, TbPencil } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { ActivityEntry, ProjectDetail } from '../lib/types';
-import { Badge } from '../components/Badge';
-import { MetricCard } from '../components/MetricCard';
+import { StatusLabel } from '../components/StatusLabel';
 import { InviteModal } from '../components/InviteModal';
 import { ProgressOverviewModal } from '../components/ProgressOverviewModal';
 import { RecentActivityModal } from '../components/RecentActivityModal';
@@ -15,11 +14,12 @@ import { GuidedTour } from '../components/GuidedTour';
 import { DeadlineWarningModal } from '../components/DeadlineWarningModal';
 import { useAuth } from '../context/AuthContext';
 import { formatActivityAction, formatRelativeTime } from '../lib/activity';
-import { PHASE_DESCRIPTIONS } from '../lib/taskDescriptions';
+import { PHASE_DESCRIPTIONS, TASK_DESCRIPTIONS } from '../lib/taskDescriptions';
 import { PHASES, phaseStatus } from '../lib/phases';
 import { PHASE_ROUTE_SLUG } from '../lib/phaseRoutes';
 import { tasksForProgress } from '../lib/taskStatus';
 import { DEADLINE_REMINDER_MILESTONES, daysUntilDeadline, formatDeadlineDate } from '../lib/deadline';
+import { findNextStep } from '../lib/nextStep';
 
 export function DashboardHubPage() {
   const { id } = useParams<{ id: string }>();
@@ -111,49 +111,50 @@ export function DashboardHubPage() {
   if (!project) return <p className="text-muted">Laddar…</p>;
 
   const countedProjectTasks = tasksForProgress(project.tasks);
-  const progress = countedProjectTasks.length
-    ? Math.round((countedProjectTasks.filter((t) => t.completed).length / countedProjectTasks.length) * 100)
-    : 0;
+  const doneProjectTaskCount = countedProjectTasks.filter((t) => t.completed).length;
+  const progress = countedProjectTasks.length ? Math.round((doneProjectTaskCount / countedProjectTasks.length) * 100) : 0;
   const hasStarted = countedProjectTasks.some((t) => t.completed || t.status === 'IN_PROGRESS');
   const lastActivity = activity[0];
   const isAdmin = project.members.find((m) => m.userId === user?.id)?.role === 'ADMIN';
   const deadlineDays = project.deceasedDate ? daysUntilDeadline(project.deceasedDate) : null;
+  const overallStatus =
+    progress === 100 ? { tone: 'success' as const, label: 'Klar' } : hasStarted ? { tone: 'primary' as const, label: 'Pågår' } : { tone: 'neutral' as const, label: 'Ej påbörjad' };
+  const nextStep = findNextStep(project.tasks);
+  const nextStepDescription = nextStep ? (TASK_DESCRIPTIONS[nextStep.task.title] ?? nextStep.task.description) : null;
 
   return (
-    <div>
+    <div className="mx-auto max-w-[1000px]">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-semibold text-text">{project.deceasedName}</h1>
-              {isAdmin && (
-                <button
-                  type="button"
-                  data-tour="edit-name"
-                  onClick={() => setOpenModal('rename')}
-                  aria-label="Redigera namn"
-                  title="Redigera namn"
-                  className="rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
-                >
-                  <TbPencil size={18} />
-                </button>
-              )}
-              {isAdmin && (
-                <DodsboDropdown
-                  projectId={id!}
-                  deceasedName={project.deceasedName}
-                  onArchived={() => {
-                    window.dispatchEvent(new CustomEvent('dodsbo:project-archived'));
-                    navigate('/dashboard');
-                  }}
-                />
-              )}
-            </div>
-            <p className="mt-1 text-muted">Dödsboets checklista och aktivitet</p>
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-3xl font-semibold text-text">{project.deceasedName}</h1>
+            {isAdmin && (
+              <button
+                type="button"
+                data-tour="edit-name"
+                onClick={() => setOpenModal('rename')}
+                aria-label="Redigera namn"
+                title="Redigera namn"
+                className="rounded-lg bg-transparent p-1.5 text-muted transition hover:bg-primary-light hover:text-primary-dark"
+              >
+                <TbPencil size={18} />
+              </button>
+            )}
+            {isAdmin && (
+              <DodsboDropdown
+                projectId={id!}
+                deceasedName={project.deceasedName}
+                onArchived={() => {
+                  window.dispatchEvent(new CustomEvent('dodsbo:project-archived'));
+                  navigate('/dashboard');
+                }}
+              />
+            )}
           </div>
-          <Badge tone={progress === 100 ? 'success' : hasStarted ? 'primary' : 'neutral'}>
-            {progress === 100 ? 'Klar' : hasStarted ? 'Pågår' : 'Ej påbörjad'}
-          </Badge>
+          <p className="mt-1 text-sm text-muted">Vi hjälper dig att ta en sak i taget.</p>
+          <div className="mt-2">
+            <StatusLabel tone={overallStatus.tone}>{overallStatus.label}</StatusLabel>
+          </div>
         </div>
         <button
           type="button"
@@ -165,97 +166,134 @@ export function DashboardHubPage() {
         </button>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <div data-tour="progress">
-          <MetricCard
-            icon={<TbProgress size={20} />}
-            label="Framsteg"
-            headerRight={deadlineDays !== null && <TbClock size={24} className="shrink-0 text-muted" />}
-            value={
-              <span className="flex flex-col items-start justify-between gap-3 sm:flex-row">
-                <span className="block min-w-0 flex-1 basis-0 text-left">
-                  <span className="text-lg font-semibold text-text">{progress}%</span>
-                  <span className="mt-1 block text-xs font-normal text-muted">
-                    {countedProjectTasks.filter((t) => t.completed).length} av {countedProjectTasks.length} klara
-                  </span>
-                </span>
-                {deadlineDays !== null && (
-                  <span className="block min-w-0 flex-1 basis-0 text-left sm:text-right">
-                    <span className="text-lg font-semibold text-text">{deadlineDays} dagar kvar</span>
-                    <span className="mt-1 block text-xs font-normal text-muted">
-                      Deadline: {formatDeadlineDate(project.deceasedDate!)}
-                    </span>
-                  </span>
-                )}
-              </span>
-            }
-            onClick={() => setOpenModal('progress')}
-          />
-        </div>
-        <div data-tour="members">
-          <MetricCard
-            icon={<TbUsers size={20} />}
-            label="Familjemedlemmar"
-            value={project.members.length}
-            valueClassName="text-xl"
-            hint={project.members.length === 1 ? '1 medlem' : `${project.members.length} medlemmar`}
-            onClick={() => setOpenModal('members')}
-            centered
-          />
-        </div>
-        <div data-tour="activity">
-          <MetricCard
-            icon={<TbBell size={20} />}
-            label="Senaste aktivitet"
-            value={lastActivity ? formatRelativeTime(lastActivity.timestamp) : '—'}
-            valueClassName="text-lg"
-            hint={lastActivity ? `${lastActivity.user.name} ${formatActivityAction(lastActivity.action)}` : 'Ingen aktivitet än'}
-            onClick={() => setOpenModal('activity')}
-            centered
-          />
-        </div>
-      </div>
+      {nextStep ? (
+        <section className="mt-12 border-l-4 border-primary bg-bg py-5 pr-4 pl-5 sm:pr-6">
+          <p className="text-xs font-semibold tracking-wide text-muted uppercase">Nästa steg</p>
+          <h2 className="mt-1 text-xl font-semibold text-text">{nextStep.task.title}</h2>
+          {nextStepDescription && <p className="mt-1.5 text-sm text-muted">{nextStepDescription}</p>}
+          <Link
+            to={`/projects/${id}/${PHASE_ROUTE_SLUG[nextStep.phase]}`}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-dark"
+          >
+            {nextStep.ctaLabel} <TbArrowRight size={16} />
+          </Link>
+        </section>
+      ) : (
+        <section className="mt-12 border-l-4 border-success bg-bg py-5 pr-4 pl-5 sm:pr-6">
+          <p className="text-xs font-semibold tracking-wide text-muted uppercase">Nästa steg</p>
+          <h2 className="mt-1 text-xl font-semibold text-text">Alla uppgifter är klara</h2>
+          <p className="mt-1.5 text-sm text-muted">
+            Ta gärna en titt på boupptecknings-guiden för att se vad som återstår inför bouppteckningen.
+          </p>
+          <Link
+            to={`/projects/${id}/bouppteckning`}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-dark"
+          >
+            Visa <TbArrowRight size={16} />
+          </Link>
+        </section>
+      )}
 
-      <div data-tour="phases" className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {PHASES.map((phase) => {
-          const tasks = project.tasks.filter((t) => t.phase === phase);
-          if (tasks.length === 0) return null;
-          const status = phaseStatus(tasks);
-          const countedTasks = tasksForProgress(tasks);
-          const doneCount = countedTasks.filter((t) => t.completed).length;
-          return (
-            <Link
-              key={phase}
-              to={`/projects/${id}/${PHASE_ROUTE_SLUG[phase]}`}
-              className="flex flex-col rounded-xl border border-border bg-surface p-6 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:bg-primary-light hover:shadow-md"
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-lg font-semibold text-text">{phase}</h2>
-                <Badge tone={status.tone}>{status.label}</Badge>
-              </div>
-              <p className="mt-1 text-sm text-muted">
-                {doneCount} av {countedTasks.length} klara
-              </p>
-              <p className="mt-2 flex-1 text-sm text-muted">{PHASE_DESCRIPTIONS[phase]}</p>
-              <p className="mt-4 flex items-center gap-1 text-sm font-medium text-primary-dark">
-                Gå till denna fas <TbArrowRight size={16} />
-              </p>
-            </Link>
-          );
-        })}
-        <Link
-          to={`/projects/${id}/bouppteckning`}
-          className="flex flex-col rounded-xl border border-border bg-surface p-6 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:bg-primary-light hover:shadow-md"
+      <section className="mt-12" data-tour="progress">
+        <button
+          type="button"
+          onClick={() => setOpenModal('progress')}
+          className="block w-full bg-transparent p-0 text-left"
         >
-          <h2 className="text-lg font-semibold text-text">Boupptecknings-guide</h2>
-          <p className="mt-2 flex-1 text-sm text-muted">
-            Steg-för-steg genom Skatteverkets bouppteckningsprocess, med din inventering och ekonomi sammanställd.
-          </p>
-          <p className="mt-4 flex items-center gap-1 text-sm font-medium text-primary-dark">
-            Öppna guiden <TbArrowRight size={16} />
-          </p>
-        </Link>
-      </div>
+          <p className="text-xs font-semibold tracking-wide text-muted uppercase">Övergripande framsteg</p>
+          <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="text-[28px] leading-none font-semibold text-text">{progress}%</span>
+            <span className="text-sm text-muted">
+              {doneProjectTaskCount} av {countedProjectTasks.length} klara
+            </span>
+            {deadlineDays !== null && (
+              <span className="text-sm text-muted">
+                · {deadlineDays} dagar kvar till bouppteckning ({formatDeadlineDate(project.deceasedDate!)})
+              </span>
+            )}
+          </div>
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-primary-light">
+            <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress}%` }} />
+          </div>
+        </button>
+      </section>
+
+      <section className="mt-12" data-tour="phases">
+        <p className="text-xs font-semibold tracking-wide text-muted uppercase">Faser</p>
+        <div className="mt-3 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {PHASES.map((phase) => {
+            const tasks = project.tasks.filter((t) => t.phase === phase);
+            if (tasks.length === 0) return null;
+            const status = phaseStatus(tasks);
+            const countedTasks = tasksForProgress(tasks);
+            const doneCount = countedTasks.filter((t) => t.completed).length;
+            return (
+              <Link
+                key={phase}
+                to={`/projects/${id}/${PHASE_ROUTE_SLUG[phase]}`}
+                className="flex flex-col gap-3 rounded border border-border bg-surface p-5 transition hover:border-primary-dark/30 hover:bg-primary-light"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h3 className="text-lg font-semibold text-text">{phase}</h3>
+                  <StatusLabel tone={status.tone}>{status.label}</StatusLabel>
+                </div>
+                <p className="flex-1 text-sm text-muted">{PHASE_DESCRIPTIONS[phase]}</p>
+                <div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-bg">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${countedTasks.length ? (doneCount / countedTasks.length) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-xs text-muted">
+                    {doneCount} av {countedTasks.length} klara
+                  </p>
+                </div>
+                <p className="mt-1 flex items-center gap-1 text-sm font-medium text-primary-dark">
+                  Gå till denna fas <TbArrowRight size={16} />
+                </p>
+              </Link>
+            );
+          })}
+          <Link
+            to={`/projects/${id}/bouppteckning`}
+            className="flex flex-col gap-3 rounded border border-border bg-surface p-5 transition hover:border-primary-dark/30 hover:bg-primary-light"
+          >
+            <h3 className="text-lg font-semibold text-text">Boupptecknings-guide</h3>
+            <p className="flex-1 text-sm text-muted">
+              Steg-för-steg genom Skatteverkets bouppteckningsprocess, med din inventering och ekonomi sammanställd.
+            </p>
+            <p className="mt-1 flex items-center gap-1 text-sm font-medium text-primary-dark">
+              Öppna guiden <TbArrowRight size={16} />
+            </p>
+          </Link>
+        </div>
+      </section>
+
+      <section className="mt-12 border-t border-border pt-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <button
+            type="button"
+            data-tour="members"
+            onClick={() => setOpenModal('members')}
+            className="bg-transparent p-0 text-left text-sm text-muted transition hover:text-text"
+          >
+            <strong className="font-semibold text-text">{project.members.length}</strong>{' '}
+            {project.members.length === 1 ? 'familjemedlem' : 'familjemedlemmar'} →
+          </button>
+          <button
+            type="button"
+            data-tour="activity"
+            onClick={() => setOpenModal('activity')}
+            className="bg-transparent p-0 text-left text-sm text-muted transition hover:text-text"
+          >
+            {lastActivity
+              ? `${lastActivity.user.name} ${formatActivityAction(lastActivity.action)} · ${formatRelativeTime(lastActivity.timestamp)}`
+              : 'Ingen aktivitet än'}{' '}
+            →
+          </button>
+        </div>
+      </section>
 
       {inviteModalOpen && (
         <InviteModal onClose={() => setInviteModalOpen(false)} onInvite={inviteMember} />
