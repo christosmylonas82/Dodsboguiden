@@ -97,24 +97,24 @@ export function InvitationsModal({
                       isPending ? 'border-primary-dark/20 bg-primary-light' : 'border-border'
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3">
-                        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface text-primary-dark">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface text-primary-dark">
                           <TbMailbox size={18} />
                         </span>
-                        <div>
-                          {isPending && (
-                            <p className="text-sm font-semibold text-primary-dark">Du är inbjuden till ett dödsbo!</p>
-                          )}
-                          <p className="mt-0.5 font-medium text-text">{invitation.project.deceasedName}</p>
-                          <p className="mt-0.5 text-sm text-muted">
-                            {invitation.senderUser.name} ({invitation.senderUser.email}) bjuder in dig att
-                            samarbeta för att hålla ordning på dödsboet.
-                          </p>
-                          <p className="mt-1 text-xs text-muted">{formatTimestamp(invitation.createdAt)}</p>
-                        </div>
+                        <p className="truncate font-medium text-text">{invitation.project.deceasedName}</p>
                       </div>
                       <Badge tone={badge.tone}>{badge.label}</Badge>
+                    </div>
+                    <div className="mt-2 pl-12">
+                      {isPending && (
+                        <p className="text-sm font-semibold text-primary-dark">Du är inbjuden till ett dödsbo!</p>
+                      )}
+                      <p className="mt-0.5 text-sm break-words text-muted">
+                        {invitation.senderUser.name} ({invitation.senderUser.email}) bjuder in dig att samarbeta för
+                        att hålla ordning på dödsboet.
+                      </p>
+                      <p className="mt-1 text-xs text-muted">{formatTimestamp(invitation.createdAt)}</p>
                     </div>
                     <div className="mt-3 flex gap-3">
                       {invitation.status === 'PENDING' ? (

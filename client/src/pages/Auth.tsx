@@ -13,11 +13,11 @@ import { EmailPromptModal } from '../components/EmailPromptModal';
 const GOOGLE_CLIENT_ID_CONFIGURED = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 const FACEBOOK_APP_ID_CONFIGURED = Boolean(import.meta.env.VITE_FACEBOOK_APP_ID);
 
-function SocialDivider() {
+function SocialDivider({ text = 'Eller logga in med' }: { text?: string }) {
   return (
     <div className="my-5 flex items-center gap-3">
       <div className="h-px flex-1 bg-border" />
-      <span className="text-xs font-medium uppercase tracking-wide text-muted">Eller logga in med</span>
+      <span className="text-xs font-medium uppercase tracking-wide text-muted">{text}</span>
       <div className="h-px flex-1 bg-border" />
     </div>
   );
@@ -331,7 +331,8 @@ function LoginForm() {
 }
 
 function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
-  const { register } = useAuth();
+  const { register, loginWithGoogle, loginWithFacebook, setEmail: submitEmailForAccount } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -343,6 +344,40 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
   const [termsOpen, setTermsOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [registeredMessage, setRegisteredMessage] = useState<string | null>(null);
+  const [socialError, setSocialError] = useState<string | null>(null);
+  const [socialSubmitting, setSocialSubmitting] = useState(false);
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
+
+  async function handleGoogleSignup(credential: string) {
+    setSocialError(null);
+    setSocialSubmitting(true);
+    try {
+      await loginWithGoogle(credential);
+      navigate('/dashboard');
+    } catch (err) {
+      setSocialError(err instanceof ApiError ? err.message : 'Kunde inte registrera med Google');
+    } finally {
+      setSocialSubmitting(false);
+    }
+  }
+
+  async function handleFacebookSignup() {
+    setSocialError(null);
+    setSocialSubmitting(true);
+    try {
+      const accessToken = await loginWithFacebookPopup();
+      const { emailRequired } = await loginWithFacebook(accessToken);
+      if (emailRequired) {
+        setShowEmailPrompt(true);
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setSocialError(err instanceof ApiError || err instanceof Error ? err.message : 'Kunde inte registrera med Facebook');
+    } finally {
+      setSocialSubmitting(false);
+    }
+  }
 
   function validate(): boolean {
     const next: Record<string, string> = {};
@@ -380,6 +415,18 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
     }
   }
 
+  if (showEmailPrompt) {
+    return (
+      <EmailPromptModal
+        onSave={async (newEmail) => {
+          await submitEmailForAccount(newEmail);
+          navigate('/dashboard');
+        }}
+        onSkip={() => navigate('/dashboard')}
+      />
+    );
+  }
+
   if (registeredMessage) {
     return (
       <div>
@@ -403,6 +450,35 @@ function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
 
   return (
     <form onSubmit={handleSubmit}>
+      {(GOOGLE_CLIENT_ID_CONFIGURED || FACEBOOK_APP_ID_CONFIGURED) && (
+        <>
+          <div className="flex items-center justify-center gap-3">
+            {GOOGLE_CLIENT_ID_CONFIGURED && (
+              <GoogleLogin
+                onSuccess={(credentialResponse) => {
+                  if (credentialResponse.credential) {
+                    handleGoogleSignup(credentialResponse.credential);
+                  }
+                }}
+                onError={() => setSocialError('Kunde inte registrera med Google')}
+                type="icon"
+                size="large"
+              />
+            )}
+            {FACEBOOK_APP_ID_CONFIGURED && (
+              <FacebookLoginButton
+                label="Registrera dig med Facebook"
+                loading={socialSubmitting}
+                iconOnly
+                onClick={handleFacebookSignup}
+              />
+            )}
+          </div>
+          {socialError && <p className="mt-2 text-center text-sm text-danger">{socialError}</p>}
+          <SocialDivider text="Eller registrera dig med e-post" />
+        </>
+      )}
+
       <p className="text-xs text-muted">* Obligatoriska fält</p>
 
       <div className="mt-3 grid gap-4 sm:grid-cols-2">
