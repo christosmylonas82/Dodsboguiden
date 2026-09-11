@@ -6,6 +6,7 @@ import { HttpError } from '../middleware/errorHandler.js';
 import { getChecklistItems, SCENARIO_LABELS, type ChecklistScenario } from '../lib/checklistTemplate.js';
 import { logActivity } from '../lib/activity.js';
 import { calculateDueDate, getDueDateStatus, TASK_DAY_OFFSETS } from '../lib/dueDate.js';
+import { sendInvitationEmail } from '../lib/email.js';
 
 const scenarioFields = {
   hasCompany: z.boolean().optional(),
@@ -259,6 +260,20 @@ export async function inviteMember(req: Request, res: Response) {
     userId: req.user!.userId,
     action: `invited ${body.email}`,
   });
+
+  if (!invitedUser) {
+    const [sender, project] = await Promise.all([
+      prisma.user.findUnique({ where: { id: req.user!.userId }, select: { name: true } }),
+      prisma.project.findUnique({ where: { id: projectId }, select: { deceasedName: true } }),
+    ]);
+    if (sender && project) {
+      try {
+        await sendInvitationEmail(body.email, sender.name, project.deceasedName);
+      } catch (err) {
+        console.error('[invitations] Failed to send invitation email:', err);
+      }
+    }
+  }
 
   res.status(201).json(invitation);
 }

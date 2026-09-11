@@ -39,6 +39,7 @@ const UNSUBSCRIBE_NOTE =
   'Detta är ett transaktionsmejl kopplat till ditt konto på DödsboGuiden. Du kan när som helst radera ditt konto under Inställningar för att sluta ta emot mejl.';
 
 const BRAND_COLOR = '#0a4062';
+const LOGO_URL = `${getPrimaryClientOrigin()}/logo.png`;
 
 /** Wraps a template's inner HTML in a consistent, email-client-safe layout (table-based, inline styles only). */
 function emailLayout(title: string, bodyHtml: string): string {
@@ -50,8 +51,8 @@ function emailLayout(title: string, bodyHtml: string): string {
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f6f5f4;padding:32px 16px;">` +
     `<tr><td align="center">` +
     `<table role="presentation" width="100%" style="max-width:480px;background-color:#ffffff;border-radius:12px;overflow:hidden;">` +
-    `<tr><td style="background-color:${BRAND_COLOR};padding:20px 32px;">` +
-    `<span style="color:#ffffff;font-size:18px;font-weight:bold;">DödsboGuiden</span>` +
+    `<tr><td style="background-color:#ffffff;padding:24px 32px;text-align:center;border-bottom:3px solid ${BRAND_COLOR};">` +
+    `<img src="${LOGO_URL}" alt="DödsboGuiden" height="36" style="height:36px;width:auto;border:0;display:inline-block;" />` +
     `</td></tr>` +
     `<tr><td style="padding:32px;color:#37352f;font-size:15px;line-height:1.6;">${bodyHtml}</td></tr>` +
     `</table></td></tr></table></body></html>`
@@ -83,13 +84,23 @@ async function send(to: string, subject: string, html: string, text: string, rep
 }
 
 export async function sendPasswordResetEmail(email: string, resetLink: string): Promise<boolean> {
+  const safeLink = escapeHtml(resetLink);
+  const body =
+    `<h1 style="margin:0 0 16px;font-size:20px;color:${BRAND_COLOR};">Återställ ditt lösenord</h1>` +
+    `<p style="margin:0 0 24px;">Klicka på knappen nedan för att återställa ditt lösenord. Länken är giltig i 1 timme.</p>` +
+    `<p style="margin:0 0 24px;text-align:center;">` +
+    `<a href="${safeLink}" style="display:inline-block;background-color:${BRAND_COLOR};color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:bold;font-size:15px;">Återställ lösenord</a>` +
+    `</p>` +
+    `<p style="margin:0 0 24px;font-size:13px;color:#787671;">Om knappen inte fungerar kan du kopiera och klistra in denna länk i din webbläsare:<br />` +
+    `<a href="${safeLink}" style="color:${BRAND_COLOR};word-break:break-all;">${safeLink}</a></p>` +
+    `<p style="margin:0 0 16px;">Om du inte begärde detta kan du bortse från mejlet.</p>` +
+    `<hr style="border:none;border-top:1px solid #e5e3df;margin:24px 0;" />` +
+    `<p style="margin:0;font-size:12px;color:#787671;">${UNSUBSCRIBE_NOTE}</p>`;
+
   return send(
     email,
     'Återställ ditt lösenord - DödsboGuiden',
-    `<p>Klicka på länken nedan för att återställa ditt lösenord. Länken är giltig i 1 timme.</p>` +
-      `<p><a href="${resetLink}">${resetLink}</a></p>` +
-      `<p>Om du inte begärde detta kan du bortse från mejlet.</p>` +
-      `<p style="color:#666;font-size:12px">${UNSUBSCRIBE_NOTE}</p>`,
+    emailLayout('Återställ ditt lösenord', body),
     `Klicka på länken för att återställa ditt lösenord (giltig i 1 timme):\n${resetLink}\n\n` +
       `Om du inte begärde detta kan du bortse från mejlet.\n\n${UNSUBSCRIBE_NOTE}`,
   );
@@ -100,11 +111,21 @@ export async function sendDeadlineReminderEmail(
   deceasedName: string,
   daysRemaining: number,
 ): Promise<boolean> {
+  const safeName = escapeHtml(deceasedName);
+  const loginLink = getPrimaryClientOrigin();
+  const body =
+    `<h1 style="margin:0 0 16px;font-size:20px;color:${BRAND_COLOR};">Påminnelse: ${daysRemaining} dagar kvar</h1>` +
+    `<p style="margin:0 0 24px;">Dödsboet "${safeName}" har <strong>${daysRemaining} dagar</strong> kvar innan bouppteckningen ska ha kommit in till Skatteverket.</p>` +
+    `<p style="margin:0 0 24px;text-align:center;">` +
+    `<a href="${loginLink}" style="display:inline-block;background-color:${BRAND_COLOR};color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:bold;font-size:15px;">Öppna DödsboGuiden</a>` +
+    `</p>` +
+    `<hr style="border:none;border-top:1px solid #e5e3df;margin:24px 0;" />` +
+    `<p style="margin:0;font-size:12px;color:#787671;">${UNSUBSCRIBE_NOTE}</p>`;
+
   return send(
     email,
     `Påminnelse: ${daysRemaining} dagar kvar till bouppteckningen`,
-    `<p>Dödsboet "${deceasedName}" har ${daysRemaining} dagar kvar innan bouppteckningen ska ha kommit in till Skatteverket.</p>` +
-      `<p style="color:#666;font-size:12px">${UNSUBSCRIBE_NOTE}</p>`,
+    emailLayout(`Påminnelse: ${daysRemaining} dagar kvar`, body),
     `Dödsboet "${deceasedName}" har ${daysRemaining} dagar kvar innan bouppteckningen ska ha kommit in till Skatteverket.\n\n${UNSUBSCRIBE_NOTE}`,
   );
 }
@@ -174,13 +195,17 @@ export async function sendWelcomeEmail(email: string, name: string): Promise<boo
 }
 
 export async function sendContactEmail(name: string, fromAddress: string, message: string): Promise<boolean> {
+  const body =
+    `<h1 style="margin:0 0 16px;font-size:20px;color:${BRAND_COLOR};">Nytt meddelande från kontaktformuläret</h1>` +
+    `<p style="margin:0 0 8px;"><strong>Namn:</strong> ${escapeHtml(name)}</p>` +
+    `<p style="margin:0 0 16px;"><strong>E-post:</strong> ${escapeHtml(fromAddress)}</p>` +
+    `<p style="margin:0 0 8px;"><strong>Meddelande:</strong></p>` +
+    `<p style="margin:0;">${escapeHtml(message).replace(/\n/g, '<br>')}</p>`;
+
   return send(
     CONTACT_EMAIL,
     `Kontaktformulär: meddelande från ${name}`,
-    `<p><strong>Namn:</strong> ${escapeHtml(name)}</p>` +
-      `<p><strong>E-post:</strong> ${escapeHtml(fromAddress)}</p>` +
-      `<p><strong>Meddelande:</strong></p>` +
-      `<p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>`,
+    emailLayout('Nytt meddelande från kontaktformuläret', body),
     `Namn: ${name}\nE-post: ${fromAddress}\n\nMeddelande:\n${message}`,
     fromAddress,
   );
@@ -192,15 +217,49 @@ export async function sendProblemReportEmail(
   message: string,
   pageUrl?: string,
 ): Promise<boolean> {
+  const body =
+    `<h1 style="margin:0 0 16px;font-size:20px;color:${BRAND_COLOR};">Ny problemrapport</h1>` +
+    `<p style="margin:0 0 8px;"><strong>Namn:</strong> ${escapeHtml(name)}</p>` +
+    `<p style="margin:0 0 8px;"><strong>E-post:</strong> ${escapeHtml(fromAddress)}</p>` +
+    (pageUrl ? `<p style="margin:0 0 16px;"><strong>Sida:</strong> ${escapeHtml(pageUrl)}</p>` : '<div style="margin-bottom:16px;"></div>') +
+    `<p style="margin:0 0 8px;"><strong>Beskrivning:</strong></p>` +
+    `<p style="margin:0;">${escapeHtml(message).replace(/\n/g, '<br>')}</p>`;
+
   return send(
     CONTACT_EMAIL,
     `Problemrapport från ${name}`,
-    `<p><strong>Namn:</strong> ${escapeHtml(name)}</p>` +
-      `<p><strong>E-post:</strong> ${escapeHtml(fromAddress)}</p>` +
-      (pageUrl ? `<p><strong>Sida:</strong> ${escapeHtml(pageUrl)}</p>` : '') +
-      `<p><strong>Beskrivning:</strong></p>` +
-      `<p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>`,
+    emailLayout('Ny problemrapport', body),
     `Namn: ${name}\nE-post: ${fromAddress}\n${pageUrl ? `Sida: ${pageUrl}\n` : ''}\nBeskrivning:\n${message}`,
     fromAddress,
+  );
+}
+
+export async function sendInvitationEmail(
+  email: string,
+  inviterName: string,
+  deceasedName: string,
+): Promise<boolean> {
+  const safeInviter = escapeHtml(inviterName);
+  const safeDeceased = escapeHtml(deceasedName);
+  const registerLink = `${getPrimaryClientOrigin()}/register?email=${encodeURIComponent(email)}`;
+
+  const body =
+    `<h1 style="margin:0 0 16px;font-size:20px;color:${BRAND_COLOR};">Du har blivit inbjuden</h1>` +
+    `<p style="margin:0 0 16px;">${safeInviter} har bjudit in dig att samarbeta kring dödsboet "${safeDeceased}" på DödsboGuiden.</p>` +
+    `<p style="margin:0 0 24px;">Skapa ett kostnadsfritt konto med den här e-postadressen för att se inbjudan och komma igång.</p>` +
+    `<p style="margin:0 0 24px;text-align:center;">` +
+    `<a href="${registerLink}" style="display:inline-block;background-color:${BRAND_COLOR};color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:bold;font-size:15px;">Skapa konto</a>` +
+    `</p>` +
+    `<p style="margin:0 0 24px;font-size:13px;color:#787671;">Om knappen inte fungerar kan du kopiera och klistra in denna länk i din webbläsare:<br />` +
+    `<a href="${registerLink}" style="color:${BRAND_COLOR};word-break:break-all;">${registerLink}</a></p>` +
+    `<hr style="border:none;border-top:1px solid #e5e3df;margin:24px 0;" />` +
+    `<p style="margin:0;font-size:12px;color:#787671;">${UNSUBSCRIBE_NOTE}</p>`;
+
+  return send(
+    email,
+    `${inviterName} har bjudit in dig till DödsboGuiden`,
+    emailLayout('Du har blivit inbjuden', body),
+    `${inviterName} har bjudit in dig att samarbeta kring dödsboet "${deceasedName}" på DödsboGuiden.\n\n` +
+      `Skapa ett kostnadsfritt konto med den här e-postadressen för att se inbjudan och komma igång:\n${registerLink}\n\n${UNSUBSCRIBE_NOTE}`,
   );
 }

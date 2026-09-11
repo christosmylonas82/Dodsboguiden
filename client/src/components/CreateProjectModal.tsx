@@ -21,10 +21,15 @@ export function CreateProjectModal({
   });
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dateWarningSeen, setDateWarningSeen] = useState(false);
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!deceasedDate && !dateWarningSeen) {
+      setDateWarningSeen(true);
+      return;
+    }
     setCreating(true);
     try {
       const project = await apiFetch<{ id: string }>('/projects', {
@@ -74,12 +79,26 @@ export function CreateProjectModal({
               type="date"
               max={new Date().toISOString().split('T')[0]}
               value={deceasedDate}
-              onChange={(e) => setDeceasedDate(e.target.value)}
+              onChange={(e) => {
+                setDeceasedDate(e.target.value);
+                setDateWarningSeen(false);
+              }}
               className="h-11 rounded-lg border border-border px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
             />
-            <p className="text-xs text-muted">
-              Om du anger ett datum räknar vi ut deadlinen för bouppteckning (4 månader) automatiskt.
+            <p
+              className={
+                !deceasedDate && dateWarningSeen
+                  ? 'text-xs font-bold text-danger'
+                  : 'text-xs text-muted'
+              }
+            >
+              Används för att räkna ut deadlinen för bouppteckning (4 månader).
             </p>
+            {!deceasedDate && dateWarningSeen && (
+              <p className="text-xs font-bold text-danger">
+                Du har inte fyllt i dödsdatum. Tryck igen på "Skapa dödsbo" om du vill fortsätta utan datum.
+              </p>
+            )}
           </div>
           <div className="mt-5 rounded-lg border border-border bg-bg p-3.5">
             <p className="text-sm font-medium text-text">Är dödsboet mer komplext? (valfritt)</p>

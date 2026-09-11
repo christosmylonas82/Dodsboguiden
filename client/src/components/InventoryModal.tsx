@@ -118,6 +118,32 @@ export function InventoryModal({
               {items.length === 0 ? 'Inga poster tillagda' : `${items.length} ${items.length === 1 ? 'post tillagd' : 'poster tillagda'}`}
             </p>
 
+            {items.length === 0 && (
+              <div className="mt-4 overflow-x-auto rounded-lg border border-dashed border-border opacity-60">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-border text-muted">
+                      <th className="py-2 pr-3 pl-3 font-medium">Typ</th>
+                      <th className="py-2 pr-3 font-medium">Värde (kr)</th>
+                      <th className="py-2 pr-3 font-medium">Status</th>
+                      <th className="py-2 pr-3 font-medium">Kommentarer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="py-2 pr-3 pl-3 italic text-muted">Exempel: Bankkonto – Handelsbanken</td>
+                      <td className="py-2 pr-3 italic text-muted">25 000</td>
+                      <td className="py-2 pr-3 italic text-muted">{INVENTORY_STATUS_LABELS[INVENTORY_STATUS_ORDER[0]]}</td>
+                      <td className="py-2 pr-3 italic text-muted">Fyll i dina egna poster nedan</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p className="border-t border-dashed border-border px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-muted">
+                  Exempel — inte riktig data
+                </p>
+              </div>
+            )}
+
             {items.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {(['ALL', ...INVENTORY_STATUS_ORDER] as const).map((s) => (

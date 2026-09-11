@@ -332,9 +332,10 @@ function LoginForm() {
 
 function RegisterForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
   const { register } = useAuth();
+  const location = useLocation();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => new URLSearchParams(location.search).get('email') ?? '');
   const [password, setPassword] = useState('');
   const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});

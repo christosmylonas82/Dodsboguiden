@@ -122,7 +122,34 @@ export function ContactsModal({
         {loading ? (
           <p className="mt-5 text-sm text-muted">Laddar…</p>
         ) : contacts.length === 0 ? (
-          <p className="mt-5 text-sm text-muted">Inga kontakter tillagda än.</p>
+          <>
+            <p className="mt-5 text-sm text-muted">Inga kontakter tillagda än.</p>
+            <div className="mt-3 overflow-x-auto rounded-lg border border-dashed border-border opacity-60">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-border text-muted">
+                    <th className="py-2 pr-3 pl-3 font-medium">Namn</th>
+                    <th className="py-2 pr-3 font-medium">Relation</th>
+                    <th className="py-2 pr-3 font-medium">Telefon</th>
+                    <th className="py-2 pr-3 font-medium">E-post</th>
+                    <th className="py-2 pr-3 font-medium">Anteckningar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="py-2 pr-3 pl-3 italic text-muted">Exempel: Anna Andersson</td>
+                    <td className="py-2 pr-3 italic text-muted">Dödsbodelägare</td>
+                    <td className="py-2 pr-3 italic text-muted">070-123 45 67</td>
+                    <td className="py-2 pr-3 italic text-muted">anna@exempel.se</td>
+                    <td className="py-2 pr-3 italic text-muted">Lägg till dina egna kontakter nedan</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p className="border-t border-dashed border-border px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-muted">
+                Exempel — inte riktig data
+              </p>
+            </div>
+          </>
         ) : (
           <div className="mt-5 overflow-x-auto">
             <table className="w-full text-left text-sm">

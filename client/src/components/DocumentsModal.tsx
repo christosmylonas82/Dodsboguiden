@@ -160,7 +160,14 @@ export function DocumentsModal({
         {loading ? (
           <p className="mt-5 text-sm text-muted">Laddar…</p>
         ) : documents.length === 0 ? (
-          <p className="mt-5 text-sm text-muted">Inga dokument uppladdade än.</p>
+          <>
+            <p className="mt-5 text-sm text-muted">Inga dokument uppladdade än.</p>
+            <div className="mt-3 rounded-lg border border-dashed border-border p-3 opacity-60">
+              <div className="truncate text-sm font-medium italic text-muted">Exempel: Dödsfallsintyg.pdf</div>
+              <div className="mt-0.5 truncate text-xs italic text-muted">Ladda upp dina egna dokument nedan</div>
+            </div>
+            <p className="mt-1.5 text-xs font-medium uppercase tracking-wide text-muted">Exempel — inte riktig data</p>
+          </>
         ) : (
           <div className="mt-5 flex flex-col gap-5">
             {grouped.map((group) => (
