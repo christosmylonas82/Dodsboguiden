@@ -11,11 +11,13 @@ import {
   failedLoginStats,
   featureUsage,
   listAllProjects,
+  listReports,
   listUsers,
   projectsPerDay,
   requestPasswordReset,
   resetStats,
   statistics,
+  updateReportStatus,
   updateUserRole,
 } from '../controllers/admin.controller.js';
 import { quizStats } from '../controllers/quiz.controller.js';
@@ -38,6 +40,8 @@ router.get('/auth/reset-stats', asyncHandler(resetStats));
 router.get('/auth/failed-login-stats', asyncHandler(failedLoginStats));
 router.get('/auth/activity-log', asyncHandler(authActivityLog));
 router.get('/audit-log', asyncHandler(auditLog));
+router.get('/reports', asyncHandler(listReports));
+router.patch('/reports/:reportId', asyncHandler(updateReportStatus));
 router.get('/quiz-stats', asyncHandler(quizStats));
 
 export default router;

@@ -185,3 +185,22 @@ export async function sendContactEmail(name: string, fromAddress: string, messag
     fromAddress,
   );
 }
+
+export async function sendProblemReportEmail(
+  name: string,
+  fromAddress: string,
+  message: string,
+  pageUrl?: string,
+): Promise<boolean> {
+  return send(
+    CONTACT_EMAIL,
+    `Problemrapport från ${name}`,
+    `<p><strong>Namn:</strong> ${escapeHtml(name)}</p>` +
+      `<p><strong>E-post:</strong> ${escapeHtml(fromAddress)}</p>` +
+      (pageUrl ? `<p><strong>Sida:</strong> ${escapeHtml(pageUrl)}</p>` : '') +
+      `<p><strong>Beskrivning:</strong></p>` +
+      `<p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>`,
+    `Namn: ${name}\nE-post: ${fromAddress}\n${pageUrl ? `Sida: ${pageUrl}\n` : ''}\nBeskrivning:\n${message}`,
+    fromAddress,
+  );
+}

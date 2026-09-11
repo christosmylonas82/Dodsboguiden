@@ -322,6 +322,50 @@ export async function auditLog(_req: Request, res: Response) {
   res.json(entries);
 }
 
+const listReportsQuerySchema = z.object({
+  status: z.enum(['OPEN', 'RESOLVED']).optional(),
+});
+
+export async function listReports(req: Request, res: Response) {
+  const query = listReportsQuerySchema.parse(req.query);
+  const reports = await prisma.problemReport.findMany({
+    where: query.status ? { status: query.status } : undefined,
+    include: { user: { select: { id: true, name: true, email: true } } },
+    orderBy: { createdAt: 'desc' },
+  });
+  res.json(reports);
+}
+
+const updateReportStatusSchema = z.object({
+  status: z.enum(['OPEN', 'RESOLVED']),
+});
+
+export async function updateReportStatus(req: Request, res: Response) {
+  const body = updateReportStatusSchema.parse(req.body);
+  const { reportId } = req.params;
+  const adminId = req.user!.userId;
+
+  const existing = await prisma.problemReport.findUnique({ where: { id: reportId } });
+  if (!existing) {
+    throw new HttpError(404, 'Report not found');
+  }
+
+  const report = await prisma.problemReport.update({
+    where: { id: reportId },
+    data: { status: body.status, resolvedAt: body.status === 'RESOLVED' ? new Date() : null },
+    include: { user: { select: { id: true, name: true, email: true } } },
+  });
+
+  await logAudit({
+    adminId,
+    action: body.status === 'RESOLVED' ? 'resolved problem report' : 'reopened problem report',
+    targetType: 'problem_report',
+    targetId: reportId,
+  });
+
+  res.json({ report });
+}
+
 const updateUserRoleSchema = z.object({
   role: z.enum(['ADMIN', 'USER']),
 });

@@ -15,6 +15,7 @@ import {
   TbFiles,
   TbShieldLock,
   TbRoute,
+  TbFlag3,
 } from 'react-icons/tb';
 import dodsboguidenLogo from '../assets/dodsboguiden-logo.png';
 import { useAuth } from '../context/AuthContext';
@@ -29,6 +30,7 @@ import { NotificationsBell } from './NotificationsBell';
 import { TipsModal } from './TipsModal';
 import { InvitationsModal } from './InvitationsModal';
 import { SettingsModal } from './SettingsModal';
+import { ReportProblemModal } from './ReportProblemModal';
 import { Footer } from './Footer';
 import { CookieBanner } from './CookieBanner';
 import { PolicyModal } from './PolicyModal';
@@ -37,20 +39,13 @@ import { useCookieConsent } from '../hooks/useCookieConsent';
 import { useTheme } from '../hooks/useTheme';
 
 const itemClass =
-  'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text';
+  'flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-muted transition hover:bg-primary-light hover:text-text';
 
 const navButtonClass =
-  'group relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-primary-light hover:text-text md:justify-center md:gap-1 md:px-2.5';
+  'flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-muted transition hover:bg-primary-light hover:text-text';
 
 function NavLabel({ text }: { text: string }) {
-  return (
-    <>
-      <span className="md:hidden">{text}</span>
-      <span className="pointer-events-none absolute top-full left-1/2 z-40 mt-1.5 hidden -translate-x-1/2 rounded-md border border-border bg-surface px-2 py-1 text-xs font-medium whitespace-nowrap text-text opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-active:opacity-100 md:block">
-        {text}
-      </span>
-    </>
-  );
+  return <span>{text}</span>;
 }
 
 type ModalKey =
@@ -61,7 +56,8 @@ type ModalKey =
   | 'documents'
   | 'tips'
   | 'invitations'
-  | 'settings';
+  | 'settings'
+  | 'reportProblem';
 
 export function Layout() {
   const { user, logout, markTipsSeen } = useAuth();
@@ -159,7 +155,7 @@ export function Layout() {
         onClick={() => openModalAndCloseMenu('contacts')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbAddressBook size={24} />
+        <TbAddressBook size={20} />
         <NavLabel text="Kontaktlista" />
       </button>
       <button
@@ -168,7 +164,7 @@ export function Layout() {
         onClick={() => openModalAndCloseMenu('inventory')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbClipboardList size={24} />
+        <TbClipboardList size={20} />
         <NavLabel text="Inventarielista" />
       </button>
       <button
@@ -177,7 +173,7 @@ export function Layout() {
         onClick={() => openModalAndCloseMenu('documents')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbFiles size={24} />
+        <TbFiles size={20} />
         <NavLabel text="Dokument" />
       </button>
       <button
@@ -186,7 +182,7 @@ export function Layout() {
         onClick={() => openModalAndCloseMenu('transactions')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbCoin size={24} />
+        <TbCoin size={20} />
         <NavLabel text="Ekonomi" />
       </button>
       <button
@@ -195,7 +191,7 @@ export function Layout() {
         onClick={() => openModalAndCloseMenu('contactRegistry')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbPhoneCall size={24} />
+        <TbPhoneCall size={20} />
         <NavLabel text="Myndigheter & företag" />
       </button>
     </>
@@ -229,19 +225,17 @@ export function Layout() {
         onClick={() => openModalAndCloseMenu('settings')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbSettings size={24} />
+        <TbSettings size={20} />
         <NavLabel text="Inställningar" />
       </button>
-      {user?.role === 'ADMIN' && (
-        <Link
-          to="/admin/dashboard"
-          className={`${navButtonClass} bg-transparent`}
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          <TbShieldLock size={24} />
-          <NavLabel text="Admin" />
-        </Link>
-      )}
+      <button
+        type="button"
+        onClick={() => openModalAndCloseMenu('reportProblem')}
+        className={`${navButtonClass} bg-transparent`}
+      >
+        <TbFlag3 size={20} />
+        <NavLabel text="Rapportera ett problem" />
+      </button>
     </>
   );
 
@@ -251,9 +245,9 @@ export function Layout() {
         logout();
         setMobileMenuOpen(false);
       }}
-      className="flex items-center gap-2 rounded-lg border border-border bg-transparent px-3 py-2 text-sm font-medium text-text transition hover:bg-primary-light"
+      className="flex items-center gap-1.5 rounded-lg border border-border bg-transparent px-2.5 py-1.5 text-[13px] font-medium text-text transition hover:bg-primary-light"
     >
-      <TbLogout2 size={18} />
+      <TbLogout2 size={20} />
       Logga ut
     </button>
   );
@@ -263,25 +257,34 @@ export function Layout() {
       <header className="border-b border-border bg-surface">
         <div className="flex w-full items-center px-3 py-2 md:px-6">
           <div className="flex shrink-0 items-center gap-2 md:gap-4">
-            {isAuthPage || location.pathname === '/om' ? (
-              <Link
-                to="/"
-                aria-label="Dödsboguiden"
-                className="flex shrink-0 items-center rounded-md bg-white px-1.5 py-1 transition hover:opacity-90 md:px-3 md:py-1.5"
-              >
-                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-5 w-auto shrink-0 md:h-10" />
-              </Link>
-            ) : (
-              <span className="flex shrink-0 items-center rounded-md bg-white px-1.5 py-1 md:px-3 md:py-1.5">
-                <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-5 w-auto shrink-0 md:h-10" />
-              </span>
-            )}
+            <div className="flex flex-col items-start gap-0.5">
+              {isAuthPage || location.pathname === '/om' ? (
+                <Link
+                  to="/"
+                  aria-label="Dödsboguiden"
+                  className="flex shrink-0 items-center rounded-md bg-white px-1.5 py-1 transition hover:opacity-90 md:px-2 md:py-1"
+                >
+                  <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-5 w-auto shrink-0 md:h-8" />
+                </Link>
+              ) : (
+                <span className="flex shrink-0 items-center rounded-md bg-white px-1.5 py-1 md:px-2 md:py-1">
+                  <img src={dodsboguidenLogo} alt="Dödsboguiden" className="h-5 w-auto shrink-0 md:h-8" />
+                </span>
+              )}
+              {user?.role === 'ADMIN' && (
+                <Link
+                  to="/admin/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-1 pl-1 text-[11px] font-medium text-muted transition hover:text-primary-dark"
+                >
+                  <TbShieldLock size={12} />
+                  Admin
+                </Link>
+              )}
+            </div>
             {user && (
-              <Link
-                to="/dashboard"
-                className="hidden items-center gap-1.5 text-sm font-semibold text-text transition hover:text-primary-dark md:flex"
-              >
-                <TbHome size={18} className="text-primary-dark" />
+              <Link to="/dashboard" className={`hidden ${navButtonClass} md:flex`}>
+                <TbHome size={20} />
                 Översikt dödsbon
               </Link>
             )}
@@ -426,6 +429,7 @@ export function Layout() {
         />
       )}
       {openModal === 'settings' && <SettingsModal onClose={() => setOpenModal(null)} />}
+      {openModal === 'reportProblem' && <ReportProblemModal onClose={() => setOpenModal(null)} />}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import invitationRoutes from './routes/invitations.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import notificationsRoutes from './routes/notifications.routes.js';
 import contactRoutes from './routes/contact.routes.js';
+import reportRoutes from './routes/report.routes.js';
 import quizRoutes from './routes/quiz.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { getAllowedOrigins } from './lib/clientOrigin.js';
@@ -36,6 +37,7 @@ app.use('/api/invitations', invitationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/reports', reportRoutes);
 app.use('/api/quiz', quizRoutes);
 
 app.use(errorHandler);

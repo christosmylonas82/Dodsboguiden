@@ -18,6 +18,7 @@ import { AdminUsersPage } from './pages/admin/AdminUsers';
 import { AdminStatsPage } from './pages/admin/AdminStats';
 import { AdminAuthPage } from './pages/admin/AdminAuth';
 import { AdminAuditLogPage } from './pages/admin/AdminAuditLog';
+import { AdminReportsPage } from './pages/admin/AdminReports';
 import { AdminLayout } from './layouts/AdminLayout';
 import './App.css';
 
@@ -110,6 +111,14 @@ function App() {
               element={
                 <AdminLayout>
                   <AdminAuditLogPage />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/reports"
+              element={
+                <AdminLayout>
+                  <AdminReportsPage />
                 </AdminLayout>
               }
             />

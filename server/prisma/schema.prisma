@@ -124,6 +124,7 @@ model User {
   authEvents          AuthEvent[]
   uploadedDocuments   Document[]
   notifications       Notification[]
+  problemReports      ProblemReport[]
 
   @@map("users")
 }
@@ -454,6 +455,27 @@ model AuditLog {
   admin User @relation(fields: [adminId], references: [id])
 
   @@map("audit_log")
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+}
+
+model ProblemReport {
+  id         String       @id @default(uuid())
+  userId     String       @map("user_id")
+  message    String       @db.Text
+  pageUrl    String?      @map("page_url")
+  status     ReportStatus @default(OPEN)
+  createdAt  DateTime     @default(now()) @map("created_at")
+  resolvedAt DateTime?    @map("resolved_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("problem_reports")
 }
 
 // Anonymous submissions from the public "suitability quiz" on the landing page
