@@ -191,7 +191,7 @@ export function Layout() {
         onClick={() => openModalAndCloseMenu('contactRegistry')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbPhoneCall size={26} />
+        <TbPhoneCall size={21} />
         <NavLabel text="Myndigheter" />
       </button>
     </>
@@ -233,7 +233,7 @@ export function Layout() {
         onClick={() => openModalAndCloseMenu('reportProblem')}
         className={`${navButtonClass} bg-transparent`}
       >
-        <TbFlag3 size={24} />
+        <TbFlag3 size={28} />
         <NavLabel text="Rapportera ett problem" />
       </button>
     </>
