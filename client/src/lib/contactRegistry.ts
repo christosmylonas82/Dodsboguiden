@@ -219,39 +219,6 @@ export const CONTACT_REGISTRY: RegistryCategory[] = [
     ],
   },
   {
-    category: 'Arkiv för dödsönskemål',
-    contacts: [
-      {
-        name: 'Vita arkivet',
-        phone: null,
-        contactHint: 'vitaarkivet.se',
-        description: 'Arkiv för dödsönskemål',
-        website: 'vitaarkivet.se',
-      },
-      {
-        name: 'Livsarkivet',
-        phone: null,
-        contactHint: 'livsarkivet.se',
-        description: 'Arkiv för att bevara minnen',
-        website: 'livsarkivet.se',
-      },
-      {
-        name: 'Begravningsarkivet (Fenix Begravning)',
-        phone: null,
-        contactHint: 'fenixbegravning.se',
-        description: 'Begravningsarkiv',
-        website: 'fenixbegravning.se',
-      },
-      {
-        name: 'Lavendla-arkivet',
-        phone: null,
-        contactHint: 'lavendla.se',
-        description: 'Arkiv för dödsönskemål',
-        website: 'lavendla.se',
-      },
-    ],
-  },
-  {
     category: 'Försäkring & konsument',
     contacts: [
       {

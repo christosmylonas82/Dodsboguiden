@@ -128,7 +128,7 @@ export function GuidedTour({ isOpen, onFinish }: { isOpen: boolean; onFinish: ()
 
     tour.addStep({
       id: 'contactRegistry',
-      title: 'Myndigheter & företag',
+      title: 'Myndigheter',
       text: 'Här hittar ni färdiga kontaktuppgifter till myndigheter, banker och andra företag som ofta behöver kontaktas vid ett dödsfall.',
       attachTo: { element: '[data-tour="contactRegistry"]', on: 'bottom' },
       buttons: [
