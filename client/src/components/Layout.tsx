@@ -428,7 +428,7 @@ export function Layout() {
           }}
         />
       )}
-      {openModal === 'settings' && <SettingsModal onClose={() => setOpenModal(null)} />}
+      {openModal === 'settings' && <SettingsModal onClose={() => setOpenModal(null)} projectId={projectId} />}
       {openModal === 'reportProblem' && <ReportProblemModal onClose={() => setOpenModal(null)} />}
     </div>
   );

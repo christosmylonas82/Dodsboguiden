@@ -23,7 +23,7 @@ function getLogoBytes(): Promise<Uint8Array> {
   return logoBytesPromise;
 }
 
-interface ExportTableOptions {
+export interface ExportTableOptions {
   title: string;
   deceasedName: string;
   headers: string[];

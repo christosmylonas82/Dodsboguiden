@@ -57,7 +57,7 @@ export function NotificationsBell() {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-20 mt-1 max-h-96 w-80 overflow-y-auto rounded-lg border border-border bg-surface shadow-lg">
+          <div className="fixed inset-x-4 top-16 z-20 max-h-96 overflow-y-auto rounded-lg border border-border bg-surface shadow-lg sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-1 sm:w-80">
             {notifications.length === 0 ? (
               <p className="p-4 text-center text-sm text-muted">Inga notiser</p>
             ) : (

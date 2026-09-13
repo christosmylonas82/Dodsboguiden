@@ -1,19 +1,98 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { TbArrowLeft, TbPlus } from 'react-icons/tb';
+import { TbArrowLeft, TbPlus, TbDownload } from 'react-icons/tb';
 import { apiFetch } from '../lib/api';
 import type { ProjectDetail, Task, TaskStatus } from '../lib/types';
-import { Badge } from '../components/Badge';
 import { HelpIcon } from '../components/HelpIcon';
-import { ExportMenu } from '../components/ExportMenu';
-import { ProgressBar } from '../components/ProgressBar';
 import { TaskManageModal } from '../components/TaskManageModal';
 import { TaskCard } from '../components/TaskCard';
 import { TASK_STATUS_LABELS } from '../lib/taskStatus';
 import { PHASE_DESCRIPTIONS, TASK_DESCRIPTIONS } from '../lib/taskDescriptions';
-import { phaseStatus } from '../lib/phases';
 import { tasksForProgress } from '../lib/taskStatus';
+import { DUE_DATE_TEXT_CLASS, formatDueDateHuman } from '../lib/dueDateUtils';
 import { SCENARIO_OPTIONS, type ScenarioKey } from '../lib/scenarios';
+import type { ExportTableOptions } from '../lib/export';
+
+type PhaseFilter = 'ALL' | 'IN_PROGRESS' | 'PENDING' | 'DONE';
+
+const FILTERS: { value: PhaseFilter; label: string }[] = [
+  { value: 'ALL', label: 'Alla uppgifter' },
+  { value: 'IN_PROGRESS', label: 'Pågår' },
+  { value: 'PENDING', label: 'Ej påbörjade' },
+  { value: 'DONE', label: 'Klara' },
+];
+
+/**
+ * Phase-local export dropdown: consolidates the two previously-separate
+ * "Tom mall" / "Fullständig" ExportMenu instances into one menu grouped by
+ * content, so the choice reads as "what do I get" instead of two unlabeled
+ * buttons. Kept local to this page (not a change to the shared ExportMenu
+ * component, which several other modals still use as-is).
+ */
+function PhaseExportMenu({
+  blankOptions,
+  filledOptions,
+}: {
+  blankOptions: () => ExportTableOptions;
+  filledOptions: () => ExportTableOptions;
+}) {
+  const [open, setOpen] = useState(false);
+
+  async function run(kind: 'pdf' | 'docx' | 'csv', options: ExportTableOptions) {
+    const lib = await import('../lib/export');
+    if (kind === 'pdf') lib.exportTableToPdf(options);
+    else if (kind === 'docx') lib.exportTableToDocx(options);
+    else lib.exportTableToCsv(options);
+    setOpen(false);
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-1.5 rounded-lg border border-border bg-transparent px-3.5 py-2 text-sm font-medium text-text transition hover:bg-primary-light"
+      >
+        <TbDownload size={16} />
+        Exportera
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 z-20 mt-1 w-72 overflow-hidden rounded-lg border border-border bg-surface shadow-lg">
+            <div className="border-b border-border px-3 py-2">
+              <p className="text-xs font-semibold text-text">Aktuell checklista</p>
+              <p className="text-[11px] text-muted">Status, ansvariga, deadlines och anteckningar</p>
+              <div className="mt-1.5 flex gap-1.5">
+                <button type="button" onClick={() => run('pdf', filledOptions())} className="rounded-md bg-transparent px-2 py-1 text-xs text-link hover:underline">
+                  PDF
+                </button>
+                <button type="button" onClick={() => run('docx', filledOptions())} className="rounded-md bg-transparent px-2 py-1 text-xs text-link hover:underline">
+                  Word
+                </button>
+                <button type="button" onClick={() => run('csv', filledOptions())} className="rounded-md bg-transparent px-2 py-1 text-xs text-link hover:underline">
+                  CSV
+                </button>
+              </div>
+            </div>
+            <div className="px-3 py-2">
+              <p className="text-xs font-semibold text-text">Tom checklista</p>
+              <p className="text-[11px] text-muted">Originalversion utan ändringar</p>
+              <div className="mt-1.5 flex gap-1.5">
+                <button type="button" onClick={() => run('pdf', blankOptions())} className="rounded-md bg-transparent px-2 py-1 text-xs text-link hover:underline">
+                  PDF
+                </button>
+                <button type="button" onClick={() => run('docx', blankOptions())} className="rounded-md bg-transparent px-2 py-1 text-xs text-link hover:underline">
+                  Word
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +101,7 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [addingTask, setAddingTask] = useState(false);
+  const [filter, setFilter] = useState<PhaseFilter>('ALL');
 
   function toggleExpanded(taskId: string) {
     setExpandedTaskIds((prev) => {
@@ -107,14 +187,16 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
   if (!project) return <p className="text-muted">Laddar…</p>;
 
   const tasks = project.tasks.filter((t) => t.phase === phase);
-  const status = phaseStatus(tasks);
   const countedTasks = tasksForProgress(tasks);
   const doneCount = countedTasks.filter((t) => t.completed).length;
   const percent = countedTasks.length ? Math.round((doneCount / countedTasks.length) * 100) : 0;
   const managingTask = tasks.find((t) => t.id === managingTaskId) ?? null;
   const phaseSlug = phase.replace(/\s+/g, '-').toLowerCase();
+  const nextTask = tasks.find((t) => t.status === 'IN_PROGRESS') ?? tasks.find((t) => t.status === 'PENDING') ?? null;
+  const nextTaskDescription = nextTask ? (TASK_DESCRIPTIONS[nextTask.title] ?? nextTask.description) : null;
+  const filteredTasks = filter === 'ALL' ? tasks : tasks.filter((t) => t.status === filter);
 
-  function blankTemplateOptions() {
+  function blankTemplateOptions(): ExportTableOptions {
     return {
       title: `Checklista (tom mall) — ${phase}`,
       deceasedName: project!.deceasedName,
@@ -124,7 +206,7 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
     };
   }
 
-  function filledExportOptions() {
+  function filledExportOptions(): ExportTableOptions {
     return {
       title: `Checklista — ${phase}`,
       deceasedName: project!.deceasedName,
@@ -142,50 +224,62 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link
-          to={`/projects/${id}/dashboard`}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4.5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-dark"
-        >
-          <TbArrowLeft size={16} />
-          Tillbaka till dashboard
-        </Link>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-medium text-muted">Tom mall:</span>
-            <ExportMenu
-              onExportPdf={async () => (await import('../lib/export')).exportTableToPdf(blankTemplateOptions())}
-              onExportDocx={async () => (await import('../lib/export')).exportTableToDocx(blankTemplateOptions())}
-            />
+      <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <Link
+            to={`/projects/${id}/dashboard`}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-dark"
+          >
+            <TbArrowLeft size={16} />
+            Tillbaka till dashboard
+          </Link>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <h1 className="text-3xl font-semibold text-text">{phase}</h1>
+            <HelpIcon text={PHASE_DESCRIPTIONS[phase]} />
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-medium text-muted">Fullständig:</span>
-            <ExportMenu
-              onExportPdf={async () => (await import('../lib/export')).exportTableToPdf(filledExportOptions())}
-              onExportDocx={async () => (await import('../lib/export')).exportTableToDocx(filledExportOptions())}
-              onExportCsv={async () => (await import('../lib/export')).exportTableToCsv(filledExportOptions())}
-            />
+          <p className="mt-1 text-sm text-muted">{PHASE_DESCRIPTIONS[phase]}</p>
+        </div>
+
+        <div className="flex flex-row items-center justify-between gap-6 sm:flex-col sm:items-end sm:justify-start">
+          <div className="flex flex-col items-start gap-1 sm:items-end">
+            <div className="flex items-baseline gap-2">
+              <span className="text-[28px] leading-none font-semibold text-text">{percent}%</span>
+              <span className="text-xs tracking-wide text-muted uppercase">klar</span>
+            </div>
+            <div className="h-1.5 w-[120px] overflow-hidden rounded-full bg-primary-light">
+              <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${percent}%` }} />
+            </div>
+            <span className="text-xs text-muted">
+              {doneCount} av {countedTasks.length} klara
+            </span>
           </div>
+          <PhaseExportMenu blankOptions={blankTemplateOptions} filledOptions={filledExportOptions} />
         </div>
       </div>
-      <p className="mt-3 text-xs text-muted">Dashboard &gt; {phase}</p>
 
-      <div className="mt-2 flex flex-wrap items-center gap-2">
-        <h1 className="text-3xl font-semibold text-text">{phase}</h1>
-        <Badge tone={status.tone}>{status.label}</Badge>
-        <span className="text-sm text-muted">
-          {doneCount} av {countedTasks.length} klara
-        </span>
-        <HelpIcon text={PHASE_DESCRIPTIONS[phase]} />
-      </div>
-      <p className="mt-1 text-muted">{PHASE_DESCRIPTIONS[phase]}</p>
-
-      <div className="mt-4 flex items-center gap-3">
-        <div className="flex-1">
-          <ProgressBar percent={percent} />
-        </div>
-        <span className="text-sm font-medium text-text">{percent}%</span>
-      </div>
+      {nextTask ? (
+        <section className="mt-8 border-l-4 border-primary bg-bg py-4 pr-4 pl-5">
+          <p className="text-xs font-semibold tracking-wide text-muted uppercase">Nästa steg</p>
+          <h2 className="mt-1 text-lg font-semibold text-text">{nextTask.title}</h2>
+          {nextTaskDescription && <p className="mt-1 text-sm text-muted">{nextTaskDescription}</p>}
+          <div className="mt-3 flex flex-wrap items-center gap-4">
+            {nextTask.dueDate && (
+              <span className={`text-xs font-medium ${DUE_DATE_TEXT_CLASS[nextTask.dueDateStatus ?? 'no_date']}`}>
+                Deadline {formatDueDateHuman(nextTask.dueDate)}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => setManagingTaskId(nextTask.id)}
+              className="bg-transparent p-0 text-sm font-medium text-primary-dark hover:underline"
+            >
+              Öppna uppgift →
+            </button>
+          </div>
+        </section>
+      ) : (
+        <p className="mt-8 text-sm text-muted italic">Alla uppgifter i denna fas är klara!</p>
+      )}
 
       {phase === 'Inför bouppteckning' && (
         <div className="mt-6 rounded-xl border border-border bg-bg p-4">
@@ -209,24 +303,45 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
         </div>
       )}
 
-      <div className="mt-6 flex flex-col gap-6">
-        {tasks.map((task) => {
-          const completedByName = task.completedBy ? memberNameByUserId.get(task.completedBy) : null;
-          const description = task.description ?? TASK_DESCRIPTIONS[task.title] ?? null;
-          return (
-            <TaskCard
-              key={task.id}
-              task={task}
-              description={description}
-              completedByName={completedByName ?? null}
-              expanded={expandedTaskIds.has(task.id)}
-              onToggleExpanded={() => toggleExpanded(task.id)}
-              onToggleComplete={() => toggleTask(task)}
-              onManage={() => setManagingTaskId(task.id)}
-              onDelete={() => deleteCustomTask(task)}
-            />
-          );
-        })}
+      <div className="mt-8 flex flex-wrap gap-2">
+        {FILTERS.map((f) => (
+          <button
+            key={f.value}
+            type="button"
+            onClick={() => setFilter(f.value)}
+            className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+              filter === f.value
+                ? 'border-primary bg-primary text-white'
+                : 'border-border bg-transparent text-text hover:bg-primary-light'
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-2 flex flex-col">
+        {filteredTasks.length === 0 ? (
+          <p className="py-6 text-sm text-muted">Inga uppgifter matchar filtret.</p>
+        ) : (
+          filteredTasks.map((task) => {
+            const completedByName = task.completedBy ? memberNameByUserId.get(task.completedBy) : null;
+            const description = task.description ?? TASK_DESCRIPTIONS[task.title] ?? null;
+            return (
+              <TaskCard
+                key={task.id}
+                task={task}
+                description={description}
+                completedByName={completedByName ?? null}
+                expanded={expandedTaskIds.has(task.id)}
+                onToggleExpanded={() => toggleExpanded(task.id)}
+                onToggleComplete={() => toggleTask(task)}
+                onManage={() => setManagingTaskId(task.id)}
+                onDelete={() => deleteCustomTask(task)}
+              />
+            );
+          })
+        )}
       </div>
 
       <form
