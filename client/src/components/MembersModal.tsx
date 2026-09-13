@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { TbTrash, TbClock } from 'react-icons/tb';
+import { useState, type FormEvent } from 'react';
+import { TbTrash, TbClock, TbUserPlus } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { PendingInvitation, ProjectMember } from '../lib/types';
 import { HELP_TEXT } from '../lib/helpText';
@@ -19,6 +19,7 @@ export function MembersModal({
   onClose,
   onMemberRemoved,
   onInvitationRevoked,
+  onInvited,
 }: {
   projectId: string;
   projectName: string;
@@ -29,10 +30,28 @@ export function MembersModal({
   onClose: () => void;
   onMemberRemoved: (memberId: string) => void;
   onInvitationRevoked: (invitationId: string) => void;
+  onInvited: (email: string) => Promise<void>;
 }) {
   const [memberToDelete, setMemberToDelete] = useState<ProjectMember | null>(null);
   const [revokingId, setRevokingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviting, setInviting] = useState(false);
+
+  async function handleInvite(e: FormEvent) {
+    e.preventDefault();
+    setInviteError(null);
+    setInviting(true);
+    try {
+      await onInvited(inviteEmail);
+      setInviteEmail('');
+    } catch (err) {
+      setInviteError(err instanceof Error ? err.message : 'Kunde inte bjuda in');
+    } finally {
+      setInviting(false);
+    }
+  }
 
   async function handleRevoke(invitationId: string) {
     setRevokingId(invitationId);
@@ -64,6 +83,32 @@ export function MembersModal({
             </button>
           </div>
         </div>
+
+        <form onSubmit={handleInvite} className="mt-5 flex flex-col gap-1.5 border-b border-border pb-5">
+          <label htmlFor="inviteEmail" className="text-sm font-medium text-text">
+            Bjud in ny familjemedlem
+          </label>
+          <div className="flex items-center gap-2">
+            <input
+              id="inviteEmail"
+              type="email"
+              required
+              placeholder="E-postadress"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              className="h-11 flex-1 rounded-lg border border-border px-4 text-text focus:border-2 focus:border-primary focus:outline-none"
+            />
+            <button
+              type="submit"
+              disabled={inviting}
+              className="flex h-11 shrink-0 items-center gap-1.5 rounded-lg bg-primary px-4.5 text-sm font-medium text-white transition hover:bg-primary-dark disabled:opacity-60"
+            >
+              <TbUserPlus size={18} />
+              {inviting ? 'Bjuder in…' : 'Bjud in'}
+            </button>
+          </div>
+          {inviteError && <p className="text-sm text-danger">{inviteError}</p>}
+        </form>
 
         <p className="mt-5 text-xs font-medium uppercase tracking-wide text-muted">Medlemmar ({members.length})</p>
         <ul className="mt-2 flex flex-col gap-3">
