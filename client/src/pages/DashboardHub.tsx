@@ -4,7 +4,6 @@ import { TbUserPlus, TbArrowRight, TbPencil } from 'react-icons/tb';
 import { apiFetch, ApiError } from '../lib/api';
 import type { ActivityEntry, ProjectDetail } from '../lib/types';
 import { StatusLabel } from '../components/StatusLabel';
-import { InviteModal } from '../components/InviteModal';
 import { ProgressOverviewModal } from '../components/ProgressOverviewModal';
 import { RecentActivityModal } from '../components/RecentActivityModal';
 import { MembersModal } from '../components/MembersModal';
@@ -28,7 +27,6 @@ export function DashboardHubPage() {
   const { user, markOnboardingSeen } = useAuth();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
-  const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [openModal, setOpenModal] = useState<'progress' | 'activity' | 'members' | 'rename' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [showTour, setShowTour] = useState(false);
@@ -158,7 +156,7 @@ export function DashboardHubPage() {
         </div>
         <button
           type="button"
-          onClick={() => setInviteModalOpen(true)}
+          onClick={() => setOpenModal('members')}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-medium text-white shadow-sm transition hover:bg-primary-dark sm:w-auto"
         >
           <TbUserPlus size={20} />
@@ -292,10 +290,6 @@ export function DashboardHubPage() {
         </div>
       </section>
 
-      {inviteModalOpen && (
-        <InviteModal onClose={() => setInviteModalOpen(false)} onInvite={inviteMember} />
-      )}
-
       {openModal === 'progress' && (
         <ProgressOverviewModal tasks={project.tasks} deceasedDate={project.deceasedDate} onClose={() => setOpenModal(null)} />
       )}
@@ -311,6 +305,7 @@ export function DashboardHubPage() {
           currentUserId={user?.id}
           isAdmin={isAdmin}
           onClose={() => setOpenModal(null)}
+          onInvited={inviteMember}
           onMemberRemoved={(memberId) => {
             setProject((prev) => (prev ? { ...prev, members: prev.members.filter((m) => m.id !== memberId) } : prev));
             showToast('Medlem borttagen');

@@ -3,7 +3,7 @@ import { HelpIcon } from './HelpIcon';
 import { SettingsBody } from './SettingsBody';
 import { ModalOverlay } from './ModalOverlay';
 
-export function SettingsModal({ onClose }: { onClose: () => void }) {
+export function SettingsModal({ onClose, projectId }: { onClose: () => void; projectId?: string }) {
   return (
     <ModalOverlay onClose={onClose} maxWidthClassName="max-w-2xl">
       <div className="max-h-[80vh] overflow-y-auto rounded-xl border border-border bg-surface p-4 sm:p-6 shadow-[0_16px_48px_-8px_rgba(15,15,15,0.16)]">
@@ -26,7 +26,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           vad de kan göra.
         </p>
         <div className="mt-5">
-          <SettingsBody onClose={onClose} />
+          <SettingsBody onClose={onClose} projectId={projectId} />
         </div>
       </div>
     </ModalOverlay>

@@ -1,15 +1,16 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TbPencil, TbDownload, TbFileText, TbTrash, TbLogout2 } from 'react-icons/tb';
+import { TbPencil, TbDownload, TbFileText, TbTrash, TbLogout2, TbHistory, TbChevronRight } from 'react-icons/tb';
 import { apiFetch, ApiError, BASE_URL, getToken } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
-import type { ProjectSummary, User } from '../lib/types';
+import type { ActivityEntry, ProjectSummary, User } from '../lib/types';
 import { exportGdprDataToPdf } from '../lib/export';
 import { ChangeEmailModal } from './ChangeEmailModal';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import { DeleteProjectPermanentlyModal } from './DeleteProjectPermanentlyModal';
 import { ImageUploadModal } from './ImageUploadModal';
 import { EditNameModal } from './EditNameModal';
+import { RecentActivityModal } from './RecentActivityModal';
 import { Avatar } from './Avatar';
 
 const RETENTION_DAYS = 30;
@@ -83,13 +84,17 @@ function SectionCard({
   );
 }
 
-export function SettingsBody({ onClose }: { onClose?: () => void }) {
+export function SettingsBody({ onClose, projectId }: { onClose?: () => void; projectId?: string }) {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
 
   const [archivedProjects, setArchivedProjects] = useState<ProjectSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
+
+  const [activity, setActivity] = useState<ActivityEntry[]>([]);
+  const [activityModalOpen, setActivityModalOpen] = useState(false);
+  const [loadingActivity, setLoadingActivity] = useState(false);
 
   const [editNameModalOpen, setEditNameModalOpen] = useState(false);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
@@ -110,6 +115,18 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
   useEffect(() => {
     reload().finally(() => setLoading(false));
   }, []);
+
+  async function openActivityLog() {
+    if (!projectId) return;
+    setLoadingActivity(true);
+    try {
+      const data = await apiFetch<ActivityEntry[]>(`/projects/${projectId}/activity`);
+      setActivity(data);
+      setActivityModalOpen(true);
+    } finally {
+      setLoadingActivity(false);
+    }
+  }
 
   function flashMessage(text: string) {
     setMessage(text);
@@ -249,6 +266,23 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
           )}
         </div>
       </SectionCard>
+
+      {projectId && (
+        <SectionCard title="Aktivitetslogg">
+          <button
+            type="button"
+            onClick={openActivityLog}
+            disabled={loadingActivity}
+            className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-transparent px-4 py-3 text-left text-sm text-text transition hover:bg-primary-light disabled:opacity-60"
+          >
+            <span className="flex items-center gap-2">
+              <TbHistory size={18} className="text-muted" />
+              {loadingActivity ? 'Laddar…' : 'Visa senaste aktivitet'}
+            </span>
+            <TbChevronRight size={16} className="text-muted" />
+          </button>
+        </SectionCard>
+      )}
 
       <SectionCard title="Arkiverade dödsbon">
         {loading ? (
@@ -418,6 +452,9 @@ export function SettingsBody({ onClose }: { onClose?: () => void }) {
             flashMessage('Dödsbo raderat permanent');
           }}
         />
+      )}
+      {activityModalOpen && projectId && (
+        <RecentActivityModal projectId={projectId} activity={activity} onClose={() => setActivityModalOpen(false)} />
       )}
     </div>
   );
