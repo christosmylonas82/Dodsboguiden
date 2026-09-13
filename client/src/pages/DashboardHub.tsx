@@ -156,6 +156,7 @@ export function DashboardHubPage() {
         </div>
         <button
           type="button"
+          data-tour="members"
           onClick={() => setOpenModal('members')}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-medium text-white shadow-sm transition hover:bg-primary-dark sm:w-auto"
         >
@@ -165,7 +166,7 @@ export function DashboardHubPage() {
       </div>
 
       {nextStep ? (
-        <section className="mt-12 border-l-4 border-primary bg-bg py-5 pr-4 pl-5 sm:pr-6">
+        <section className="mt-12 border-l-4 border-primary bg-bg py-5 pr-4 pl-5 sm:pr-6" data-tour="next-step">
           <p className="text-xs font-semibold tracking-wide text-muted uppercase">Nästa steg</p>
           <h2 className="mt-1 text-xl font-semibold text-text">{nextStep.task.title}</h2>
           {nextStepDescription && <p className="mt-1.5 text-sm text-muted">{nextStepDescription}</p>}
@@ -177,7 +178,7 @@ export function DashboardHubPage() {
           </Link>
         </section>
       ) : (
-        <section className="mt-12 border-l-4 border-success bg-bg py-5 pr-4 pl-5 sm:pr-6">
+        <section className="mt-12 border-l-4 border-success bg-bg py-5 pr-4 pl-5 sm:pr-6" data-tour="next-step">
           <p className="text-xs font-semibold tracking-wide text-muted uppercase">Nästa steg</p>
           <h2 className="mt-1 text-xl font-semibold text-text">Alla uppgifter är klara</h2>
           <p className="mt-1.5 text-sm text-muted">
@@ -269,7 +270,6 @@ export function DashboardHubPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <button
             type="button"
-            data-tour="members"
             onClick={() => setOpenModal('members')}
             className="bg-transparent p-0 text-left text-sm text-muted transition hover:text-text"
           >
