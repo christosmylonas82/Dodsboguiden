@@ -203,12 +203,9 @@ export function DashboardHubPage() {
           <p className="text-xs font-semibold tracking-wide text-muted uppercase">Övergripande framsteg</p>
           <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="text-[28px] leading-none font-semibold text-text">{progress}%</span>
-            <span className="text-sm text-muted">
-              {doneProjectTaskCount} av {countedProjectTasks.length} klara
-            </span>
             {deadlineDays !== null && (
               <span className="text-sm text-muted">
-                · {deadlineDays} dagar kvar till bouppteckning ({formatDeadlineDate(project.deceasedDate!)})
+                {deadlineDays} dagar kvar till bouppteckning ({formatDeadlineDate(project.deceasedDate!)})
               </span>
             )}
           </div>
@@ -249,7 +246,7 @@ export function DashboardHubPage() {
                     {doneCount} av {countedTasks.length} klara
                   </p>
                 </div>
-                <p className="mt-1 flex items-center gap-1 text-sm font-medium text-primary-dark">
+                <p className="mt-1 flex items-center gap-1 text-sm font-medium text-primary">
                   Gå till denna fas <TbArrowRight size={16} />
                 </p>
               </Link>
@@ -263,7 +260,7 @@ export function DashboardHubPage() {
             <p className="flex-1 text-sm text-muted">
               Steg-för-steg genom Skatteverkets bouppteckningsprocess, med din inventering och ekonomi sammanställd.
             </p>
-            <p className="mt-1 flex items-center gap-1 text-sm font-medium text-primary-dark">
+            <p className="mt-1 flex items-center gap-1 text-sm font-medium text-primary">
               Öppna guiden <TbArrowRight size={16} />
             </p>
           </Link>
