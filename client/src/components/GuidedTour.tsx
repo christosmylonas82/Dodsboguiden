@@ -28,10 +28,32 @@ export function GuidedTour({ isOpen, onFinish }: { isOpen: boolean; onFinish: ()
     });
 
     tour.addStep({
-      id: 'phases',
-      title: 'De 5 faserna',
-      text: 'Din dödsbohantering är indelad i 5 faser: Direkt efter dödsfall, Begravning, Inför bouppteckning, Under bouppteckning, och Avslut & arvskifte. Varje fas har en egen checklista med uppgifter. Under "Under bouppteckning" hittar ni även en Boupptecknings-guide med bland annat ett steg för att hålla bouppteckningsförrättningen (mötet). I "Inför bouppteckning" kan ni även kryssa i om dödsboet är mer komplext (t.ex. företag, samägande, utlandstillgångar) för att få fler relevanta uppgifter i checklistan.',
-      attachTo: { element: '[data-tour="phases"]', on: 'top' },
+      id: 'edit-name',
+      title: 'Redigera dödsbo',
+      text: 'Klicka på pennan för att ändra den avlidnes namn eller dödsdatum.',
+      attachTo: { element: '[data-tour="edit-name"]', on: 'bottom' },
+      buttons: [
+        { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
+        { text: 'Nästa', action: () => tour.next() },
+      ],
+    });
+
+    tour.addStep({
+      id: 'members',
+      title: 'Familjemedlemmar',
+      text: 'Bjud in andra familjemedlemmar att arbeta tillsammans. Samma ruta visar också vilka som redan är med och status på inbjudningar som väntar.',
+      attachTo: { element: '[data-tour="members"]', on: 'bottom' },
+      buttons: [
+        { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
+        { text: 'Nästa', action: () => tour.next() },
+      ],
+    });
+
+    tour.addStep({
+      id: 'next-step',
+      title: 'Nästa steg',
+      text: 'Vi lyfter alltid fram nästa uppgift att göra här, så ni aldrig behöver leta efter var ni ska börja.',
+      attachTo: { element: '[data-tour="next-step"]', on: 'bottom' },
       buttons: [
         { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
         { text: 'Nästa', action: () => tour.next() },
@@ -50,10 +72,10 @@ export function GuidedTour({ isOpen, onFinish }: { isOpen: boolean; onFinish: ()
     });
 
     tour.addStep({
-      id: 'members',
-      title: 'Familjemedlemmar',
-      text: 'Bjud in andra familjemedlemmar för att arbeta tillsammans. Alla kan se framsteg och uppgifter.',
-      attachTo: { element: '[data-tour="members"]', on: 'bottom' },
+      id: 'phases',
+      title: 'De 5 faserna',
+      text: 'Din dödsbohantering är indelad i 5 faser: Direkt efter dödsfall, Begravning, Inför bouppteckning, Under bouppteckning, och Avslut & arvskifte. Varje fas har en egen checklista med uppgifter. Under "Under bouppteckning" hittar ni även en Boupptecknings-guide med bland annat ett steg för att hålla bouppteckningsförrättningen (mötet). I "Inför bouppteckning" kan ni även kryssa i om dödsboet är mer komplext (t.ex. företag, samägande, utlandstillgångar) för att få fler relevanta uppgifter i checklistan.',
+      attachTo: { element: '[data-tour="phases"]', on: 'top' },
       buttons: [
         { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
         { text: 'Nästa', action: () => tour.next() },
@@ -63,19 +85,8 @@ export function GuidedTour({ isOpen, onFinish }: { isOpen: boolean; onFinish: ()
     tour.addStep({
       id: 'activity',
       title: 'Senaste aktivitet',
-      text: 'Här ser du vad som senast hänt i dödsboet – vem som gjorde vad och när. Klicka för hela aktivitetsloggen.',
-      attachTo: { element: '[data-tour="activity"]', on: 'bottom' },
-      buttons: [
-        { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
-        { text: 'Nästa', action: () => tour.next() },
-      ],
-    });
-
-    tour.addStep({
-      id: 'edit-name',
-      title: 'Redigera dödsbo',
-      text: 'Klicka på pennan för att ändra den avlidnes namn eller dödsdatum.',
-      attachTo: { element: '[data-tour="edit-name"]', on: 'bottom' },
+      text: 'Här ser du vad som senast hänt i dödsboet – vem som gjorde vad och när. Klicka för hela aktivitetsloggen, som ni även hittar en genväg till under Inställningar.',
+      attachTo: { element: '[data-tour="activity"]', on: 'top' },
       buttons: [
         { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
         { text: 'Nästa', action: () => tour.next() },
@@ -162,7 +173,7 @@ export function GuidedTour({ isOpen, onFinish }: { isOpen: boolean; onFinish: ()
     tour.addStep({
       id: 'settings',
       title: 'Inställningar',
-      text: 'Hantera din profil, ändra lösenord och andra inställningar här.',
+      text: 'Hantera din profil, ändra lösenord, se aktivitetsloggen och andra inställningar här.',
       attachTo: { element: '[data-tour="settings"]', on: 'bottom' },
       buttons: [
         { text: 'Tillbaka', action: () => tour.back(), ...SECONDARY },
