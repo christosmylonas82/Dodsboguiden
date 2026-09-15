@@ -32,7 +32,7 @@ export function CreateProjectModal({
     }
     setCreating(true);
     try {
-      const project = await apiFetch<{ id: string }>('/projects', {
+      const project = await apiFetch<{ slug: string }>('/projects', {
         method: 'POST',
         body: JSON.stringify({
           deceasedName,
@@ -40,7 +40,7 @@ export function CreateProjectModal({
           ...scenarios,
         }),
       });
-      onCreated(project.id);
+      onCreated(project.slug);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Kunde inte skapa dödsbo');
     } finally {

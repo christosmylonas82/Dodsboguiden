@@ -258,7 +258,7 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
       </div>
 
       {nextTask ? (
-        <section className="mt-8 border-l-4 border-primary bg-bg py-4 pr-4 pl-5">
+        <section className="mt-8 border-l-4 border-link bg-link/10 py-4 pr-4 pl-5">
           <p className="text-xs font-semibold tracking-wide text-muted uppercase">Nästa steg</p>
           <h2 className="mt-1 text-lg font-semibold text-text">{nextTask.title}</h2>
           {nextTaskDescription && <p className="mt-1 text-sm text-muted">{nextTaskDescription}</p>}

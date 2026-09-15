@@ -16,6 +16,7 @@ export interface User {
 
 export interface ProjectSummary {
   id: string;
+  slug: string;
   deceasedName: string;
   status: 'ACTIVE' | 'COMPLETED';
   createdAt: string;
@@ -69,6 +70,7 @@ export interface ProjectMember {
 
 export interface ProjectDetail {
   id: string;
+  slug: string;
   deceasedName: string;
   deceasedDate: string | null;
   status: 'ACTIVE' | 'COMPLETED';

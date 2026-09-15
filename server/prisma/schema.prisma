@@ -180,6 +180,7 @@ model AuthEvent {
 
 model Project {
   id            String        @id @default(uuid())
+  slug          String        @unique
   ownerId       String        @map("owner_id")
   deceasedName  String        @map("deceased_name")
   deceasedDate  DateTime?     @map("deceased_date")

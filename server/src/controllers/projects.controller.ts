@@ -7,6 +7,7 @@ import { getChecklistItems, SCENARIO_LABELS, type ChecklistScenario } from '../l
 import { logActivity } from '../lib/activity.js';
 import { calculateDueDate, getDueDateStatus, TASK_DAY_OFFSETS } from '../lib/dueDate.js';
 import { sendInvitationEmail } from '../lib/email.js';
+import { generateProjectSlug } from '../lib/slug.js';
 
 const scenarioFields = {
   hasCompany: z.boolean().optional(),
@@ -45,6 +46,7 @@ export async function createProject(req: Request, res: Response) {
 
   const project = await prisma.project.create({
     data: {
+      slug: generateProjectSlug(body.deceasedName),
       ownerId: userId,
       deceasedName: body.deceasedName,
       deceasedDate,
@@ -178,6 +180,7 @@ export async function listProjects(req: Request, res: Response) {
       const countedTasks = p.tasks.filter((t) => t.status !== 'SKIPPED');
       return {
         id: p.id,
+        slug: p.slug,
         deceasedName: p.deceasedName,
         status: p.status,
         createdAt: p.createdAt,

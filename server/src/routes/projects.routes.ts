@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/auth.js';
+import { prisma } from '../lib/prisma.js';
+import { HttpError } from '../middleware/errorHandler.js';
 import { requireProjectAdmin, requireProjectMember } from '../middleware/projectAccess.js';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import {
@@ -53,6 +55,30 @@ import {
 const router = Router();
 
 router.use(requireAuth);
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Every :id in this router identifies a project, and the client now links to
+// projects by their pretty slug (e.g. "erik-andersson-a1b2c3") instead of the
+// raw UUID. Resolving it once here — before any controller or the
+// requireProjectMember/Admin checks below run — means every existing route
+// keeps working against the real id without change.
+router.param('id', async (req, res, next, value) => {
+  if (UUID_RE.test(value)) {
+    next();
+    return;
+  }
+  try {
+    const project = await prisma.project.findUnique({ where: { slug: value }, select: { id: true } });
+    if (!project) {
+      throw new HttpError(404, 'Project not found');
+    }
+    req.params.id = project.id;
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.post('/', asyncHandler(createProject));
 router.get('/', asyncHandler(listProjects));

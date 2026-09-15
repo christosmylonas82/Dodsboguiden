@@ -60,7 +60,7 @@ export function DashboardPage() {
           {projects?.map((p) => (
             <Link
               key={p.id}
-              to={`/projects/${p.id}/dashboard`}
+              to={`/projects/${p.slug}/dashboard`}
               className="block rounded-xl border border-border bg-surface p-5 shadow-sm transition hover:-translate-y-0.5 hover:bg-primary-light hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-2">
@@ -83,7 +83,7 @@ export function DashboardPage() {
       {createModalOpen && (
         <CreateProjectModal
           onClose={() => setCreateModalOpen(false)}
-          onCreated={(projectId) => navigate(`/projects/${projectId}/dashboard`)}
+          onCreated={(projectSlug) => navigate(`/projects/${projectSlug}/dashboard`)}
         />
       )}
 
