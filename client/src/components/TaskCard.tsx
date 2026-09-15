@@ -24,6 +24,7 @@ export function TaskCard({
   description,
   completedByName,
   expanded,
+  isNextStep,
   onToggleExpanded,
   onToggleComplete,
   onManage,
@@ -33,6 +34,7 @@ export function TaskCard({
   description: string | null;
   completedByName: string | null;
   expanded: boolean;
+  isNextStep?: boolean;
   onToggleExpanded: () => void;
   onToggleComplete: () => void;
   onManage: () => void;
@@ -50,9 +52,9 @@ export function TaskCard({
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') onManage();
       }}
-      className={`flex cursor-pointer flex-col gap-1.5 border-b border-border px-1 py-3 transition hover:bg-primary-light focus:outline-none focus-visible:bg-primary-light last:border-0 ${
-        isSettled ? 'opacity-60' : ''
-      }`}
+      className={`flex cursor-pointer flex-col gap-1.5 border-b border-border px-1 py-3 transition focus:outline-none focus-visible:bg-primary-light last:border-0 ${
+        isNextStep ? 'border-l-4 border-link bg-link/10 pl-2 hover:bg-link/15' : 'hover:bg-primary-light'
+      } ${isSettled ? 'opacity-60' : ''}`}
     >
       <div className="flex items-start gap-3">
         <input

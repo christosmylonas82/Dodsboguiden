@@ -334,6 +334,7 @@ export function PhaseDashboardPage({ phase }: { phase: Task['phase'] }) {
                 description={description}
                 completedByName={completedByName ?? null}
                 expanded={expandedTaskIds.has(task.id)}
+                isNextStep={task.id === nextTask?.id}
                 onToggleExpanded={() => toggleExpanded(task.id)}
                 onToggleComplete={() => toggleTask(task)}
                 onManage={() => setManagingTaskId(task.id)}
