@@ -13,7 +13,15 @@ import { getAllowedOrigins } from './lib/clientOrigin.js';
 
 export const app = express();
 
-app.set('trust proxy', process.env.TRUST_PROXY === 'true');
+// A boolean here would tell Express to trust the *entire* X-Forwarded-For
+// chain and blindly use its leftmost entry as req.ip. Since that header is
+// client-supplied, a request like `X-Forwarded-For: 1.2.3.4, <real-proxy-ip>`
+// would let any client spoof req.ip and walk straight past the per-IP rate
+// limiter in middleware/rateLimit.ts. Railway's edge sits exactly one hop in
+// front of this app, so we trust exactly one hop — Express then takes the
+// rightmost (proxy-appended) entry and ignores anything a client prepends.
+const trustProxyHops = Number(process.env.TRUST_PROXY_HOPS ?? (process.env.TRUST_PROXY === 'true' ? 1 : 0));
+app.set('trust proxy', trustProxyHops);
 
 const allowedOrigins = getAllowedOrigins();
 
