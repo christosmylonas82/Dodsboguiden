@@ -39,7 +39,7 @@ const registerSchema = z.object({
   name: z.string().min(1),
   password: z.string(),
   gdprConsent: z.literal(true, {
-    errorMap: () => ({ message: 'GDPR consent is required to register' }),
+    message: 'GDPR consent is required to register',
   }),
 });
 
